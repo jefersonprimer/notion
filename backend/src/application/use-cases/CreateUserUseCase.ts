@@ -6,16 +6,12 @@ export class CreateUserUseCase {
   constructor(private userRepository: IUserRepository) {}
 
   async execute({ email, password }: CreateUserInputDTO): Promise<CreateUserOutputDTO> {
-    // 1. Validar se o usuário já existe
-    const userAlreadyExists = await this.userRepository.findByEmail(email);
+    // A lógica de verificar se o usuário já existe foi removida.
+    // O Supabase (camada de infra) já faz essa validação e retornará um erro se o e-mail for duplicado.
+    // O controller será responsável por capturar e tratar esse erro.
 
-    if (userAlreadyExists) {
-      throw new Error("User with this email already exists.");
-    }
-
-    // 2. Criar o usuário (a lógica de hash de senha etc. ficará na implementação do repositório)
-    // Por enquanto, nosso repositório não lida com senha, vamos ajustar isso na camada de infra.
-    const newUser = await this.userRepository.create({ email, displayName: null, avatarUrl: null });
+    // Criamos o usuário passando o email e a senha.
+    const newUser = await this.userRepository.create({ email, password });
 
     return {
       id: newUser.id,

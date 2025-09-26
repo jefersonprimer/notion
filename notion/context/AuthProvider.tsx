@@ -1,56 +1,81 @@
-// /context/AuthProvider.tsx
+import { createContext, useContext, useState, useEffect } from 'react';
+import { router, useSegments } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { Session } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
-import { View, ActivityIndicator } from 'react-native';
+const SESSION_KEY = 'my-session';
 
-// 1. Definir o tipo do valor que o contexto irá fornecer
+// Tipos (iguais aos anteriores)
+type User = {
+  id: string;
+  email: string;
+};
+type Session = {
+  access_token: string;
+  user: User;
+};
 type AuthContextData = {
   session: Session | null;
   loading: boolean;
+  setSession: (session: Session | null) => void;
 };
 
-// 2. Criar o Contexto
-const AuthContext = createContext<AuthContextData>({
-  session: null,
-  loading: true,
+const AuthContext = createContext<AuthContextData>({ 
+  session: null, 
+  loading: true, // Inicia como true enquanto carrega a sessão do storage
+  setSession: () => {} 
 });
 
-// 3. Criar o Componente Provedor (Provider)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSessionState] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Tenta pegar a sessão ativa quando o app inicia
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
+    async function loadSession() {
+      try {
+        const storedSession = await AsyncStorage.getItem(SESSION_KEY);
+        if (storedSession) {
+          setSessionState(JSON.parse(storedSession));
+        }
+      } catch (e) {
+        console.error("Failed to load session from storage", e);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-    // O mais importante: escuta as mudanças no estado de autenticação
-    // Isso é acionado quando o usuário faz login, logout, etc.
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      // Se não estiver mais carregando, mantém como false
-      if (loading) setLoading(false);
-    });
-
-    // Limpa a inscrição quando o componente é desmontado
-    return () => subscription.unsubscribe();
+    loadSession();
   }, []);
 
+  const handleSetSession = async (newSession: Session | null) => {
+    setSessionState(newSession);
+    if (newSession) {
+      await AsyncStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
+    } else {
+      await AsyncStorage.removeItem(SESSION_KEY);
+    }
+  };
+
+  // Lógica de redirecionamento
+  const segments = useSegments();
+  useEffect(() => {
+    if (loading) return; // Não faz nada enquanto carrega a sessão
+
+    const inAuthGroup = segments[0] === '(auth)';
+
+    if (session && inAuthGroup) {
+      router.replace('/(tabs)');
+    } else if (!session && !inAuthGroup) {
+      router.replace('/(auth)/Login');
+    }
+  }, [session, segments, loading]);
+
   return (
-    <AuthContext.Provider value={{ session, loading }}>
+    <AuthContext.Provider value={{ session, loading, setSession: handleSetSession }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-// 4. Criar um Hook customizado para usar o contexto facilmente
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

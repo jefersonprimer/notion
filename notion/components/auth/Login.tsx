@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import { View, TextInput, Button, Text, Pressable, ActivityIndicator, Alert } from "react-native";
-import { supabase } from "@/lib/supabase";
+import api from "@/lib/axios";
+import { API_URL } from "@/constants/api";
+// Importar o hook do AuthContext para gerenciar o estado de autenticação
+import { useAuth } from "@/context/AuthProvider";
 
 type LoginProps = {
   onSwitchToRegister: () => void;
@@ -13,19 +16,36 @@ export default function Login({ onSwitchToRegister }: LoginProps) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Usar o setSession do AuthContext para atualizar o estado global
+  const { setSession } = useAuth();
 
   async function signIn() {
     setLoading(true);
     setError(null);
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    try {
+      const response = await api.post(`/login`, { email, password });
+      const { user, accessToken } = response.data;
 
-    if (error) {
-      setError(error.message);
-    } else {
-      // O AuthProvider vai detectar a mudança de sessão e redirecionar automaticamente
+      // Aqui, em vez de apenas logar, vamos atualizar o estado global da aplicação
+      // O AuthProvider irá detectar a mudança e redirecionar o usuário
+      setSession({
+        access_token: accessToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          // ... outros dados do usuário que a API retornar
+        },
+      });
+
       console.log("Login realizado com sucesso!");
+
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || "Ocorreu um erro no login.";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (

@@ -9,7 +9,12 @@ import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Fonts } from '@/constants/theme';
 
+import { useAuth } from '@/context/AuthProvider';
+import { Button } from 'react-native';
+
 export default function TabTwoScreen() {
+  const { setSession } = useAuth();
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
@@ -30,6 +35,7 @@ export default function TabTwoScreen() {
           Explore
         </ThemedText>
       </ThemedView>
+      <Button title="Logout" onPress={() => setSession(null)} />
       <ThemedText>This app includes example code to help you get started.</ThemedText>
       <Collapsible title="File-based routing">
         <ThemedText>

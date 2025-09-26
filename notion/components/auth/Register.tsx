@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { View, TextInput, Button, Text, Pressable, ActivityIndicator, Alert } from "react-native";
-import { supabase } from "@/lib/supabase";
+import api from "@/lib/axios";
+import { API_URL } from "@/constants/api";
 
 type RegisterProps = {
   onSwitchToLogin: () => void;
@@ -17,16 +18,21 @@ export default function Register({ onSwitchToLogin }: RegisterProps) {
   async function signUp() {
     setLoading(true);
     setError(null);
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    try {
+      await api.post(`/signup`, { email, password });
+      
+      Alert.alert(
+        "Cadastro realizado!", 
+        "Você já pode fazer o login com suas credenciais."
+      );
+      onSwitchToLogin();
 
-    if (error) {
-      setError(error.message);
-    } else {
-      // É uma boa prática avisar o usuário para checar o email
-      Alert.alert("Cadastro realizado!", "Por favor, verifique seu e-mail para confirmar sua conta.");
-      onSwitchToLogin(); // Opcional: volta para a tela de login após o cadastro
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || "Ocorreu um erro no cadastro.";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (
