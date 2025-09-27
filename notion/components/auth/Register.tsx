@@ -1,9 +1,9 @@
-// /components/auth/Register.tsx
-
 import { useState } from "react";
 import { View, TextInput, Button, Text, Pressable, ActivityIndicator, Alert } from "react-native";
 import api from "@/lib/axios";
 import { API_URL } from "@/constants/api";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Colors } from "@/constants/theme";
 
 type RegisterProps = {
   onSwitchToLogin: () => void;
@@ -15,11 +15,14 @@ export default function Register({ onSwitchToLogin }: RegisterProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const colorScheme = useColorScheme();
+  const themeColors = Colors[colorScheme ?? 'light'];
+
   async function signUp() {
     setLoading(true);
     setError(null);
     try {
-      await api.post(`/signup`, { email, password });
+      await api.post(`/users/signup`, { email, password });
       
       Alert.alert(
         "Cadastro realizado!", 
@@ -36,32 +39,36 @@ export default function Register({ onSwitchToLogin }: RegisterProps) {
   }
 
   return (
-    <View className="flex-1 items-center justify-center gap-4 p-4">
-      <Text className="text-2xl font-bold mb-4">Criar Conta</Text>
+    <View className="flex-1 items-center justify-center gap-4 p-4" style={{ backgroundColor: themeColors.background }}>
+      <Text className="text-2xl font-bold mb-4" style={{ color: themeColors.text }}>Criar Conta</Text>
 
       <TextInput
         placeholder="Email"
+        placeholderTextColor={themeColors.text}
         value={email}
         onChangeText={setEmail}
-        className="border w-full p-3 rounded-lg bg-gray-100"
+        className={`border w-full p-3 rounded-lg ${colorScheme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}
+        style={{ color: themeColors.text }}
         autoCapitalize="none"
         keyboardType="email-address"
       />
       <TextInput
         placeholder="Senha"
+        placeholderTextColor={themeColors.text}
         value={password}
         secureTextEntry
         onChangeText={setPassword}
-        className="border w-full p-3 rounded-lg bg-gray-100"
+        className={`border w-full p-3 rounded-lg ${colorScheme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'}`}
+        style={{ color: themeColors.text }}
       />
 
       {error && <Text className="text-red-500 mt-2">{error}</Text>}
       
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color={themeColors.tint} />
       ) : (
         <View className="w-full">
-            <Button title="Cadastrar" onPress={signUp} disabled={loading} />
+            <Button title="Cadastrar" onPress={signUp} disabled={loading} color={themeColors.tint} />
         </View>
       )}
 

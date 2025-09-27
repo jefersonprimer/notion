@@ -1,9 +1,14 @@
-import { Note } from "../entities/Note";
+import { Note } from '../entities/Note';
 
 export interface INoteRepository {
-  create(data: Omit<Note, 'id' | 'createdAt'>): Promise<Note>;
-  findById(id: string): Promise<Note | null>;
-  findByUser(userId: string): Promise<Note[]>;
-  update(id: string, data: Partial<Omit<Note, 'id' | 'userId'>>): Promise<Note | null>;
-  delete(id: string): Promise<void>;
+  create(note: Omit<Note, 'id' | 'createdAt' | 'is_deleted' | 'deleted_at'>): Promise<Note>;
+  findByUserId(userId: string): Promise<Note[]>;
+  findById(id: string, userId: string): Promise<Note | null>;
+  update(id: string, userId: string, data: Partial<Pick<Note, 'title' | 'description'>>): Promise<Note | null>;
+  softDelete(id: string, userId: string): Promise<void>;
+  restore(id: string, userId: string): Promise<void>;
+  permanentDelete(id: string, userId: string): Promise<void>;
+  findDeletedByUserId(userId: string): Promise<Note[]>;
+  search(userId: string, query: string): Promise<Note[]>;
+  deleteAllByUserId(userId: string): Promise<void>;
 }

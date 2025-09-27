@@ -2,7 +2,7 @@ import { IAuthRepository } from "../../domain/repositories/IAuthRepository";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { LoginInputDTO, LoginOutputDTO } from "../dtos/LoginDTO";
 
-export class LoginUseCase {
+export class LoginUserCase {
   constructor(
     private authRepository: IAuthRepository,
     private userRepository: IUserRepository

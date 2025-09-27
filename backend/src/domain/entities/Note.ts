@@ -4,4 +4,6 @@ export type Note = {
   title: string;
   description: string | null;
   createdAt: Date;
+  is_deleted: boolean; // For soft delete
+  deleted_at: Date | null; // To know when it was moved to trash
 };
