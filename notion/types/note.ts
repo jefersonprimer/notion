@@ -1,10 +1,10 @@
-import { user } from './user.ts'
-
 export type Note = {
-  id: string
-  title: string
-  description: string
-  user_id: string
-  created_at: string
-}
+  id: string;
+  userId: string;
+  title: string;
+  description: string | null;
+  createdAt: string; // Dates are often strings in JSON
+  is_deleted: boolean;
+  deleted_at: string | null;
+};
 

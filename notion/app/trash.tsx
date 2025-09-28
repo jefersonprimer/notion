@@ -5,11 +5,9 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Stack, useRouter } from 'expo-router';
 
-type DeletedNote = {
-  id: string;
-  title: string;
-  deleted_at: string;
-};
+import { Note } from '@/types/note';
+
+type DeletedNote = Note;
 
 export default function TrashScreen() {
   const [notes, setNotes] = useState<DeletedNote[]>([]);

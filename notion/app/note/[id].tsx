@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
-import { View, TextInput, Text, Button, Alert, ActivityIndicator, TouchableOpacity, StyleSheet } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { View, TextInput, Text, Button, Alert, ActivityIndicator, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import api from '@/lib/axios';
 import { useDebounce } from '@/hooks/use-debouncer';
 import { ThemedView } from '@/components/themed-view';
 import { ThemedText } from '@/components/themed-text';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function NoteScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -24,6 +25,9 @@ export default function NoteScreen() {
   // Loading and error states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Modal state
+  const [modalVisible, setModalVisible] = useState(false);
 
   // Debounce title and description for auto-saving
   const debouncedTitle = useDebounce(title, 500);
@@ -61,7 +65,7 @@ export default function NoteScreen() {
       'Mover para a Lixeira',
       'Tem certeza que quer mover esta nota para a lixeira?',
       [
-        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Cancelar', style: 'cancel', onPress: () => setModalVisible(false) },
         {
           text: 'Mover',
           style: 'destructive',
@@ -69,6 +73,7 @@ export default function NoteScreen() {
             try {
               await api.delete(`/notes/${id}`);
               Alert.alert('Sucesso', 'Nota movida para a lixeira.');
+              setModalVisible(false);
               router.back();
             } catch (err: any) {
               Alert.alert('Erro', err.response?.data?.message || 'Não foi possível mover a nota.');
@@ -92,6 +97,25 @@ export default function NoteScreen() {
         lineHeight: 24,
         color: Colors[colorScheme ?? 'light'].text,
     },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    modalContent: {
+        backgroundColor: Colors[colorScheme ?? 'light'].background,
+        padding: 20,
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+    },
+    modalButton: {
+        padding: 15,
+        alignItems: 'center',
+    },
+    modalButtonText: {
+        color: 'red',
+        fontSize: 18,
+    }
   });
 
   if (loading) {
@@ -104,6 +128,15 @@ export default function NoteScreen() {
 
   return (
     <ThemedView style={{ flex: 1, padding: 16 }}>
+        <Stack.Screen
+            options={{
+                headerRight: () => (
+                    <TouchableOpacity onPress={() => setModalVisible(true)}>
+                        <Ionicons name="ellipsis-horizontal" size={24} color={Colors[colorScheme ?? 'light'].text} />
+                    </TouchableOpacity>
+                ),
+            }}
+        />
         {isEditingTitle ? (
             <TextInput
                 value={title}
@@ -133,9 +166,22 @@ export default function NoteScreen() {
             </TouchableOpacity>
         )}
 
-        <View style={{ marginTop: 'auto', paddingTop: 20 }}>
-            <Button title="Mover para Lixeira" color="red" onPress={handleDelete} />
-        </View>
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+                setModalVisible(!modalVisible);
+            }}
+        >
+            <TouchableOpacity style={styles.modalContainer} activeOpacity={1} onPressOut={() => setModalVisible(false)}>
+                <View style={styles.modalContent}>
+                    <TouchableOpacity style={styles.modalButton} onPress={handleDelete}>
+                        <Text style={styles.modalButtonText}>Mover para Lixeira</Text>
+                    </TouchableOpacity>
+                </View>
+            </TouchableOpacity>
+        </Modal>
     </ThemedView>
   );
 }

@@ -1,8 +1,14 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Ionicons } from '@expo/vector-icons'; // Import Ionicons
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import HomeHeader from '@/components/HomeHeader';
+
+import { HomeIcon } from '@/components/ui/HomeIcon';
+import { SearchIcon } from '@/components/ui/SearchIcon';
+import { InboxIcon } from '@/components/ui/InboxIcon';
+import { CreateNoteIcon } from '@/components/ui/CreateNoteIcon';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -11,14 +17,14 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'home' : 'home-outline'} size={24} color={color} />
+          header: () => <HomeHeader />,
+          tabBarIcon: ({ color }) => (
+            <HomeIcon color={color} />
           ),
         }}
       />
@@ -26,17 +32,19 @@ export default function TabLayout() {
         name="search"
         options={{
           title: 'Busca',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'search' : 'search-outline'} size={24} color={color} />
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <SearchIcon color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="messages"
         options={{
-          title: 'Mensagens',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'chatbubble-ellipses' : 'chatbubble-ellipses-outline'} size={24} color={color} />
+          title: 'Caixa de entrada',
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <InboxIcon color={color} />
           ),
         }}
       />
@@ -44,8 +52,9 @@ export default function TabLayout() {
         name="create"
         options={{
           title: 'Criar Nota',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'add-circle' : 'add-circle-outline'} size={24} color={color} />
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <CreateNoteIcon color={color} />
           ),
         }}
       />

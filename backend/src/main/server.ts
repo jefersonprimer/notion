@@ -8,8 +8,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares
+app.use(cors({
+  origin: '*', // Allow all origins - adjust for production
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control'],
+}));
 app.use(express.json());
-app.use(cors());
 
 // Routes
 app.use('/api/users', userRouter);

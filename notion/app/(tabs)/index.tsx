@@ -4,31 +4,31 @@ import { useRouter } from 'expo-router';
 import api from '@/lib/axios';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import HomeHeader from '@/components/HomeHeader';
 import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '@/context/AuthProvider';
 
-// This type can be expanded if more fields are needed for display
-type Note = {
-  id: string;
-  title: string;
-};
+import { Note } from '@/types/note';
 
 export default function HomeScreen() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { setSession } = useAuth();
 
   const fetchNotes = useCallback(async () => {
-    // Ensure loading is true at the start of a fetch, especially for pull-to-refresh
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get('/notes'); // Fetch from our backend
+      const response = await api.get('/notes');
       setNotes(response.data);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Failed to fetch notes.';
-      setError(errorMessage);
+      if (errorMessage === 'Token invalid or expired.') {
+        setSession(null);
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,6 @@ export default function HomeScreen() {
   if (loading && notes.length === 0) {
     return (
       <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <HomeHeader />
         <ActivityIndicator size="large" />
       </ThemedView>
     );
@@ -65,7 +64,6 @@ export default function HomeScreen() {
   if (error) {
     return (
       <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 }}>
-        <HomeHeader />
         <ThemedText type="subtitle" style={{ textAlign: 'center', marginBottom: 12 }}>Ocorreu um erro ao buscar suas notas.</ThemedText>
         <ThemedText style={{ marginBottom: 20 }}>{error}</ThemedText>
         <Button title="Tentar Novamente" onPress={fetchNotes} />
@@ -75,7 +73,6 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <HomeHeader />
       <FlatList
         data={notes}
         keyExtractor={(item) => item.id}
