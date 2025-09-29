@@ -22,6 +22,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
+          tabBarShowLabel: false,
           header: () => <HomeHeader />,
           tabBarIcon: ({ color }) => (
             <HomeIcon color={color} />
@@ -32,6 +33,7 @@ export default function TabLayout() {
         name="search"
         options={{
           title: 'Busca',
+          tabBarShowLabel: false,
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <SearchIcon color={color} />
@@ -42,6 +44,7 @@ export default function TabLayout() {
         name="messages"
         options={{
           title: 'Caixa de entrada',
+          tabBarShowLabel: false,
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <InboxIcon color={color} />
@@ -52,6 +55,7 @@ export default function TabLayout() {
         name="create"
         options={{
           title: 'Criar Nota',
+          tabBarShowLabel: false,
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <CreateNoteIcon color={color} />

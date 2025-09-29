@@ -1,49 +1,41 @@
-// /components/auth/Login.tsx
+// /components/auth/Register.tsx
 
 import { useState } from "react";
 import { View, TextInput, Text, Pressable, ActivityIndicator, Alert, StyleSheet, TouchableOpacity } from "react-native";
 import api from "@/lib/axios";
-import { useAuth } from "@/context/AuthProvider";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Colors } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 
-type LoginProps = {
-  onSwitchToRegister: () => void;
-  onSwitchToForgotPassword: () => void;
+type RegisterProps = {
+  onSwitchToLogin: () => void;
 };
 
-export default function Login({ onSwitchToRegister, onSwitchToForgotPassword }: LoginProps) {
+export default function Register({ onSwitchToLogin }: RegisterProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  
-  const { setSession } = useAuth();
+
   const colorScheme = useColorScheme();
   const themeColors = Colors[colorScheme ?? 'light'];
 
-  async function signIn() {
+  async function signUp() {
+    if (!displayName) {
+      setError("Por favor, insira seu nome.");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const response = await api.post(`/users/login`, { email, password });
-      const { user, accessToken } = response.data;
-
-      setSession({
-        access_token: accessToken,
-        user: {
-          id: user.id,
-          email: user.email,
-          displayName: user.displayName,
-        },
-      });
-
-      console.log("Login realizado com sucesso!");
-
+      await api.post(`/users`, { email, password, displayName });
+      Alert.alert("Sucesso!", "Sua conta foi criada. Por favor, faça o login.", [
+        { text: "OK", onPress: onSwitchToLogin }
+      ]);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || "Ocorreu um erro no login.";
+      const errorMessage = err.response?.data?.message || "Ocorreu um erro no cadastro.";
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -115,17 +107,21 @@ export default function Login({ onSwitchToRegister, onSwitchToForgotPassword }: 
       color: themeColors.tint,
       textAlign: 'center',
       marginTop: 16,
-    },
-    secondaryLink: {
-        color: 'gray',
-        textAlign: 'center',
-        marginTop: 12,
     }
   });
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Entrar</Text>
+      <Text style={styles.title}>Criar Conta</Text>
+
+      <TextInput
+        placeholder="Nome"
+        placeholderTextColor={themeColors.text}
+        value={displayName}
+        onChangeText={setDisplayName}
+        style={styles.input}
+        autoCapitalize="words"
+      />
 
       <TextInput
         placeholder="Email"
@@ -155,17 +151,13 @@ export default function Login({ onSwitchToRegister, onSwitchToForgotPassword }: 
       {loading ? (
         <ActivityIndicator size="large" color={themeColors.tint} />
       ) : (
-        <TouchableOpacity style={styles.button} onPress={signIn} disabled={loading}>
-            <Text style={styles.buttonText}>Entrar</Text>
+        <TouchableOpacity style={styles.button} onPress={signUp} disabled={loading}>
+            <Text style={styles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
       )}
 
-      <Pressable onPress={onSwitchToRegister}>
-        <Text style={styles.link}>Não tem uma conta? Cadastre-se</Text>
-      </Pressable>
-
-      <Pressable onPress={onSwitchToForgotPassword}>
-        <Text style={styles.secondaryLink}>Esqueceu sua senha?</Text>
+      <Pressable onPress={onSwitchToLogin}>
+        <Text style={styles.link}>Já tem uma conta? Entre</Text>
       </Pressable>
     </View>
   );

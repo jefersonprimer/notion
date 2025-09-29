@@ -31,7 +31,7 @@ export class SupabaseNoteRepository implements INoteRepository {
       .select('*')
       .eq('user_id', userId)
       .eq('is_deleted', false)
-      .order('created_at', { ascending: false });
+      .order('updated_at', { ascending: false });
 
     if (error) {
       console.error("Supabase find notes error:", error.message);
@@ -164,7 +164,8 @@ export class SupabaseNoteRepository implements INoteRepository {
         description: data.description,
         createdAt: new Date(data.created_at),
         is_deleted: data.is_deleted,
-        deleted_at: data.deleted_at ? new Date(data.deleted_at) : null
+        deleted_at: data.deleted_at ? new Date(data.deleted_at) : null,
+        updated_at: new Date(data.updated_at)
     };
   }
 }

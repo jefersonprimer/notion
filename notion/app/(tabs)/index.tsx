@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { View, FlatList, TouchableOpacity, ActivityIndicator, RefreshControl, Button } from 'react-native';
+import { View, ActivityIndicator, RefreshControl, Button, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import api from '@/lib/axios';
 import { ThemedText } from '@/components/themed-text';
@@ -8,6 +8,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '@/context/AuthProvider';
 
 import { Note } from '@/types/note';
+import RecentNotes from '@/components/RecentNotes';
+import AllNotes from '@/components/AllNotes';
 
 export default function HomeScreen() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -32,7 +34,7 @@ export default function HomeScreen() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [setSession]);
 
   useFocusEffect(
     useCallback(() => {
@@ -40,22 +42,9 @@ export default function HomeScreen() {
     }, [fetchNotes])
   );
 
-  function openNote(id: string) {
-    router.push(`/note/${id}`);
-  }
-
-  const renderItem = ({ item }: { item: Note }) => (
-    <TouchableOpacity
-      className="border border-gray-200 dark:border-gray-700 p-4 rounded-lg mb-3 bg-white dark:bg-gray-800 shadow-sm"
-      onPress={() => openNote(item.id)}
-    >
-      <ThemedText type="subtitle">{item.title}</ThemedText>
-    </TouchableOpacity>
-  );
-
   if (loading && notes.length === 0) {
     return (
-      <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <ThemedView style={styles.centerContainer}>
         <ActivityIndicator size="large" />
       </ThemedView>
     );
@@ -63,7 +52,7 @@ export default function HomeScreen() {
 
   if (error) {
     return (
-      <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 }}>
+      <ThemedView style={styles.centerContainer}>
         <ThemedText type="subtitle" style={{ textAlign: 'center', marginBottom: 12 }}>Ocorreu um erro ao buscar suas notas.</ThemedText>
         <ThemedText style={{ marginBottom: 20 }}>{error}</ThemedText>
         <Button title="Tentar Novamente" onPress={fetchNotes} />
@@ -71,24 +60,35 @@ export default function HomeScreen() {
     );
   }
 
+  const recentNotes = notes.slice(0, 5);
+
   return (
-    <ThemedView style={{ flex: 1 }}>
-      <FlatList
-        data={notes}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        style={{ paddingHorizontal: 16, marginTop: 10 }}
-        ListEmptyComponent={
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 80 }}>
-            <ThemedText type="subtitle">Nenhuma nota ainda.</ThemedText>
-            <ThemedText style={{ marginTop: 8 }}>Use a aba "Criar Nota" para começar.</ThemedText>
-          </View>
-        }
+    <ThemedView style={styles.flex1}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
         refreshControl={
           <RefreshControl refreshing={loading} onRefresh={fetchNotes} />
         }
-        contentContainerStyle={{ paddingBottom: 30 }}
-      />
+      >
+        <RecentNotes notes={recentNotes} />
+        <AllNotes notes={notes} />
+      </ScrollView>
     </ThemedView>
   );
 }
+
+const styles = StyleSheet.create({
+    flex1: {
+        flex: 1,
+    },
+    centerContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 16,
+    },
+    scrollContent: {
+        paddingHorizontal: 16,
+        paddingVertical: 24,
+    }
+})

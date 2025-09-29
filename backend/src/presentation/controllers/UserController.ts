@@ -16,14 +16,14 @@ export class UserController {
 
   // handleCreateUser(...) continua o mesmo
   async handleCreateUser(req: Request, res: Response): Promise<Response> {
-    const { email, password } = req.body;
+    const { email, password, displayName } = req.body;
 
     try {
-      if (!email || !password) {
-        return res.status(400).json({ message: "Email and password are required." });
+      if (!email || !password || !displayName) {
+        return res.status(400).json({ message: "Email, password and displayName are required." });
       }
 
-      const output = await this.createUserUseCase.execute({ email, password });
+      const output = await this.createUserUseCase.execute({ email, password, displayName });
       return res.status(201).json(output);
 
     } catch (error: any) {

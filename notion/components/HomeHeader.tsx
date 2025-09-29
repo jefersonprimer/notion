@@ -34,7 +34,7 @@ export default function HomeHeader() {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingHorizontal: 16,
+      paddingHorizontal: 20,
       paddingVertical: 10,
       backgroundColor: Colors[colorScheme ?? 'light'].background,
     },
@@ -42,7 +42,7 @@ export default function HomeHeader() {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingHorizontal: 16,
+      paddingHorizontal: 0,
       paddingBottom: 10,
       gap: '15px'
     }
@@ -96,7 +96,7 @@ export default function HomeHeader() {
           </Pressable>
 
           <TouchableOpacity onPress={() => setUserModalVisible(true)} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-            <ThemedText style={styles.emailText}>Notion de {session?.user?.email}</ThemedText>
+            <ThemedText style={styles.emailText}>Notion de {session?.user?.displayName || session?.user?.email}</ThemedText>
             <ArrowChevronSingleDownIcon color={Colors[colorScheme ?? 'light'].text}/>
           </TouchableOpacity>
         </View>
