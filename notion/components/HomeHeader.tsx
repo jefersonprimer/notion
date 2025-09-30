@@ -39,7 +39,7 @@ export default function HomeHeader() {
 
   const openMenuModal = () => {
     ellipsisIconRef.current?.measure((fx, fy, width, height, px, py) => {
-      setMenuModalPosition({ top: py + height, right: 20 });
+      setMenuModalPosition({ top: py, right: 20 });
       setMenuModalVisible(true);
     });
   };
@@ -87,7 +87,7 @@ export default function HomeHeader() {
       paddingBottom: 40, // For home indicator
     },
     modalButtonSpacer: {
-        marginVertical: 8,
+      marginVertical: 8,
     },
     menuModalOverlay: {
       flex: 1,
@@ -97,7 +97,7 @@ export default function HomeHeader() {
       position: 'absolute',
       alignItems: 'flex-start',
       backgroundColor: '#252525',
-      padding: 20,
+      padding: 16,
       shadowColor: '#000',
       shadowOffset: {
         width: 0,
@@ -107,6 +107,7 @@ export default function HomeHeader() {
       shadowRadius: 3.84,
       elevation: 5,
       gap: 15,
+      width: 300,
     }  
   });
 
@@ -138,19 +139,34 @@ export default function HomeHeader() {
             <TouchableOpacity style={styles.menuModalOverlay} activeOpacity={1} onPressOut={() => setMenuModalVisible(false)}>
               <View style={[styles.menuModalContent, { top: menuModalPosition.top, right: menuModalPosition.right }]}>
                 <TouchableOpacity onPress={() => handleNavigate('#')}>
-                  <ThemedText><ArrowInCircleUpFillIcon/>Fazer upgrade do plano</ThemedText>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                    <ArrowInCircleUpFillIcon color='#2383E2'/>
+                    <ThemedText>Fazer upgrade do plano</ThemedText>
+                  </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleNavigate('#')}>
-                  <ThemedText><PeopleIcon/>Membros</ThemedText>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                    <PeopleIcon color={Colors[colorScheme ?? 'light'].text}/>
+                    <ThemedText>Membros</ThemedText>
+                  </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleNavigate('/settings')}>
-                  <ThemedText><SettingsIcon/>Configurações</ThemedText>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                    <SettingsIcon color={Colors[colorScheme ?? 'light'].text}/>
+                    <ThemedText>Configurações</ThemedText>
+                  </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleNavigate('/trash')}>
-                  <ThemedText><TrashIcon/>Lixeira</ThemedText>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                    <TrashIcon color={Colors[colorScheme ?? 'light'].text}/>
+                    <ThemedText>Lixeira</ThemedText>
+                  </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleNavigate('#')}>
-                  <ThemedText><SacIcon />Ajuda e suporte</ThemedText>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                    <SacIcon color={Colors[colorScheme ?? 'light'].text}/>
+                    <ThemedText>Ajuda e suporte</ThemedText>
+                  </View>
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>

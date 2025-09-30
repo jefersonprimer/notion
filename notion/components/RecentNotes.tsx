@@ -72,22 +72,24 @@ const styles = StyleSheet.create({
     borderColor: '#393939',
     overflow: 'hidden',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-start', 
   },
   cardBackground: {
     ...StyleSheet.absoluteFillObject,
   },
   topHalf: {
     height: '50%',
-    backgroundColor: '#333333',
+    backgroundColor: '#313131',
   },
   bottomHalf: {
     height: '50%',
-    backgroundColor: '#000000',
+    backgroundColor: '#252525',
   },
   contentContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'flex-start',  
+    justifyContent: 'center',  
     padding: 12,
   },
   title: {
