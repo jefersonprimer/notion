@@ -38,7 +38,7 @@ const AllNotes: React.FC<AllNotesProps> = ({ notes }) => {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="subtitle">Particular</ThemedText>
+      <ThemedText type="subtitle" style={styles.subtitle}>Particular</ThemedText>
       <FlatList
         data={notes}
         renderItem={renderItem}
@@ -53,6 +53,11 @@ const AllNotes: React.FC<AllNotesProps> = ({ notes }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  subtitle: {
+    color: '#838383',
+    fontWeight: 500,
+    fontSize: 14
   },
   listContent: {
     paddingVertical: 12,

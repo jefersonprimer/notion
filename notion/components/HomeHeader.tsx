@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
-import { View, TouchableOpacity, Modal, Button, StyleSheet, Image, SafeAreaView, Text, Pressable } from 'react-native';
+import { View, TouchableOpacity, Modal, Button, StyleSheet, Image, Text, Pressable } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthProvider';
 import { Ionicons } from '@expo/vector-icons';
@@ -49,37 +50,26 @@ export default function HomeHeader() {
       justifyContent: 'space-between',
       alignItems: 'center',
       paddingHorizontal: 20,
-      paddingVertical: 10,
+      paddingVertical: 0,
       backgroundColor: Colors[colorScheme ?? 'light'].background,
     },
     headerUserMenu: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
       alignItems: 'center',
-      paddingHorizontal: 0,
-      paddingBottom: 10,
-      gap: '15px'
-    }
-    ,
+      gap: 15,
+    },
     logo: {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
       width: 30,
       height: 30,
+      justifyContent: 'center',
+      alignItems: 'center',
       backgroundColor: '#404040',
-      borderRadius: '0.25rem'
+      borderRadius: 4,
     },
     logoText: {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      textTransform: 'uppercase',
-      fontWeight: 500,
-      width: 30,
-      height: 30,
       color: 'rgb(168, 164, 156)',
-
+      fontWeight: '500',
+      textTransform: 'uppercase',
     },
     emailText: {
       fontWeight: 'bold',
@@ -117,7 +107,8 @@ export default function HomeHeader() {
       shadowRadius: 3.84,
       elevation: 5,
       gap: 15,
-    }  });
+    }  
+  });
 
   return (
     <SafeAreaView style={{ backgroundColor: Colors[colorScheme ?? 'light'].background }}>
