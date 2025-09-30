@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     width: 130,
     height: 120,
     borderRadius: 12,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: '#4c4c4c',
     overflow: 'hidden',
     elevation: 5,

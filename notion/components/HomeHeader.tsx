@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { View, TouchableOpacity, Modal, Button, StyleSheet, Image, SafeAreaView, Text, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthProvider';
@@ -9,6 +9,11 @@ import { Colors } from '@/constants/theme';
 
 import { ArrowChevronSingleDownIcon } from '@/components/ui/ArrowChevronSingleDownIcon';
 import { EllipsisIcon } from '@/components/ui/EllipsisIcon';
+import { TrashIcon } from '@/components/ui/TrashIcon';
+import { SettingsIcon } from '@/components/ui/SettingsIcon';
+import { PeopleIcon } from '@/components/ui/PeopleIcon';
+import { SacIcon } from '@/components/ui/SacIcon';
+import { ArrowInCircleUpFillIcon } from '@/components/ui/ArrowInCircleUpFillIcon'
 
 export default function HomeHeader() {
   const { session, setSession } = useAuth();
@@ -17,6 +22,8 @@ export default function HomeHeader() {
 
   const [userModalVisible, setUserModalVisible] = useState(false);
   const [menuModalVisible, setMenuModalVisible] = useState(false);
+  const [menuModalPosition, setMenuModalPosition] = useState({ top: 0, right: 0 });
+  const ellipsisIconRef = useRef<TouchableOpacity>(null);
 
   const handleLogout = () => {
     setSession(null);
@@ -27,6 +34,13 @@ export default function HomeHeader() {
   const handleNavigate = (path: string) => {
     setMenuModalVisible(false);
     router.push(path as any);
+  };
+
+  const openMenuModal = () => {
+    ellipsisIconRef.current?.measure((fx, fy, width, height, px, py) => {
+      setMenuModalPosition({ top: py + height, right: 20 });
+      setMenuModalVisible(true);
+    });
   };
 
   const styles = StyleSheet.create({
@@ -84,8 +98,26 @@ export default function HomeHeader() {
     },
     modalButtonSpacer: {
         marginVertical: 8,
-    }
-  });
+    },
+    menuModalOverlay: {
+      flex: 1,
+      backgroundColor: 'transparent',
+    },
+    menuModalContent: {
+      position: 'absolute',
+      alignItems: 'flex-start',
+      backgroundColor: '#252525',
+      padding: 20,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+      gap: 15,
+    }  });
 
   return (
     <SafeAreaView style={{ backgroundColor: Colors[colorScheme ?? 'light'].background }}>
@@ -101,9 +133,38 @@ export default function HomeHeader() {
           </TouchableOpacity>
         </View>
         
-        <TouchableOpacity onPress={() => setMenuModalVisible(true)}>
-          <EllipsisIcon color={Colors[colorScheme ?? 'light'].text} />
-        </TouchableOpacity>
+        <View>
+          <TouchableOpacity ref={ellipsisIconRef} onPress={openMenuModal}>
+            <EllipsisIcon color={Colors[colorScheme ?? 'light'].text} />
+          </TouchableOpacity>
+          
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={menuModalVisible}
+            onRequestClose={() => setMenuModalVisible(false)}
+          >
+            <TouchableOpacity style={styles.menuModalOverlay} activeOpacity={1} onPressOut={() => setMenuModalVisible(false)}>
+              <View style={[styles.menuModalContent, { top: menuModalPosition.top, right: menuModalPosition.right }]}>
+                <TouchableOpacity onPress={() => handleNavigate('#')}>
+                  <ThemedText><ArrowInCircleUpFillIcon/>Fazer upgrade do plano</ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleNavigate('#')}>
+                  <ThemedText><PeopleIcon/>Membros</ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleNavigate('/settings')}>
+                  <ThemedText><SettingsIcon/>Configurações</ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleNavigate('/trash')}>
+                  <ThemedText><TrashIcon/>Lixeira</ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleNavigate('#')}>
+                  <ThemedText><SacIcon />Ajuda e suporte</ThemedText>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          </Modal>
+        </View>
 
         {/* User Account Modal */}
         <Modal
@@ -119,24 +180,6 @@ export default function HomeHeader() {
               <Button title="Sair" color="red" onPress={handleLogout} />
               <View style={styles.modalButtonSpacer} />
               <Button title="Cancelar" onPress={() => setUserModalVisible(false)} />
-            </View>
-          </TouchableOpacity>
-        </Modal>
-
-        {/* Main Menu Modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={menuModalVisible}
-          onRequestClose={() => setMenuModalVisible(false)}
-        >
-          <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPressOut={() => setMenuModalVisible(false)}>
-            <View style={styles.modalContent}>
-              <Button title="Lixeira" onPress={() => handleNavigate('/trash')} />
-              <View style={styles.modalButtonSpacer} />
-              <Button title="Configurações" onPress={() => handleNavigate('/settings')} />
-              <View style={styles.modalButtonSpacer} />
-              <Button title="Cancelar" onPress={() => setMenuModalVisible(false)} />
             </View>
           </TouchableOpacity>
         </Modal>

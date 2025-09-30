@@ -4,8 +4,9 @@ import { View, FlatList, StyleSheet, Text } from 'react-native';
 import { ThemedText } from './themed-text';
 import { Note } from '../types/note';
 import { PageIconFilledDark } from './ui/PageIconFilledDark';
-import { EllipsisIcon } from './ui/EllipsisIcon.tsx';
-import { PlusSmall } from './ui/PlusSmall.tsx';
+import { EllipsisIcon } from './ui/EllipsisIcon';
+import { PlusSmall } from './ui/PlusSmall';
+
 
 type AllNotesProps = {
   notes: Note[];
