@@ -6,5 +6,6 @@ export type Note = {
   createdAt: string; // Dates are often strings in JSON
   is_deleted: boolean;
   deleted_at: string | null;
+  is_favorite: boolean;
 };
 

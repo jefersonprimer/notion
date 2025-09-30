@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { router, useSegments } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
+import { setAuthToken } from '@/lib/axios';
 
 const SESSION_KEY = 'my-session';
 const SAVED_ACCOUNTS_KEY = 'saved-accounts';
@@ -64,6 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const activeSession: Session = JSON.parse(storedSession);
           const token = await SecureStore.getItemAsync(activeSession.user.id);
           if (token) {
+            setAuthToken(token);
             setSession(activeSession);
           }
         }
@@ -107,12 +109,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (newSession: Session) => {
     setSession(newSession);
+    setAuthToken(newSession.access_token);
     await AsyncStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
     await addAccount(newSession);
   };
 
   const signOut = async () => {
     setSession(null);
+    setAuthToken(null);
     await AsyncStorage.removeItem(SESSION_KEY);
   };
 

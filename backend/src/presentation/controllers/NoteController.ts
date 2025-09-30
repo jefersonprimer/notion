@@ -8,6 +8,8 @@ import { RestoreNoteUseCase } from '../../application/use-cases/RestoreNoteUseCa
 import { PermanentDeleteNoteUseCase } from '../../application/use-cases/PermanentDeleteNoteUseCase';
 import { ListDeletedNotesUseCase } from '../../application/use-cases/ListDeletedNotesUseCase';
 import { SearchNotesUseCase } from '../../application/use-cases/SearchNotesUseCase';
+import { FavoriteNoteUseCase } from '../../application/use-cases/FavoriteNoteUseCase';
+import { ListFavoriteNotesUseCase } from '../../application/use-cases/ListFavoriteNotesUseCase';
 
 export class NoteController {
   constructor(
@@ -19,7 +21,9 @@ export class NoteController {
     private restoreNoteUseCase: RestoreNoteUseCase,
     private permanentDeleteNoteUseCase: PermanentDeleteNoteUseCase,
     private listDeletedNotesUseCase: ListDeletedNotesUseCase,
-    private searchNotesUseCase: SearchNotesUseCase
+    private searchNotesUseCase: SearchNotesUseCase,
+    private favoriteNoteUseCase: FavoriteNoteUseCase,
+    private listFavoriteNotesUseCase: ListFavoriteNotesUseCase
   ) {}
 
   async create(req: Request, res: Response): Promise<Response> {
@@ -120,6 +124,31 @@ export class NoteController {
       const userId = req.user!.id;
       const query = req.query.q as string;
       const notes = await this.searchNotesUseCase.execute({ userId, query });
+      return res.status(200).json(notes);
+    } catch (error: any) {
+      return res.status(400).json({ message: error.message });
+    }
+  }
+
+  async favorite(req: Request, res: Response): Promise<Response> {
+    try {
+      const userId = req.user!.id;
+      const { id } = req.params;
+      const { isFavorite } = req.body;
+      const note = await this.favoriteNoteUseCase.execute({ id, userId, isFavorite });
+      if (!note) {
+        return res.status(404).json({ message: 'Note not found.' });
+      }
+      return res.status(200).json(note);
+    } catch (error: any) {
+      return res.status(400).json({ message: error.message });
+    }
+  }
+
+  async listFavorites(req: Request, res: Response): Promise<Response> {
+    try {
+      const userId = req.user!.id;
+      const notes = await this.listFavoriteNotesUseCase.execute(userId);
       return res.status(200).json(notes);
     } catch (error: any) {
       return res.status(400).json({ message: error.message });

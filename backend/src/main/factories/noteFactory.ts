@@ -11,6 +11,8 @@ import { RestoreNoteUseCase } from '../../application/use-cases/RestoreNoteUseCa
 import { PermanentDeleteNoteUseCase } from '../../application/use-cases/PermanentDeleteNoteUseCase';
 import { ListDeletedNotesUseCase } from '../../application/use-cases/ListDeletedNotesUseCase';
 import { SearchNotesUseCase } from '../../application/use-cases/SearchNotesUseCase';
+import { FavoriteNoteUseCase } from '../../application/use-cases/FavoriteNoteUseCase';
+import { ListFavoriteNotesUseCase } from '../../application/use-cases/ListFavoriteNotesUseCase';
 
 // 1. Instantiate Repository
 const supabaseNoteRepository = new SupabaseNoteRepository();
@@ -25,6 +27,8 @@ const restoreNoteUseCase = new RestoreNoteUseCase(supabaseNoteRepository);
 const permanentDeleteNoteUseCase = new PermanentDeleteNoteUseCase(supabaseNoteRepository);
 const listDeletedNotesUseCase = new ListDeletedNotesUseCase(supabaseNoteRepository);
 const searchNotesUseCase = new SearchNotesUseCase(supabaseNoteRepository);
+const favoriteNoteUseCase = new FavoriteNoteUseCase(supabaseNoteRepository);
+const listFavoriteNotesUseCase = new ListFavoriteNotesUseCase(supabaseNoteRepository);
 
 // 3. Instantiate Controller
 const noteController = new NoteController(
@@ -36,7 +40,9 @@ const noteController = new NoteController(
   restoreNoteUseCase,
   permanentDeleteNoteUseCase,
   listDeletedNotesUseCase,
-  searchNotesUseCase
+  searchNotesUseCase,
+  favoriteNoteUseCase,
+  listFavoriteNotesUseCase
 );
 
 export { noteController };

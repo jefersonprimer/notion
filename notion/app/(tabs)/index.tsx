@@ -8,9 +8,11 @@ import { useAuth } from '@/context/AuthProvider';
 import { Note } from '@/types/note';
 import RecentNotes from '@/components/RecentNotes';
 import AllNotes from '@/components/AllNotes';
+import AllFavoritesNotes from '@/components/AllFavoritesNotes';
 
 export default function HomeScreen() {
   const [notes, setNotes] = useState<Note[]>([]);
+  const [favoriteNotes, setFavoriteNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { session, signOut } = useAuth();
@@ -35,9 +37,21 @@ export default function HomeScreen() {
     }
   }, [session, signOut]); // Adiciona session e signOut como dependências
 
+  const fetchFavoriteNotes = useCallback(async () => {
+    if (!session) return;
+
+    try {
+      const response = await api.get('/notes/favorites');
+      setFavoriteNotes(response.data);
+    } catch (err: any) {
+      console.error('Failed to fetch favorite notes.', err);
+    }
+  }, [session]);
+
   useEffect(() => {
     fetchNotes();
-  }, [fetchNotes]); // Roda o fetchNotes quando o componente monta ou a função fetchNotes muda
+    fetchFavoriteNotes();
+  }, [fetchNotes, fetchFavoriteNotes]); // Roda o fetchNotes quando o componente monta ou a função fetchNotes muda
 
   if (loading && notes.length === 0) {
     return (
@@ -57,6 +71,22 @@ export default function HomeScreen() {
     );
   }
 
+  const handleToggleFavorite = (id: string, isFavorite: boolean) => {
+    setNotes(prevNotes => 
+      prevNotes.map(note => 
+        note.id === id ? { ...note, is_favorite: isFavorite } : note
+      )
+    );
+    if (isFavorite) {
+      const noteToAdd = notes.find(note => note.id === id);
+      if (noteToAdd) {
+        setFavoriteNotes(prevFavorites => [...prevFavorites, { ...noteToAdd, is_favorite: true }]);
+      }
+    } else {
+      setFavoriteNotes(prevFavorites => prevFavorites.filter(note => note.id !== id));
+    }
+  };
+
   const recentNotes = notes.slice(0, 5);
 
   return (
@@ -64,11 +94,12 @@ export default function HomeScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={fetchNotes} />
+          <RefreshControl refreshing={loading} onRefresh={() => { fetchNotes(); fetchFavoriteNotes(); }} />
         }
       >
         <RecentNotes notes={recentNotes} />
-        <AllNotes notes={notes} />
+        <AllFavoritesNotes notes={favoriteNotes} onToggleFavorite={handleToggleFavorite} />
+        <AllNotes notes={notes} onToggleFavorite={handleToggleFavorite} />
       </ScrollView>
     </ThemedView>
   );

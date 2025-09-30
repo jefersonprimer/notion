@@ -18,6 +18,7 @@ export default function NoteScreen() {
   // Note content state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [isFavorite, setIsFavorite] = useState(false);
 
   // UI editing state
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -42,6 +43,7 @@ export default function NoteScreen() {
       .then(response => {
         setTitle(response.data.title);
         setDescription(response.data.description || '');
+        setIsFavorite(response.data.is_favorite);
       })
       .catch(err => setError(err.response?.data?.message || 'Failed to fetch note.'))
       .finally(() => setLoading(false));
@@ -60,6 +62,19 @@ export default function NoteScreen() {
       api.put(`/notes/${id}`, { description: debouncedDescription });
     }
   }, [debouncedDescription]);
+
+  const handleToggleFavorite = async () => {
+    try {
+      const newIsFavorite = !isFavorite;
+      setIsFavorite(newIsFavorite);
+      await api.patch(`/notes/${id}/favorite`, { isFavorite: newIsFavorite });
+    } catch (err) {
+      console.error('Failed to toggle favorite', err);
+      // Revert the state if the API call fails
+      setIsFavorite(!isFavorite);
+      Alert.alert('Error', 'Failed to update favorite status.');
+    }
+  };
 
   const handleDelete = () => {
     Alert.alert(
@@ -139,9 +154,18 @@ export default function NoteScreen() {
                     </TouchableOpacity>
                 ),
                 headerRight: () => (
-                    <TouchableOpacity onPress={() => setModalVisible(true)}>
-                        <Ionicons name="ellipsis-horizontal" size={24} color={Colors[colorScheme ?? 'light'].text} />
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <TouchableOpacity onPress={handleToggleFavorite} style={{ marginRight: 15 }}>
+                            <Ionicons 
+                                name={isFavorite ? 'star' : 'star-outline'} 
+                                size={24} 
+                                color={isFavorite ? Colors.light.tint : Colors[colorScheme ?? 'light'].text} 
+                            />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setModalVisible(true)}>
+                            <Ionicons name="ellipsis-horizontal" size={24} color={Colors[colorScheme ?? 'light'].text} />
+                        </TouchableOpacity>
+                    </View>
                 ),
             }}
         />

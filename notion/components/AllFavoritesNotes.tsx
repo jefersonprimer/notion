@@ -10,18 +10,14 @@ import { Ionicons } from '@expo/vector-icons';
 import api from '@/lib/axios';
 
 
-type AllNotesProps = {
+type AllFavoritesNotesProps = {
   notes: Note[];
   onToggleFavorite: (id: string, isFavorite: boolean) => void;
 };
 
-const AllNotes: React.FC<AllNotesProps> = ({ notes, onToggleFavorite }) => {
+const AllFavoritesNotes: React.FC<AllFavoritesNotesProps> = ({ notes, onToggleFavorite }) => {
   if (!notes || notes.length === 0) {
-    return (
-        <View style={styles.emptyContainer}>
-            <ThemedText>No notes yet. Create one!</ThemedText>
-        </View>
-    )
+    return null;
   }
 
   const handleToggleFavorite = async (id: string, isFavorite: boolean) => {
@@ -57,7 +53,7 @@ const AllNotes: React.FC<AllNotesProps> = ({ notes, onToggleFavorite }) => {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="subtitle" style={styles.subtitle}>Particular</ThemedText>
+      <ThemedText type="subtitle" style={styles.subtitle}>Favorites</ThemedText>
       <FlatList
         data={notes}
         renderItem={renderItem}
@@ -109,4 +105,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default AllNotes;
+export default AllFavoritesNotes;

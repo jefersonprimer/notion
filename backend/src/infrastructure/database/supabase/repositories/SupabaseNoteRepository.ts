@@ -13,6 +13,7 @@ export class SupabaseNoteRepository implements INoteRepository {
         title,
         description,
         is_deleted: false, // New notes are not deleted by default
+        is_favorite: false, // New notes are not favorite by default
       })
       .select()
       .single();
@@ -155,6 +156,43 @@ export class SupabaseNoteRepository implements INoteRepository {
     }
   }
 
+  async favorite(id: string, userId: string, isFavorite: boolean): Promise<Note | null> {
+    const { data, error } = await supabase
+      .from('notes')
+      .update({ is_favorite: isFavorite })
+      .match({ id, user_id: userId })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Supabase favorite note error:", error.message);
+      throw new Error("Could not favorite note.");
+    }
+
+    return this.mapToNote(data);
+  }
+
+  async findFavoritesByUserId(userId: string): Promise<Note[]> {
+    const { data, error } = await supabase
+      .from('notes')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('is_deleted', false)
+      .eq('is_favorite', true)
+      .order('updated_at', { ascending: false });
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+      console.error("Supabase find favorite notes error:", error.message);
+      throw new Error("Could not find favorite notes.");
+    }
+
+    if (!data) {
+        return [];
+    }
+
+    return data.map(this.mapToNote);
+  }
+
   // Helper to map database result to Note entity
   private mapToNote(data: any): Note {
     return {
@@ -165,7 +203,8 @@ export class SupabaseNoteRepository implements INoteRepository {
         createdAt: new Date(data.created_at),
         is_deleted: data.is_deleted,
         deleted_at: data.deleted_at ? new Date(data.deleted_at) : null,
-        updated_at: new Date(data.updated_at)
+        updated_at: new Date(data.updated_at),
+        is_favorite: data.is_favorite,
     };
   }
 }
