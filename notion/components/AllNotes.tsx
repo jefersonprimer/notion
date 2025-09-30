@@ -22,18 +22,16 @@ const AllNotes: React.FC<AllNotesProps> = ({ notes }) => {
   }
 
   const renderItem = ({ item }: { item: Note }) => (
-    <Link href={`/note/${item.id}`} style={styles.noteItem}>
-      <View style={styles.noteContent}>
-        <View style={styles.noteHead}>
-          <PageIconFilledDark />
-          <ThemedText type="defaultSemiBold">{item.title}</ThemedText>
-        </View>
-        <View style={styles.noteTail}>
-          <EllipsisIcon />
-          <PlusSmall/>
-        </View>
+    <View style={styles.noteItem}>
+      <Link href={`/note/${item.id}`} style={styles.noteHead}>
+        <PageIconFilledDark />
+        <ThemedText type="defaultSemiBold">{item.title}</ThemedText>
+      </Link>
+      <View style={styles.noteTail}>
+        <EllipsisIcon />
+        <PlusSmall/>
       </View>
-    </Link>
+    </View>
   );
 
   return (
@@ -67,16 +65,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 0,
-    paddingVertical: 10 
-  },
-  noteContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingHorizontal: 16,
-    paddingBottom: 10,
-    width: '100%',
+    paddingTop: 10,
+    paddingBottom: 20,
   },
   noteHead: {
     flexDirection: 'row',
