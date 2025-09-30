@@ -1,10 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { View, ActivityIndicator, RefreshControl, Button, ScrollView, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
 import api from '@/lib/axios';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '@/context/AuthProvider';
 
 import { Note } from '@/types/note';
@@ -15,10 +13,11 @@ export default function HomeScreen() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-  const { setSession } = useAuth();
+  const { session, signOut } = useAuth();
 
   const fetchNotes = useCallback(async () => {
+    if (!session) return; // Não busca notas se não houver sessão
+
     setLoading(true);
     setError(null);
     try {
@@ -26,21 +25,19 @@ export default function HomeScreen() {
       setNotes(response.data);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Failed to fetch notes.';
-      if (errorMessage === 'Token invalid or expired.') {
-        setSession(null);
+      if (err.response?.status === 401) { // Unauthorized
+        signOut();
       } else {
         setError(errorMessage);
       }
     } finally {
       setLoading(false);
     }
-  }, [setSession]);
+  }, [session, signOut]); // Adiciona session e signOut como dependências
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchNotes();
-    }, [fetchNotes])
-  );
+  useEffect(() => {
+    fetchNotes();
+  }, [fetchNotes]); // Roda o fetchNotes quando o componente monta ou a função fetchNotes muda
 
   if (loading && notes.length === 0) {
     return (

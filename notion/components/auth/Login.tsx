@@ -20,18 +20,18 @@ export default function Login({ onSwitchToRegister, onSwitchToForgotPassword }: 
   const [error, setError] = useState<string | null>(null);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   
-  const { setSession } = useAuth();
+  const { signIn } = useAuth();
   const colorScheme = useColorScheme();
   const themeColors = Colors[colorScheme ?? 'light'];
 
-  async function signIn() {
+  async function handleSignIn() {
     setLoading(true);
     setError(null);
     try {
       const response = await api.post(`/users/login`, { email, password });
       const { user, accessToken } = response.data;
 
-      setSession({
+      signIn({
         access_token: accessToken,
         user: {
           id: user.id,
@@ -155,7 +155,7 @@ export default function Login({ onSwitchToRegister, onSwitchToForgotPassword }: 
       {loading ? (
         <ActivityIndicator size="large" color={themeColors.tint} />
       ) : (
-        <TouchableOpacity style={styles.button} onPress={signIn} disabled={loading}>
+        <TouchableOpacity style={styles.button} onPress={handleSignIn} disabled={loading}>
             <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
       )}

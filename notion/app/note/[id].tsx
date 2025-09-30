@@ -8,6 +8,7 @@ import { ThemedText } from '@/components/themed-text';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { AngleLeftIcon } from '@/components/ui/AngleLeftIcon';
 
 export default function NoteScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -130,6 +131,13 @@ export default function NoteScreen() {
     <ThemedView style={{ flex: 1, padding: 16 }}>
         <Stack.Screen
             options={{
+                headerTitle: '',
+                headerBackVisible: false,
+                headerLeft: () => (
+                    <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 10 }}>
+                        <AngleLeftIcon color={Colors[colorScheme ?? 'light'].text} />
+                    </TouchableOpacity>
+                ),
                 headerRight: () => (
                     <TouchableOpacity onPress={() => setModalVisible(true)}>
                         <Ionicons name="ellipsis-horizontal" size={24} color={Colors[colorScheme ?? 'light'].text} />

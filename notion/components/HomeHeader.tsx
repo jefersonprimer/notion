@@ -1,9 +1,8 @@
-import { useState, useRef } from 'react';
-import { View, TouchableOpacity, Modal, Button, StyleSheet, Image, Text, Pressable } from 'react-native';
+import { useRef, useState } from 'react';
+import { View, TouchableOpacity, Modal, StyleSheet, Image, Text, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthProvider';
-import { Ionicons } from '@expo/vector-icons';
 import { ThemedText } from './themed-text';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
@@ -14,23 +13,20 @@ import { TrashIcon } from '@/components/ui/TrashIcon';
 import { SettingsIcon } from '@/components/ui/SettingsIcon';
 import { PeopleIcon } from '@/components/ui/PeopleIcon';
 import { SacIcon } from '@/components/ui/SacIcon';
-import { ArrowInCircleUpFillIcon } from '@/components/ui/ArrowInCircleUpFillIcon'
+import { ArrowInCircleUpFillIcon } from '@/components/ui/ArrowInCircleUpFillIcon';
 
-export default function HomeHeader() {
-  const { session, setSession } = useAuth();
+interface HomeHeaderProps {
+  onOpenAccountSwitcher: () => void;
+}
+
+export default function HomeHeader({ onOpenAccountSwitcher }: HomeHeaderProps) {
+  const { session } = useAuth();
   const router = useRouter();
   const colorScheme = useColorScheme();
 
-  const [userModalVisible, setUserModalVisible] = useState(false);
   const [menuModalVisible, setMenuModalVisible] = useState(false);
   const [menuModalPosition, setMenuModalPosition] = useState({ top: 0, right: 0 });
   const ellipsisIconRef = useRef<TouchableOpacity>(null);
-
-  const handleLogout = () => {
-    setSession(null);
-    setUserModalVisible(false);
-    // The AuthProvider will handle the redirect to the login screen
-  };
 
   const handleNavigate = (path: string) => {
     setMenuModalVisible(false);
@@ -74,21 +70,6 @@ export default function HomeHeader() {
     emailText: {
       fontWeight: 'bold',
     },
-    modalOverlay: {
-      flex: 1,
-      justifyContent: 'flex-end',
-      backgroundColor: 'rgba(0,0,0,0.5)',
-    },
-    modalContent: {
-      backgroundColor: Colors[colorScheme ?? 'light'].backgroundOffset,
-      padding: 20,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-      paddingBottom: 40, // For home indicator
-    },
-    modalButtonSpacer: {
-      marginVertical: 8,
-    },
     menuModalOverlay: {
       flex: 1,
       backgroundColor: 'transparent',
@@ -108,7 +89,7 @@ export default function HomeHeader() {
       elevation: 5,
       gap: 15,
       width: 300,
-    }  
+    }
   });
 
   return (
@@ -119,7 +100,7 @@ export default function HomeHeader() {
             <Text style={styles.logoText}>n</Text>
           </Pressable>
 
-          <TouchableOpacity onPress={() => setUserModalVisible(true)} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+          <TouchableOpacity onPress={onOpenAccountSwitcher} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
             <ThemedText style={styles.emailText}>Notion de {session?.user?.displayName || session?.user?.email}</ThemedText>
             <ArrowChevronSingleDownIcon color={Colors[colorScheme ?? 'light'].text}/>
           </TouchableOpacity>
@@ -172,24 +153,6 @@ export default function HomeHeader() {
             </TouchableOpacity>
           </Modal>
         </View>
-
-        {/* User Account Modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={userModalVisible}
-          onRequestClose={() => setUserModalVisible(false)}
-        >
-          <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPressOut={() => setUserModalVisible(false)}>
-            <View style={styles.modalContent}>
-              <Button title="Adicionar nova conta" onPress={handleLogout} />
-              <View style={styles.modalButtonSpacer} />
-              <Button title="Sair" color="red" onPress={handleLogout} />
-              <View style={styles.modalButtonSpacer} />
-              <Button title="Cancelar" onPress={() => setUserModalVisible(false)} />
-            </View>
-          </TouchableOpacity>
-        </Modal>
       </View>
     </SafeAreaView>
   );
