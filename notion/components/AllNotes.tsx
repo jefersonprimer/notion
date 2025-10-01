@@ -4,6 +4,9 @@ import { ThemedText } from './themed-text';
 import { Note } from '../types/note';
 import api from '@/lib/axios';
 import NoteCard from './NoteCard';
+
+import { EllipsisIcon } from '@/components/ui/EllipsisIcon';
+import { PlusSmallIcon } from '@/components/ui/PlusSmallIcon';
 import { StarIcon } from '@/components/ui/StarIcon';
 import { StarSlashIcon } from '@/components/ui/StarSlashIcon';
 import { TrashIcon } from '@/components/ui/TrashIcon';
@@ -76,7 +79,14 @@ const AllNotes: React.FC<AllNotesProps> = ({ notes, onToggleFavorite, onDelete }
 
   return (
     <View style={styles.container}>
-      <ThemedText type="subtitle" style={styles.subtitle}>Particular</ThemedText>
+      <View style={styles.header}>
+        <ThemedText type="subtitle" style={styles.subtitle}>Particular</ThemedText>
+        <View style={styles.headerIcons}>
+          <EllipsisIcon />
+          <PlusSmallIcon />
+        </View>
+      </View> 
+
       <FlatList
         data={notes}
         renderItem={renderItem}
@@ -120,6 +130,15 @@ const AllNotes: React.FC<AllNotesProps> = ({ notes, onToggleFavorite, onDelete }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerIcons: {
+    flexDirection: 'row',
+    gap: 16
   },
   subtitle: {
     color: '#838383',

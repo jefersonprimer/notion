@@ -7,6 +7,7 @@ import { Note } from '../types/note';
 import { PageFilledDarkIcon } from './ui/PageFilledDarkIcon';
 import { EllipsisIcon } from './ui/EllipsisIcon';
 import { PlusSmallIcon } from './ui/PlusSmallIcon';
+import { ChevronRightIcon } from './ui/ChevronRightIcon';
 
 import { Link } from 'expo-router';
 
@@ -18,6 +19,9 @@ type NoteCardProps = {
 
 const NoteCard: React.FC<NoteCardProps> = ({ item, handleToggleFavorite, openModal }) => (
   <View style={styles.noteItem}>
+    <View style={styles.nestedListview}>
+      <ChevronRightIcon/>
+    </View>
     <Link href={`/note/${item.id}`} style={styles.noteHead}>
       <View style={styles.noteHeadContent}>
         <PageFilledDarkIcon />
@@ -38,9 +42,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10
-  },
+    
+    paddingVertical: 10,
+    gap: 10
+  }, 
   noteHead: {
     flexDirection: 'row',
     alignItems: 'center',
