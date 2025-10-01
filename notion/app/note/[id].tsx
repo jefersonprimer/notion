@@ -8,7 +8,11 @@ import { ThemedText } from '@/components/themed-text';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+
 import { AngleLeftIcon } from '@/components/ui/AngleLeftIcon';
+import { StarIcon } from '@/components/ui/StarIcon';
+import { StarSlashIcon } from '@/components/ui/StarSlashIcon';
+import { TrashIcon } from '@/components/ui/TrashIcon';
 
 export default function NoteScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -126,10 +130,9 @@ export default function NoteScreen() {
     },
     modalButton: {
         padding: 15,
-        alignItems: 'center',
+        alignItems: 'flex-start',
     },
     modalButtonText: {
-        color: 'red',
         fontSize: 18,
     }
   });
@@ -154,18 +157,9 @@ export default function NoteScreen() {
                     </TouchableOpacity>
                 ),
                 headerRight: () => (
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <TouchableOpacity onPress={handleToggleFavorite} style={{ marginRight: 15 }}>
-                            <Ionicons 
-                                name={isFavorite ? 'star' : 'star-outline'} 
-                                size={24} 
-                                color={isFavorite ? Colors.light.tint : Colors[colorScheme ?? 'light'].text} 
-                            />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setModalVisible(true)}>
-                            <Ionicons name="ellipsis-horizontal" size={24} color={Colors[colorScheme ?? 'light'].text} />
-                        </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity onPress={() => setModalVisible(true)}>
+                        <Ionicons name="ellipsis-horizontal" size={24} color={Colors[colorScheme ?? 'light'].text} />
+                    </TouchableOpacity>
                 ),
             }}
         />
@@ -208,8 +202,19 @@ export default function NoteScreen() {
         >
             <TouchableOpacity style={styles.modalContainer} activeOpacity={1} onPressOut={() => setModalVisible(false)}>
                 <View style={styles.modalContent}>
+                    <TouchableOpacity style={styles.modalButton} onPress={handleToggleFavorite}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            {isFavorite ? <StarSlashIcon color={Colors[colorScheme ?? 'light'].text} /> : <StarIcon color={Colors[colorScheme ?? 'light'].text} />}
+                            <Text style={[styles.modalButtonText, { color: Colors[colorScheme ?? 'light'].text, marginLeft: 10 }]}>
+                                {isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
                     <TouchableOpacity style={styles.modalButton} onPress={handleDelete}>
-                        <Text style={styles.modalButtonText}>Mover para Lixeira</Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <TrashIcon color={Colors[colorScheme ?? 'light'].text}/>
+                        <Text style={[styles.modalButtonText, { color: Colors[colorScheme ?? 'light'].text, marginLeft: 10 }]}>Mover para Lixeira</Text>
+                      </View>
                     </TouchableOpacity>
                 </View>
             </TouchableOpacity>

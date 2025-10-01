@@ -2,11 +2,11 @@ import React from 'react';
 import { Svg, Path } from 'react-native-svg';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
-interface PlusSmallProps {
+interface PlusSmallIconProps {
   color?: string;
 }
 
-export function PlusSmall({ color: colorProp }: PlusSmallProps) {
+export function PlusSmallIcon({ color: colorProp }: PlusSmallIconProps) {
   const themeColor = useThemeColor({ light: '#000', dark: '#fff' }, 'text');
   const color = colorProp || themeColor;
 

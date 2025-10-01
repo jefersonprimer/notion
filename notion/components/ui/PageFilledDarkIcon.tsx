@@ -1,13 +1,13 @@
 import React from 'react';
 import { Svg, Path, G } from 'react-native-svg';
 
-interface PageIconFilledDarkProps {
+interface PageFilledDarkIconProps {
   color: string;
 }
 
 // if is the theme is black the color of fill is (#868686) if not (#91918e)
 
-export function PageIconFilledDark({ color }: PageIconFilledDarkProps ) {
+export function PageFilledDarkIcon({ color }: PageFilledDarkIconProps ) {
   return (
     <Svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" width={20} height={20} fill={color}> 
       <G>

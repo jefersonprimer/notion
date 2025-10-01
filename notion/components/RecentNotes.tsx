@@ -6,7 +6,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { View, FlatList, StyleSheet, Pressable } from 'react-native';
 import { Link } from 'expo-router';
 
-import { PageIconFilledDark } from './ui/PageIconFilledDark';
+import { PageFilledDarkIcon } from './ui/PageFilledDarkIcon';
 
 type RecentNotesProps = {
   notes: Note[];
@@ -29,7 +29,7 @@ const RecentNotes: React.FC<RecentNotesProps> = ({ notes}) => {
           </View>
 
           <View style={styles.contentContainer}>
-            <PageIconFilledDark color={iconColor} />
+            <PageFilledDarkIcon color={iconColor} />
             <ThemedText style={styles.title} numberOfLines={2}>
               {item.title}
             </ThemedText>

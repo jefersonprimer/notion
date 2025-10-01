@@ -1,13 +1,12 @@
-import { Link } from 'expo-router';
 import React, { useState } from 'react';
 import { View, FlatList, StyleSheet, Text, TouchableOpacity, Modal, Alert } from 'react-native';
 import { ThemedText } from './themed-text';
 import { Note } from '../types/note';
-import { PageIconFilledDark } from './ui/PageIconFilledDark';
-import { EllipsisIcon } from './ui/EllipsisIcon';
-import { PlusSmall } from './ui/PlusSmall';
-import { Ionicons } from '@expo/vector-icons';
 import api from '@/lib/axios';
+import NoteCard from './NoteCard';
+import { StarIcon } from '@/components/ui/StarIcon';
+import { StarSlashIcon } from '@/components/ui/StarSlashIcon';
+import { TrashIcon } from '@/components/ui/TrashIcon';
 
 type AllNotesProps = {
   notes: Note[];
@@ -68,25 +67,11 @@ const AllNotes: React.FC<AllNotesProps> = ({ notes, onToggleFavorite, onDelete }
   };
 
   const renderItem = ({ item }: { item: Note }) => (
-    <View style={styles.noteItem}>
-      <Link href={`/note/${item.id}`} style={styles.noteHead}>
-        <PageIconFilledDark />
-        <ThemedText type="defaultSemiBold">{item.title}</ThemedText>
-      </Link>
-      <View style={styles.noteTail}>
-        <TouchableOpacity onPress={() => handleToggleFavorite(item.id, !item.is_favorite)} style={{ marginRight: 15 }}>
-          <Ionicons
-            name={item.is_favorite ? 'star' : 'star-outline'}
-            size={24}
-            color={item.is_favorite ? '#FFC700' : '#838383'}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => openModal(item)}>
-          <EllipsisIcon />
-        </TouchableOpacity>
-        <PlusSmall />
-      </View>
-    </View>
+    <NoteCard 
+      item={item}
+      handleToggleFavorite={handleToggleFavorite}
+      openModal={openModal}
+    />
   );
 
   return (
@@ -113,10 +98,16 @@ const AllNotes: React.FC<AllNotesProps> = ({ notes, onToggleFavorite, onDelete }
                 handleToggleFavorite(selectedNote.id, !selectedNote.is_favorite);
                 setModalVisible(false);
               }}>
-                <Text style={styles.modalButtonText}>{selectedNote.is_favorite ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                  {selectedNote.is_favorite ? <StarSlashIcon  /> : <StarIcon />}
+                  <Text style={styles.modalButtonText}>{selectedNote.is_favorite ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}</Text>
+                </View> 
               </TouchableOpacity>
               <TouchableOpacity style={styles.modalButton} onPress={handleDelete}>
-                <Text style={[styles.modalButtonText, { color: 'red' }]}>Mover para a Lixeira</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                  <TrashIcon/>
+                  <Text style={[styles.modalButtonText, { color: 'red' }]}>Mover para a Lixeira</Text>
+                </View> 
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
