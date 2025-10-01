@@ -127,28 +127,8 @@ const styles = StyleSheet.create({
     fontSize: 14
   },
   listContent: {
-    paddingVertical: 12,
-    gap: 12,
-  },
-  noteItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 20,
-  },
-  noteHead: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    flexShrink: 1,
-  },
-  noteTail: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
+    paddingVertical: 12
+  }, 
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',

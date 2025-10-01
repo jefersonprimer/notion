@@ -19,8 +19,10 @@ type NoteCardProps = {
 const NoteCard: React.FC<NoteCardProps> = ({ item, handleToggleFavorite, openModal }) => (
   <View style={styles.noteItem}>
     <Link href={`/note/${item.id}`} style={styles.noteHead}>
-      <PageFilledDarkIcon />
-      <ThemedText type="defaultSemiBold">{item.title}</ThemedText>
+      <View style={styles.noteHeadContent}>
+        <PageFilledDarkIcon />
+        <ThemedText type="defaultSemiBold">{item.title}</ThemedText>
+      </View> 
     </Link>
     <View style={styles.noteTail}>
       <TouchableOpacity onPress={() => openModal(item)}>
@@ -37,14 +39,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 20,
+    paddingVertical: 10
   },
   noteHead: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
-    flexShrink: 1,
+    flex: 1,
+  },
+  noteHeadContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
   },
   noteTail: {
     flexDirection: 'row',

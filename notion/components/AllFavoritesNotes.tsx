@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { View, FlatList, StyleSheet, Text, TouchableOpacity, Modal, Alert } from 'react-native';
 import { ThemedText } from './themed-text';
-import { Note } from '../types/note';
+
 import api from '@/lib/axios';
+
 import NoteCard from './NoteCard';
+import { Note } from '../types/note';
+
 import { StarIcon } from '@/components/ui/StarIcon';
 import { StarSlashIcon } from '@/components/ui/StarSlashIcon';
 import { TrashIcon } from '@/components/ui/TrashIcon';
@@ -124,27 +127,7 @@ const styles = StyleSheet.create({
     fontSize: 14
   },
   listContent: {
-    paddingVertical: 12,
-    gap: 12,
-  },
-  noteItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 20,
-  },
-  noteHead: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    flexShrink: 1,
-  },
-  noteTail: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
+    paddingVertical: 10
   },
   emptyContainer: {
     flex: 1,
