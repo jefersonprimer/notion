@@ -1,40 +1,43 @@
-import { Link } from 'expo-router';
-import React from 'react';
-import { View, Text, FlatList, StyleSheet, Dimensions, Pressable } from 'react-native';
-import { ThemedText } from './themed-text';
-import { PageIconFilledDark } from './ui/PageIconFilledDark';
+import React, { useState } from 'react';
+import api from '@/lib/axios';
 import { Note } from '../types/note';
+import { ThemedText } from './themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { View, FlatList, StyleSheet, Pressable } from 'react-native';
+import { Link } from 'expo-router';
+
+import { PageIconFilledDark } from './ui/PageIconFilledDark';
 
 type RecentNotesProps = {
   notes: Note[];
 };
 
-const RecentNotes: React.FC<RecentNotesProps> = ({ notes }) => {
+const RecentNotes: React.FC<RecentNotesProps> = ({ notes}) => {
   const iconColor = useThemeColor({}, 'icon');
-
+  
   if (!notes || notes.length === 0) {
     return null;
   }
+ 
+  const renderItem = ({ item }: { item: Note }) => (
+    <View style={styles.card}>
+      <Link href={`/note/${item.id}`} asChild>
+        <Pressable style={styles.pressableContent}>
+          <View style={styles.cardBackground}>
+            <View style={styles.topHalf} />
+            <View style={styles.bottomHalf} />
+          </View>
 
-const renderItem = ({ item }: { item: Note }) => (
-  <Link href={`/note/${item.id}`} asChild>
-    <Pressable style={styles.card}>
-      <View style={styles.cardBackground}>
-        <View style={styles.topHalf} />
-        <View style={styles.bottomHalf} />
-      </View>
-
-      <View style={styles.contentContainer}>
-        <PageIconFilledDark color={iconColor} />
-        <ThemedText style={styles.title} numberOfLines={2}>
-          {item.title}
-        </ThemedText>
-      </View>
-    </Pressable>
-  </Link>
-);
-
+          <View style={styles.contentContainer}>
+            <PageIconFilledDark color={iconColor} />
+            <ThemedText style={styles.title} numberOfLines={2}>
+              {item.title}
+            </ThemedText>
+          </View>
+        </Pressable>
+      </Link>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -46,23 +49,23 @@ const renderItem = ({ item }: { item: Note }) => (
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
-      />
+      /> 
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 24,
+    marginBottom: 24
   },
   subtitle: {
     color: '#838383',
     fontWeight: '500',
-    fontSize: 14,
+    fontSize: 14
   },
   listContent: {
     paddingVertical: 12,
-    gap: 16,
+    gap: 16
   },
   card: {
     width: 130,
@@ -72,32 +75,36 @@ const styles = StyleSheet.create({
     borderColor: '#393939',
     overflow: 'hidden',
     justifyContent: 'center',
-    alignItems: 'flex-start', 
+    alignItems: 'flex-start'
+  },
+  pressableContent: {
+    width: '100%',
+    height: '100%'
   },
   cardBackground: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFillObject
   },
   topHalf: {
     height: '50%',
-    backgroundColor: '#313131',
+    backgroundColor: '#313131'
   },
   bottomHalf: {
     height: '50%',
-    backgroundColor: '#252525',
+    backgroundColor: '#252525'
   },
   contentContainer: {
     flex: 1,
     flexDirection: 'column',
-    alignItems: 'flex-start',  
-    justifyContent: 'center',  
-    padding: 12,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    padding: 12
   },
   title: {
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '500',
     marginTop: 8,
-    textAlign: 'center',
+    textAlign: 'center'
   },
 });
 

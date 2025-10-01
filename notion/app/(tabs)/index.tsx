@@ -87,6 +87,11 @@ export default function HomeScreen() {
     }
   };
 
+  const handleDelete = (id: string) => {
+    setNotes(prevNotes => prevNotes.filter(note => note.id !== id));
+    setFavoriteNotes(prevFavorites => prevFavorites.filter(note => note.id !== id));
+  };
+
   const recentNotes = notes.slice(0, 5);
 
   return (
@@ -97,9 +102,9 @@ export default function HomeScreen() {
           <RefreshControl refreshing={loading} onRefresh={() => { fetchNotes(); fetchFavoriteNotes(); }} />
         }
       >
-        <RecentNotes notes={recentNotes} />
-        <AllFavoritesNotes notes={favoriteNotes} onToggleFavorite={handleToggleFavorite} />
-        <AllNotes notes={notes} onToggleFavorite={handleToggleFavorite} />
+        <RecentNotes notes={recentNotes} onToggleFavorite={handleToggleFavorite} onDelete={handleDelete} />
+        <AllFavoritesNotes notes={favoriteNotes} onToggleFavorite={handleToggleFavorite} onDelete={handleDelete} />
+        <AllNotes notes={notes} onToggleFavorite={handleToggleFavorite} onDelete={handleDelete} />
       </ScrollView>
     </ThemedView>
   );
