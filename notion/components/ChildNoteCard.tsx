@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Modal, Text, Alert } from 'react-na
 import { ThemedText } from './themed-text';
 import { Note } from '../types/note';
 import { PageFilledDarkIcon } from './ui/PageFilledDarkIcon';
+import { PageEmptyIcon } from './ui/PageEmptyIcon';
 import { EllipsisIcon } from './ui/EllipsisIcon';
 import { Link, useRouter } from 'expo-router';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -107,7 +108,7 @@ const ChildNoteCard: React.FC<ChildNoteCardProps> = ({ item }) => {
       <View style={styles.noteItem}>
         <Link href={`/note/${item.id}`} style={styles.noteHead}>
           <View style={styles.noteHeadContent}>
-            <PageFilledDarkIcon />
+            {item.title && item.description ? <PageFilledDarkIcon /> : <PageEmptyIcon color={Colors[colorScheme ?? 'light'].text} />}
             <ThemedText type="defaultSemiBold" style={{ textDecorationLine: 'underline' }}>
               {item.title}
             </ThemedText>

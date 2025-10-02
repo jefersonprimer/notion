@@ -7,13 +7,15 @@ import { Note } from '../types/note';
 import { ArrowChevronSingleDownIcon } from './ui/ArrowChevronSingleDownIcon';
 import { ChevronRightIcon } from './ui/ChevronRightIcon';
 import { PageFilledDarkIcon } from './ui/PageFilledDarkIcon';
+import { PageEmptyIcon } from './ui/PageEmptyIcon';
 import { EllipsisIcon } from './ui/EllipsisIcon';
 import { PlusSmallIcon } from './ui/PlusSmallIcon';
 
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors } from '@/constants/theme';
+
+
 import { Link , useRouter } from 'expo-router';
-
-
-// ... (imports)
 
 type NoteCardProps = {
   item: Note;
@@ -24,6 +26,7 @@ type NoteCardProps = {
 };
 
 const NoteCard: React.FC<NoteCardProps> = ({ item, openModal, onToggleExpand, isExpanded, indentationLevel }) => {
+  const colorScheme = useColorScheme();
   const router = useRouter();
 
   const handleCreateChild = () => {
@@ -37,7 +40,7 @@ const NoteCard: React.FC<NoteCardProps> = ({ item, openModal, onToggleExpand, is
       </TouchableOpacity>
       <Link href={`/note/${item.id}`} style={styles.noteHead}>
         <View style={styles.noteHeadContent}>
-          <PageFilledDarkIcon />
+          {item.title && item.description ? <PageFilledDarkIcon /> : <PageEmptyIcon color={Colors[colorScheme ?? 'light'].text} />}
           <ThemedText type="defaultSemiBold">{item.title}</ThemedText>
         </View>
       </Link>
@@ -58,7 +61,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    
     paddingVertical: 10,
     gap: 10
   }, 
