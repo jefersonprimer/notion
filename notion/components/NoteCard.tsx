@@ -10,9 +10,8 @@ import { PageFilledDarkIcon } from './ui/PageFilledDarkIcon';
 import { EllipsisIcon } from './ui/EllipsisIcon';
 import { PlusSmallIcon } from './ui/PlusSmallIcon';
 
-import { Link } from 'expo-router';
+import { Link , useRouter } from 'expo-router';
 
-import { useRouter } from 'expo-router';
 
 // ... (imports)
 

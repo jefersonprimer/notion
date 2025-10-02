@@ -11,8 +11,10 @@ CREATE TABLE public.notes (
   deleted_at timestamp with time zone,
   updated_at timestamp with time zone DEFAULT now(),
   is_favorite boolean NOT NULL DEFAULT false,
+  parent_id uuid,
   CONSTRAINT notes_pkey PRIMARY KEY (id),
-  CONSTRAINT notes_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+  CONSTRAINT notes_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT notes_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES public.notes(id)
 );
 CREATE TABLE public.profiles (
   id uuid NOT NULL,

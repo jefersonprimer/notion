@@ -8,5 +8,5 @@ export type SavedAccount = {
   id: string;
   email: string;
   displayName: string | null;
-  lastUsed: string; // ISO date string
+  lastUsed: string; 
 };

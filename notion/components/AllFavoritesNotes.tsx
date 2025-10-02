@@ -86,7 +86,7 @@ const AllFavoritesNotes: React.FC<AllFavoritesNotesProps> = ({ notes, onToggleFa
 
   return (
     <View style={styles.container}>
-      <ThemedText type="subtitle" style={styles.subtitle}>Favorites</ThemedText>
+      <ThemedText type="subtitle" style={styles.subtitle}>Favoritos</ThemedText>
       <NoteTree
         notes={notes}
         openModal={openModal}

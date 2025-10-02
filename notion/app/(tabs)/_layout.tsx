@@ -1,6 +1,5 @@
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 import { Tabs } from 'expo-router';
-import React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import BottomSheet from '@gorhom/bottom-sheet';
 

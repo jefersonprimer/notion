@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { View, TextInput, Text, Button, Alert, ActivityIndicator, TouchableOpacity, StyleSheet, Modal } from 'react-native';
-import { useLocalSearchParams, useRouter, Stack, Link } from 'expo-router';
+import { View, TextInput, Text, Alert, ActivityIndicator, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import api from '@/lib/axios';
 import { useDebounce } from '@/hooks/use-debouncer';
 import { ThemedView } from '@/components/themed-view';
@@ -13,9 +13,8 @@ import { AngleLeftIcon } from '@/components/ui/AngleLeftIcon';
 import { StarIcon } from '@/components/ui/StarIcon';
 import { StarSlashIcon } from '@/components/ui/StarSlashIcon';
 import { TrashIcon } from '@/components/ui/TrashIcon';
-import { PageFilledDarkIcon } from '@/components/ui/PageFilledDarkIcon';
-import { EllipsisIcon } from '@/components/ui/EllipsisIcon';
 import { Note } from '@/types/note';
+import ChildNoteCard from '@/components/ChildNoteCard';
 
 export default function NoteScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -68,14 +67,14 @@ export default function NoteScreen() {
     if (debouncedTitle !== undefined && !loading) { // Avoid saving on initial fetch
       api.put(`/notes/${id}`, { title: debouncedTitle });
     }
-  }, [debouncedTitle]);
+  }, [debouncedTitle, id, loading]);
 
   // Auto-save description when debounced value changes
   useEffect(() => {
     if (debouncedDescription !== undefined && !loading) { // Avoid saving on initial fetch
       api.put(`/notes/${id}`, { description: debouncedDescription });
     }
-  }, [debouncedDescription]);
+  }, [debouncedDescription, id, loading]);
 
   const handleToggleFavorite = async () => {
     try {
@@ -205,17 +204,7 @@ export default function NoteScreen() {
         {children.length > 0 && (
           <View style={{ marginTop: 20 }}>
             {children.map(child => (
-              <Link key={child.id} href={`/note/${child.id}`}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '10' }}>
-                    <PageFilledDarkIcon/>
-                    <Text style={{ color: 'white', textDecorationLine: 'underline', fontSize: 16, paddingVertical: 5 }}>{child.title}</Text>
-                  </View>
-                  <View style={{ flexDirection: 'row' }}>
-                    <EllipsisIcon />
-                  </View>
-                </View>
-              </Link>
+              <ChildNoteCard key={child.id} item={child} />
             ))}
           </View>
         )}
