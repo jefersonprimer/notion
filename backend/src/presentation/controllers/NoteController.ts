@@ -10,6 +10,7 @@ import { ListDeletedNotesUseCase } from '../../application/use-cases/ListDeleted
 import { SearchNotesUseCase } from '../../application/use-cases/SearchNotesUseCase';
 import { FavoriteNoteUseCase } from '../../application/use-cases/FavoriteNoteUseCase';
 import { ListFavoriteNotesUseCase } from '../../application/use-cases/ListFavoriteNotesUseCase';
+import { ListChildNotesUseCase } from '../../application/use-cases/ListChildNotesUseCase';
 
 export class NoteController {
   constructor(
@@ -23,14 +24,15 @@ export class NoteController {
     private listDeletedNotesUseCase: ListDeletedNotesUseCase,
     private searchNotesUseCase: SearchNotesUseCase,
     private favoriteNoteUseCase: FavoriteNoteUseCase,
-    private listFavoriteNotesUseCase: ListFavoriteNotesUseCase
+    private listFavoriteNotesUseCase: ListFavoriteNotesUseCase,
+    private listChildNotesUseCase: ListChildNotesUseCase
   ) {}
 
   async create(req: Request, res: Response): Promise<Response> {
     try {
       const userId = req.user!.id;
-      const { title, description } = req.body;
-      const note = await this.createNoteUseCase.execute({ userId, title, description });
+      const { title, description, parentId } = req.body;
+      const note = await this.createNoteUseCase.execute({ userId, title, description, parentId });
       return res.status(201).json(note);
     } catch (error: any) {
       return res.status(400).json({ message: error.message });
@@ -41,6 +43,16 @@ export class NoteController {
     try {
       const userId = req.user!.id;
       const notes = await this.listNotesUseCase.execute(userId);
+      return res.status(200).json(notes);
+    } catch (error: any) {
+      return res.status(400).json({ message: error.message });
+    }
+  }
+
+  async listChildren(req: Request, res: Response): Promise<Response> {
+    try {
+      const { parentId } = req.params;
+      const notes = await this.listChildNotesUseCase.execute(parentId);
       return res.status(200).json(notes);
     } catch (error: any) {
       return res.status(400).json({ message: error.message });

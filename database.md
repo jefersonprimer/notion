@@ -10,6 +10,7 @@ CREATE TABLE public.notes (
   is_deleted boolean NOT NULL DEFAULT false,
   deleted_at timestamp with time zone,
   updated_at timestamp with time zone DEFAULT now(),
+  is_favorite boolean NOT NULL DEFAULT false,
   CONSTRAINT notes_pkey PRIMARY KEY (id),
   CONSTRAINT notes_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );

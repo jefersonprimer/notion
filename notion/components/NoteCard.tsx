@@ -4,38 +4,55 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { ThemedText } from './themed-text';
 import { Note } from '../types/note';
 
+import { ArrowChevronSingleDownIcon } from './ui/ArrowChevronSingleDownIcon';
+import { ChevronRightIcon } from './ui/ChevronRightIcon';
 import { PageFilledDarkIcon } from './ui/PageFilledDarkIcon';
 import { EllipsisIcon } from './ui/EllipsisIcon';
 import { PlusSmallIcon } from './ui/PlusSmallIcon';
-import { ChevronRightIcon } from './ui/ChevronRightIcon';
 
 import { Link } from 'expo-router';
 
+import { useRouter } from 'expo-router';
+
+// ... (imports)
+
 type NoteCardProps = {
   item: Note;
-  handleToggleFavorite: (id: string, isFavorite: boolean) => void;
   openModal: (note: Note) => void;
+  onToggleExpand: (noteId: string) => void;
+  isExpanded: boolean;
+  indentationLevel: number;
 };
 
-const NoteCard: React.FC<NoteCardProps> = ({ item, handleToggleFavorite, openModal }) => (
-  <View style={styles.noteItem}>
-    <View style={styles.nestedListview}>
-      <ChevronRightIcon/>
-    </View>
-    <Link href={`/note/${item.id}`} style={styles.noteHead}>
-      <View style={styles.noteHeadContent}>
-        <PageFilledDarkIcon />
-        <ThemedText type="defaultSemiBold">{item.title}</ThemedText>
-      </View> 
-    </Link>
-    <View style={styles.noteTail}>
-      <TouchableOpacity onPress={() => openModal(item)}>
-        <EllipsisIcon />
+const NoteCard: React.FC<NoteCardProps> = ({ item, openModal, onToggleExpand, isExpanded, indentationLevel }) => {
+  const router = useRouter();
+
+  const handleCreateChild = () => {
+    router.push({ pathname: '/create', params: { parentId: item.id } });
+  };
+
+  return (
+    <View style={[styles.noteItem, { marginLeft: indentationLevel * 20 }]}>
+      <TouchableOpacity onPress={() => onToggleExpand(item.id)} style={styles.nestedListview}>
+        {isExpanded ? <ArrowChevronSingleDownIcon /> : <ChevronRightIcon />}
       </TouchableOpacity>
-      <PlusSmallIcon />
+      <Link href={`/note/${item.id}`} style={styles.noteHead}>
+        <View style={styles.noteHeadContent}>
+          <PageFilledDarkIcon />
+          <ThemedText type="defaultSemiBold">{item.title}</ThemedText>
+        </View>
+      </Link>
+      <View style={styles.noteTail}>
+        <TouchableOpacity onPress={() => openModal(item)}>
+          <EllipsisIcon />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleCreateChild}>
+          <PlusSmallIcon />
+        </TouchableOpacity>
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   noteItem: {

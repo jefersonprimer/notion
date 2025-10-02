@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { TextInput, Button, Alert, ActivityIndicator, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import api from '@/lib/axios';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -12,6 +12,7 @@ export default function CreateNoteScreen() {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { parentId } = useLocalSearchParams<{ parentId?: string }>();
   const colorScheme = useColorScheme();
 
   const styles = StyleSheet.create({
@@ -39,7 +40,7 @@ export default function CreateNoteScreen() {
 
     setLoading(true);
     try {
-      await api.post('/notes', { title, description });
+      await api.post('/notes', { title, description, parentId });
       Alert.alert('Sucesso', 'Sua nota foi salva!');
       // Navigate to home screen after creation and reset fields
       setTitle('');

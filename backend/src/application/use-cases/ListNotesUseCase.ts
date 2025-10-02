@@ -8,6 +8,6 @@ export class ListNotesUseCase {
     if (!userId) {
       throw new Error('User ID is required.');
     }
-    return this.noteRepository.findByUserId(userId);
+    return this.noteRepository.findTopLevelByUserId(userId);
   }
 }

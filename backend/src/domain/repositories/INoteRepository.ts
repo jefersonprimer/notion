@@ -1,8 +1,10 @@
 import { Note } from '../entities/Note';
 
 export interface INoteRepository {
-  create(note: Omit<Note, 'id' | 'createdAt' | 'is_deleted' | 'deleted_at'>): Promise<Note>;
+  create(note: Omit<Note, 'id' | 'createdAt' | 'is_deleted' | 'deleted_at'> & { parentId?: string | null }): Promise<Note>;
   findByUserId(userId: string): Promise<Note[]>;
+  findTopLevelByUserId(userId: string): Promise<Note[]>;
+  findByParentId(parentId: string): Promise<Note[]>;
   findById(id: string, userId: string): Promise<Note | null>;
   update(id: string, userId: string, data: Partial<Pick<Note, 'title' | 'description'>>): Promise<Note | null>;
   softDelete(id: string, userId: string): Promise<void>;

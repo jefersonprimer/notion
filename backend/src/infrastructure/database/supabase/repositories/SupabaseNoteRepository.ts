@@ -4,16 +4,17 @@ import { supabase } from "../client";
 
 export class SupabaseNoteRepository implements INoteRepository {
 
-  async create(noteData: Omit<Note, 'id' | 'createdAt' | 'is_deleted' | 'deleted_at'>): Promise<Note> {
-    const { userId, title, description } = noteData;
+  async create(noteData: Omit<Note, 'id' | 'createdAt' | 'is_deleted' | 'deleted_at'> & { parentId?: string | null }): Promise<Note> {
+    const { userId, title, description, parentId } = noteData;
     const { data, error } = await supabase
       .from('notes')
       .insert({
         user_id: userId,
         title,
         description,
-        is_deleted: false, // New notes are not deleted by default
-        is_favorite: false, // New notes are not favorite by default
+        parent_id: parentId,
+        is_deleted: false, 
+        is_favorite: false,
       })
       .select()
       .single();
@@ -24,6 +25,39 @@ export class SupabaseNoteRepository implements INoteRepository {
     }
 
     return this.mapToNote(data);
+  }
+
+  async findTopLevelByUserId(userId: string): Promise<Note[]> {
+    const { data, error } = await supabase
+      .from('notes')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('is_deleted', false)
+      .is('parent_id', null)
+      .order('updated_at', { ascending: false });
+
+    if (error) {
+      console.error("Supabase find top-level notes error:", error.message);
+      throw new Error("Could not find notes.");
+    }
+
+    return data.map(this.mapToNote);
+  }
+
+  async findByParentId(parentId: string): Promise<Note[]> {
+    const { data, error } = await supabase
+      .from('notes')
+      .select('*')
+      .eq('parent_id', parentId)
+      .eq('is_deleted', false)
+      .order('updated_at', { ascending: false });
+
+    if (error) {
+      console.error("Supabase find child notes error:", error.message);
+      throw new Error("Could not find child notes.");
+    }
+
+    return data.map(this.mapToNote);
   }
 
   async findByUserId(userId: string): Promise<Note[]> {
@@ -205,6 +239,7 @@ export class SupabaseNoteRepository implements INoteRepository {
         deleted_at: data.deleted_at ? new Date(data.deleted_at) : null,
         updated_at: new Date(data.updated_at),
         is_favorite: data.is_favorite,
+        parentId: data.parent_id,
     };
   }
 }

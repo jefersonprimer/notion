@@ -7,5 +7,6 @@ export type Note = {
   is_deleted: boolean;
   deleted_at: string | null;
   is_favorite: boolean;
+  parentId?: string | null; // Optional parent ID for nested notes
 };
 

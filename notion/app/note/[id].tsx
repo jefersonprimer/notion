@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View, TextInput, Text, Button, Alert, ActivityIndicator, TouchableOpacity, StyleSheet, Modal } from 'react-native';
-import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack, Link } from 'expo-router';
 import api from '@/lib/axios';
 import { useDebounce } from '@/hooks/use-debouncer';
 import { ThemedView } from '@/components/themed-view';
@@ -13,6 +13,9 @@ import { AngleLeftIcon } from '@/components/ui/AngleLeftIcon';
 import { StarIcon } from '@/components/ui/StarIcon';
 import { StarSlashIcon } from '@/components/ui/StarSlashIcon';
 import { TrashIcon } from '@/components/ui/TrashIcon';
+import { PageFilledDarkIcon } from '@/components/ui/PageFilledDarkIcon';
+import { EllipsisIcon } from '@/components/ui/EllipsisIcon';
+import { Note } from '@/types/note';
 
 export default function NoteScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -23,6 +26,7 @@ export default function NoteScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
+  const [children, setChildren] = useState<Note[]>([]);
 
   // UI editing state
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -51,6 +55,12 @@ export default function NoteScreen() {
       })
       .catch(err => setError(err.response?.data?.message || 'Failed to fetch note.'))
       .finally(() => setLoading(false));
+
+    api.get(`/notes/${id}/children`)
+      .then(response => {
+        setChildren(response.data);
+      })
+      .catch(err => console.error('Failed to fetch child notes.', err));
   }, [id]);
 
   // Auto-save title when debounced value changes
@@ -190,6 +200,24 @@ export default function NoteScreen() {
             <TouchableOpacity onPress={() => setIsEditingDescription(true)}>
                 <Text style={styles.description}>{description || 'Sem descrição'}</Text>
             </TouchableOpacity>
+        )}
+
+        {children.length > 0 && (
+          <View style={{ marginTop: 20 }}>
+            {children.map(child => (
+              <Link key={child.id} href={`/note/${child.id}`}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '10' }}>
+                    <PageFilledDarkIcon/>
+                    <Text style={{ color: 'white', textDecorationLine: 'underline', fontSize: 16, paddingVertical: 5 }}>{child.title}</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row' }}>
+                    <EllipsisIcon />
+                  </View>
+                </View>
+              </Link>
+            ))}
+          </View>
         )}
 
         <Modal

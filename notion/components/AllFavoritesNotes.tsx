@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-import { View, FlatList, StyleSheet, Text, TouchableOpacity, Modal, Alert } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Modal, Alert } from 'react-native';
 import { ThemedText } from './themed-text';
 
 import api from '@/lib/axios';
 
-import NoteCard from './NoteCard';
+import NoteTree from './NoteTree';
 import { Note } from '../types/note';
 
 import { StarIcon } from '@/components/ui/StarIcon';
 import { StarSlashIcon } from '@/components/ui/StarSlashIcon';
 import { TrashIcon } from '@/components/ui/TrashIcon';
-
 
 type AllFavoritesNotesProps = {
   notes: Note[];
@@ -21,10 +20,29 @@ type AllFavoritesNotesProps = {
 const AllFavoritesNotes: React.FC<AllFavoritesNotesProps> = ({ notes, onToggleFavorite, onDelete }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>({});
+  const [childNodes, setChildNodes] = useState<Record<string, Note[]>>({});
 
   if (!notes || notes.length === 0) {
     return null;
   }
+
+  const handleToggleExpand = async (noteId: string) => {
+    const isCurrentlyExpanded = !!expandedNotes[noteId];
+
+    if (!isCurrentlyExpanded && !childNodes[noteId]) {
+      try {
+        const response = await api.get(`/notes/${noteId}/children`);
+        setChildNodes(prev => ({ ...prev, [noteId]: response.data }));
+        setExpandedNotes(prev => ({ ...prev, [noteId]: true }));
+      } catch (err) {
+        console.error(`Failed to fetch child notes for ${noteId}`, err);
+        Alert.alert('Erro', 'Failed to fetch child notes');
+      }
+    } else {
+      setExpandedNotes(prev => ({ ...prev, [noteId]: !isCurrentlyExpanded }));
+    }
+  };
 
   const handleToggleFavorite = async (id: string, isFavorite: boolean) => {
     onToggleFavorite(id, isFavorite);
@@ -66,23 +84,15 @@ const AllFavoritesNotes: React.FC<AllFavoritesNotesProps> = ({ notes, onToggleFa
     setModalVisible(true);
   };
 
-  const renderItem = ({ item }: { item: Note }) => (
-    <NoteCard 
-      item={item}
-      handleToggleFavorite={handleToggleFavorite}
-      openModal={openModal}
-    />
-  );
-
   return (
     <View style={styles.container}>
       <ThemedText type="subtitle" style={styles.subtitle}>Favorites</ThemedText>
-      <FlatList
-        data={notes}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        scrollEnabled={false}
+      <NoteTree
+        notes={notes}
+        openModal={openModal}
+        onToggleExpand={handleToggleExpand}
+        expandedNotes={expandedNotes}
+        childNodes={childNodes}
       />
       {selectedNote && (
         <Modal
