@@ -1,15 +1,22 @@
 import { useEffect, useState } from 'react';
-import { View, FlatList, Button, Alert, ActivityIndicator } from 'react-native';
+import { View, FlatList, Button, Alert, ActivityIndicator, TouchableOpacity, Linking } from 'react-native';
 import api from '@/lib/axios';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Stack, useRouter } from 'expo-router';
 
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors } from '@/constants/theme';
+
 import { Note } from '@/types/note';
+import TrashNoteCard from '@/components/TrashNoteCard';
+import { SacIcon } from '@/components/ui/SacIcon';
+import { AngleLeftIcon } from '@/components/ui/AngleLeftIcon';
 
 type DeletedNote = Note;
 
 export default function TrashScreen() {
+  const colorScheme = useColorScheme();
   const [notes, setNotes] = useState<DeletedNote[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -65,23 +72,31 @@ export default function TrashScreen() {
   };
 
   const renderItem = ({ item }: { item: DeletedNote }) => (
-    <View className="border-b border-gray-200 dark:border-gray-700 p-4 flex-row justify-between items-center">
-      <View style={{ flex: 1 }}>
-        <ThemedText type="subtitle">{item.title}</ThemedText>
-        <ThemedText style={{ fontSize: 12, color: 'gray' }}>
-          Deletada em: {new Date(item.deleted_at).toLocaleDateString()}
-        </ThemedText>
-      </View>
-      <View style={{ flexDirection: 'row', gap: 10 }}>
-        <Button title="Restaurar" onPress={() => handleRestore(item.id)} />
-        <Button title="Apagar" color="red" onPress={() => handlePermanentDelete(item.id)} />
-      </View>
-    </View>
+    <TrashNoteCard
+      item={item}
+      onRestore={handleRestore}
+      onPermanentDelete={handlePermanentDelete}
+    />
   );
 
   return (
-    <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'Lixeira' }} />
+    <ThemedView style={{ flex: 1, backgroundColor: '#202020', }}>
+      <Stack.Screen options={{
+        headerStyle: { backgroundColor: '#202020' },
+        headerTintColor: '#fff',
+        headerTitle: 'Lixeira',
+        headerTitleAlign: 'center',
+        headerRight: () => (
+          <TouchableOpacity onPress={() => router.back()} style={{ padding: 4 }}>
+            <ThemedText style={{color: '#2383E2', fontSize: 16}}>Concluído</ThemedText>
+          </TouchableOpacity>
+        ),
+        headerLeft: () => (
+          <TouchableOpacity onPress={() => Linking.openURL('https://www.notion.com/pt/help/duplicate-delete-and-restore-content')} style={{ padding: 4 }}>
+            <SacIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />
+          </TouchableOpacity>
+        ),
+      }} />
       {loading ? (
         <ActivityIndicator style={{ flex: 1 }} size="large" />
       ) : (

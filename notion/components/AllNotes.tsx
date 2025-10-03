@@ -93,8 +93,8 @@ const AllNotes: React.FC<AllNotesProps> = ({ notes, onToggleFavorite, onDelete }
       <View style={styles.header}>
         <ThemedText type="subtitle" style={styles.subtitle}>Particular</ThemedText>
         <View style={styles.headerIcons}>
-          <EllipsisIcon />
-          <PlusSmallIcon />
+          <EllipsisIcon size={20} />
+          <PlusSmallIcon size={20} />
         </View>
       </View> 
 
