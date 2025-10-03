@@ -5,6 +5,7 @@ import BottomSheet from '@gorhom/bottom-sheet';
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeColor } from '@/hooks/use-theme-color';
 import HomeHeader from '@/components/HomeHeader';
 import { AccountSwitcherModal } from '@/components/auth/AccountSwitcherModal';
 
@@ -16,6 +17,7 @@ import { CreateNoteIcon } from '@/components/ui/CreateNoteIcon';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const backgroundColor = useThemeColor({}, 'background');
 
   const handleOpenSheet = () => bottomSheetRef.current?.expand();
   const handleCloseSheet = () => bottomSheetRef.current?.close();
@@ -25,6 +27,9 @@ export default function TabLayout() {
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+          tabBarStyle: {
+            backgroundColor,
+          },
         }}>
         <Tabs.Screen
           name="index"
@@ -33,7 +38,7 @@ export default function TabLayout() {
             tabBarShowLabel: false,
             header: () => <HomeHeader onOpenAccountSwitcher={handleOpenSheet} />,
             tabBarIcon: ({ color }) => (
-              <HomeIcon color={color} />
+              <HomeIcon color={color} size={30} />
             ),
           }}
         />
@@ -44,7 +49,7 @@ export default function TabLayout() {
             tabBarShowLabel: false,
             headerShown: false,
             tabBarIcon: ({ color }) => (
-              <SearchIcon color={color} />
+              <SearchIcon color={color} size={30}/>
             ),
           }}
         />
@@ -55,7 +60,7 @@ export default function TabLayout() {
             tabBarShowLabel: false,
             headerShown: false,
             tabBarIcon: ({ color }) => (
-              <InboxIcon color={color} />
+              <InboxIcon color={color} size={30}/>
             ),
           }}
         />
@@ -66,7 +71,7 @@ export default function TabLayout() {
             tabBarShowLabel: false,
             headerShown: false,
             tabBarIcon: ({ color }) => (
-              <CreateNoteIcon color={color} />
+              <CreateNoteIcon color={color} size={30} />
             ),
           }}
         />

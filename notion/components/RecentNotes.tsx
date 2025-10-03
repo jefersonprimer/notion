@@ -56,7 +56,7 @@ const RecentNotes: React.FC<RecentNotesProps> = ({ notes}) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 24
+    marginBottom: 2
   },
   subtitle: {
     color: '#838383',
@@ -64,12 +64,12 @@ const styles = StyleSheet.create({
     fontSize: 14
   },
   listContent: {
-    paddingVertical: 12,
+    paddingVertical: 14,
     gap: 16
   },
   card: {
     width: 130,
-    height: 120,
+    height: 130,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#393939',

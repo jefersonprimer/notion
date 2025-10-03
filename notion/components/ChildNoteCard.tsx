@@ -108,7 +108,7 @@ const ChildNoteCard: React.FC<ChildNoteCardProps> = ({ item }) => {
       <View style={styles.noteItem}>
         <Link href={`/note/${item.id}`} style={styles.noteHead}>
           <View style={styles.noteHeadContent}>
-            {item.title && item.description ? <PageFilledDarkIcon /> : <PageEmptyIcon color={Colors[colorScheme ?? 'light'].text} />}
+            {item.title && item.description ? <PageFilledDarkIcon color={Colors[colorScheme ?? 'light'].icon} /> : <PageEmptyIcon color={Colors[colorScheme ?? 'light'].icon} />}
             <ThemedText type="defaultSemiBold" style={{ textDecorationLine: 'underline' }}>
               {item.title}
             </ThemedText>
@@ -116,7 +116,7 @@ const ChildNoteCard: React.FC<ChildNoteCardProps> = ({ item }) => {
         </Link>
         <View style={styles.noteTail}>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <EllipsisIcon />
+            <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={20}/>
           </TouchableOpacity>
         </View>
       </View>

@@ -102,13 +102,13 @@ export default function HomeHeader({ onOpenAccountSwitcher }: HomeHeaderProps) {
 
           <TouchableOpacity onPress={onOpenAccountSwitcher} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
             <ThemedText style={styles.emailText}>Notion de {session?.user?.displayName || session?.user?.email}</ThemedText>
-            <ArrowChevronSingleDownIcon color={Colors[colorScheme ?? 'light'].text}/>
+            <ArrowChevronSingleDownIcon color={Colors[colorScheme ?? 'light'].icon}/>
           </TouchableOpacity>
         </View>
         
         <View>
           <TouchableOpacity ref={ellipsisIconRef} onPress={openMenuModal}>
-            <EllipsisIcon color={Colors[colorScheme ?? 'light'].text} />
+            <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={20}/>
           </TouchableOpacity>
           
           <Modal

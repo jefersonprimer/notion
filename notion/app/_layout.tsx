@@ -4,6 +4,8 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useEffect } from 'react';
+import * as SystemUI from 'expo-system-ui';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { AuthProvider } from '@/context/AuthProvider';
@@ -27,6 +29,10 @@ const InitialLayout = () => {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
+
+  useEffect(() => {
+    SystemUI.setBackgroundColorAsync(theme.colors.background);
+  }, [theme]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

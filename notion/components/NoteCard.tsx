@@ -36,20 +36,20 @@ const NoteCard: React.FC<NoteCardProps> = ({ item, openModal, onToggleExpand, is
   return (
     <View style={[styles.noteItem, { marginLeft: indentationLevel * 20 }]}>
       <TouchableOpacity onPress={() => onToggleExpand(item.id)} style={styles.nestedListview}>
-        {isExpanded ? <ArrowChevronSingleDownIcon /> : <ChevronRightIcon />}
+        {isExpanded ? <ArrowChevronSingleDownIcon color={Colors[colorScheme ?? 'light'].icon} /> : <ChevronRightIcon color={Colors[colorScheme ?? 'light'].icon} />}
       </TouchableOpacity>
       <Link href={`/note/${item.id}`} style={styles.noteHead}>
         <View style={styles.noteHeadContent}>
-          {item.title && item.description ? <PageFilledDarkIcon /> : <PageEmptyIcon color={Colors[colorScheme ?? 'light'].text} />}
+          {item.title && item.description ? <PageFilledDarkIcon color={Colors[colorScheme ?? 'light'].icon} /> : <PageEmptyIcon color={Colors[colorScheme ?? 'light'].icon} />}
           <ThemedText type="defaultSemiBold">{item.title}</ThemedText>
         </View>
       </Link>
       <View style={styles.noteTail}>
         <TouchableOpacity onPress={() => openModal(item)}>
-          <EllipsisIcon />
+          <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleCreateChild}>
-          <PlusSmallIcon />
+          <PlusSmallIcon color={Colors[colorScheme ?? 'light'].icon} />
         </TouchableOpacity>
       </View>
     </View>

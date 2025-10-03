@@ -10,6 +10,7 @@ import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 import { AngleLeftIcon } from '@/components/ui/AngleLeftIcon';
+import { EllipsisIcon } from '@/components/ui/EllipsisIcon';
 import { StarIcon } from '@/components/ui/StarIcon';
 import { StarSlashIcon } from '@/components/ui/StarSlashIcon';
 import { TrashIcon } from '@/components/ui/TrashIcon';
@@ -161,13 +162,13 @@ export default function NoteScreen() {
                 headerTitle: '',
                 headerBackVisible: false,
                 headerLeft: () => (
-                    <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 10 }}>
-                        <AngleLeftIcon color={Colors[colorScheme ?? 'light'].text} />
+                    <TouchableOpacity onPress={() => router.back()}>
+                        <AngleLeftIcon color={Colors[colorScheme ?? 'light'].icon} size={30} />
                     </TouchableOpacity>
                 ),
                 headerRight: () => (
                     <TouchableOpacity onPress={() => setModalVisible(true)}>
-                        <Ionicons name="ellipsis-horizontal" size={24} color={Colors[colorScheme ?? 'light'].text} />
+                        <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={24} />
                     </TouchableOpacity>
                 ),
             }}
