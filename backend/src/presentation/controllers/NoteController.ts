@@ -135,7 +135,11 @@ export class NoteController {
     try {
       const userId = req.user!.id;
       const query = req.query.q as string;
-      const notes = await this.searchNotesUseCase.execute({ userId, query });
+      const titleOnly = req.query.titleOnly === 'true';
+      const sortBy = req.query.sortBy as 'created_at' | 'updated_at' | undefined;
+      const sortDirection = req.query.sortDirection as 'asc' | 'desc' | undefined;
+
+      const notes = await this.searchNotesUseCase.execute({ userId, query, titleOnly, sortBy, sortDirection });
       return res.status(200).json(notes);
     } catch (error: any) {
       return res.status(400).json({ message: error.message });

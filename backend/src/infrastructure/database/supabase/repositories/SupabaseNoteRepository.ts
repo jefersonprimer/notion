@@ -60,13 +60,13 @@ export class SupabaseNoteRepository implements INoteRepository {
     return data.map(this.mapToNote);
   }
 
-  async findByUserId(userId: string): Promise<Note[]> {
+  async findByUserId(userId: string, sortBy: 'created_at' | 'updated_at' = 'updated_at', sortDirection: 'asc' | 'desc' = 'desc'): Promise<Note[]> {
     const { data, error } = await supabase
       .from('notes')
       .select('*')
       .eq('user_id', userId)
       .eq('is_deleted', false)
-      .order('updated_at', { ascending: false });
+      .order(sortBy, { ascending: sortDirection === 'asc' });
 
     if (error) {
       console.error("Supabase find notes error:", error.message);
@@ -162,13 +162,26 @@ export class SupabaseNoteRepository implements INoteRepository {
     return data.map(this.mapToNote);
   }
 
-  async search(userId: string, query: string): Promise<Note[]> {
-    const { data, error } = await supabase
+  async search(userId: string, query: string, titleOnly?: boolean, sortBy?: 'created_at' | 'updated_at', sortDirection?: 'asc' | 'desc'): Promise<Note[]> {
+    let filter;
+    if (titleOnly) {
+      filter = `title.ilike.%${query}%`;
+    } else {
+      filter = `title.ilike.%${query}%,description.ilike.%${query}%`;
+    }
+
+    let queryBuilder = supabase
       .from('notes')
       .select('*')
       .eq('user_id', userId)
       .eq('is_deleted', false)
-      .or(`title.ilike.%${query}%,description.ilike.%${query}%`);
+      .or(filter);
+
+    if (sortBy) {
+      queryBuilder = queryBuilder.order(sortBy, { ascending: sortDirection === 'asc' });
+    }
+
+    const { data, error } = await queryBuilder;
 
     if (error) {
       console.error("Supabase search notes error:", error.message);
