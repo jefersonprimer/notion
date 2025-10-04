@@ -36,7 +36,7 @@ const NoteCard: React.FC<NoteCardProps> = ({ item, openModal, onToggleExpand, is
   return (
     <View style={[styles.noteItem, { marginLeft: indentationLevel * 20 }]}>
       <TouchableOpacity onPress={() => onToggleExpand(item.id)} style={styles.nestedListview}>
-        {isExpanded ? <ArrowChevronSingleDownIcon color={Colors[colorScheme ?? 'light'].icon} /> : <ChevronRightIcon color={Colors[colorScheme ?? 'light'].icon} />}
+        {isExpanded ? <ArrowChevronSingleDownIcon color={Colors[colorScheme ?? 'light'].icon} size={20} /> : <ChevronRightIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />}
       </TouchableOpacity>
       <Link href={`/note/${item.id}`} style={styles.noteHead}>
         <View style={styles.noteHeadContent}>

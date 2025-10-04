@@ -1,11 +1,16 @@
 import { useState } from 'react';
-import { TextInput, Button, Alert, ActivityIndicator, StyleSheet } from 'react-native';
+import { TextInput, Button, Alert, ActivityIndicator, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import api from '@/lib/axios';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
+
+import { AngleLeftIcon } from '@/components/ui/AngleLeftIcon';
+import { PadLockIcon } from '@/components/ui/PadLockIcon';
+import { ChevronRightIcon } from '@/components/ui/ChevronRightIcon';
+import { EllipsisIcon } from '@/components/ui/EllipsisIcon';
 
 export default function CreateNoteScreen() {
   const [title, setTitle] = useState('');
@@ -55,9 +60,20 @@ export default function CreateNoteScreen() {
   }
 
   return (
-    <ThemedView style={{ flex: 1, padding: 16, paddingTop: 40 }}>
-      <ThemedText type="title" style={{ marginBottom: 24 }}>Nova Nota</ThemedText>
-      
+    <ThemedView style={{ flex: 1, padding: 16 }}>
+     
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 20 }}>
+        <TouchableOpacity onPress={() => router.push('/(tabs)')}>
+        <AngleLeftIcon color={Colors[colorScheme ?? 'light'].icon} size={24} />
+      </TouchableOpacity>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+          <PadLockIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />
+          <ThemedText type="title" style={{ fontSize: 14 }}>Particular</ThemedText>
+          <ChevronRightIcon color={Colors[colorScheme ?? 'light'].icon} size={16} />
+        </View>
+        <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={24} />
+      </View>
+           
       <TextInput
         placeholder="Título"
         value={title}
