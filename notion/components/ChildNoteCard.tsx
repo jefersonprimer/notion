@@ -108,7 +108,7 @@ const ChildNoteCard: React.FC<ChildNoteCardProps> = ({ item }) => {
       <View style={styles.noteItem}>
         <Link href={`/note/${item.id}`} style={styles.noteHead}>
           <View style={styles.noteHeadContent}>
-            {item.title && item.description ? <PageFilledDarkIcon color={Colors[colorScheme ?? 'light'].icon} /> : <PageEmptyIcon color={Colors[colorScheme ?? 'light'].icon} />}
+            {item.title && item.description ? <PageFilledDarkIcon color={Colors[colorScheme ?? 'light'].icon} size={20} /> : <PageEmptyIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />}
             <ThemedText type="defaultSemiBold" style={{ textDecorationLine: 'underline' }}>
               {item.title}
             </ThemedText>

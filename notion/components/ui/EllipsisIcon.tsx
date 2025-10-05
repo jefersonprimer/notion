@@ -1,10 +1,9 @@
 import React from 'react';
 import { Svg, Path } from 'react-native-svg';
-import { useThemeColor } from '@/hooks/use-theme-color';
 
 interface EllipsisIconProps {
-  color?: string;
-  size?: number;
+  color: string;
+  size: number;
 }
 
 export function EllipsisIcon({ color, size }: EllipsisIconProps) {

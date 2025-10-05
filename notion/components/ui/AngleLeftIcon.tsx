@@ -2,8 +2,8 @@ import React from 'react';
 import { Svg, Path } from 'react-native-svg';
 
 interface AngleLeftIconProps {
-  color?: string;
-  size?: number;
+  color: string;
+  size: number;
 }
 
 export function AngleLeftIcon({ color, size }: AngleLeftIconProps) {

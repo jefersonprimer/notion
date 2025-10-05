@@ -5,6 +5,9 @@ import { Note } from '../types/note';
 import api from '@/lib/axios';
 import NoteTree from './NoteTree';
 
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors } from '@/constants/theme';
+
 import { EllipsisIcon } from '@/components/ui/EllipsisIcon';
 import { PlusSmallIcon } from '@/components/ui/PlusSmallIcon';
 import { StarIcon } from '@/components/ui/StarIcon';
@@ -18,6 +21,8 @@ type AllNotesProps = {
 };
 
 const AllNotes: React.FC<AllNotesProps> = ({ notes, onToggleFavorite, onDelete }) => {
+  const colorScheme = useColorScheme();
+
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>({});
@@ -93,8 +98,8 @@ const AllNotes: React.FC<AllNotesProps> = ({ notes, onToggleFavorite, onDelete }
       <View style={styles.header}>
         <ThemedText type="subtitle" style={styles.subtitle}>Particular</ThemedText>
         <View style={styles.headerIcons}>
-          <EllipsisIcon size={20} />
-          <PlusSmallIcon size={20} />
+          <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />
+          <PlusSmallIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />
         </View>
       </View> 
 
@@ -120,13 +125,13 @@ const AllNotes: React.FC<AllNotesProps> = ({ notes, onToggleFavorite, onDelete }
                 setModalVisible(false);
               }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                  {selectedNote.is_favorite ? <StarSlashIcon  /> : <StarIcon />}
+                  {selectedNote.is_favorite ? <StarSlashIcon color={Colors[colorScheme ?? 'light'].icon} size={20} /> : <StarIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />}
                   <Text style={styles.modalButtonText}>{selectedNote.is_favorite ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}</Text>
                 </View> 
               </TouchableOpacity>
               <TouchableOpacity style={styles.modalButton} onPress={handleDelete}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                  <TrashIcon/>
+                  <TrashIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />
                   <Text style={[styles.modalButtonText, { color: 'red' }]}>Mover para a Lixeira</Text>
                 </View> 
               </TouchableOpacity>

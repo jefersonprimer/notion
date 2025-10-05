@@ -29,7 +29,7 @@ const RecentNotes: React.FC<RecentNotesProps> = ({ notes}) => {
           </View>
 
           <View style={styles.contentContainer}>
-            <PageFilledDarkIcon color={iconColor} />
+            <PageFilledDarkIcon color={iconColor} size={24} />
             <ThemedText style={styles.title} numberOfLines={2}>
               {item.title}
             </ThemedText>

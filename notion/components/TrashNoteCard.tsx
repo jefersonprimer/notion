@@ -22,7 +22,7 @@ export default function TrashNoteCard({ item, onRestore, onPermanentDelete }: Tr
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#252525', padding: 10, borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#353535' }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 1, marginRight: 30 }}>
-        {item.title && item.description ? <PageFilledDarkIcon color={Colors[colorScheme ?? 'light'].icon} /> : <PageEmptyIcon color={Colors[colorScheme ?? 'light'].icon} />}
+        {item.title && item.description ? <PageFilledDarkIcon color={Colors[colorScheme ?? 'light'].icon} size={20} /> : <PageEmptyIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />}
           <ThemedText type="subtitle" numberOfLines={1} style={{ fontSize: 16, fontWeight: 500 }}>{item.title}</ThemedText>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>

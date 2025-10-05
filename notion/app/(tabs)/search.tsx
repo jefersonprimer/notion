@@ -55,7 +55,7 @@ const SearchNoteCard = ({ note, allNotes }: { note: Note, allNotes: Note[] }) =>
   return (
     <TouchableOpacity style={styles.card} onPress={() => router.push(`/note/${note.id}`)}>
       <View style={styles.iconContainer}>
-        {note.description ? <PageFilledDarkIcon color={Colors[colorScheme ?? 'light'].icon} /> : <PageEmptyIcon color={Colors[colorScheme ?? 'light'].icon} />}
+        {note.description ? <PageFilledDarkIcon color={Colors[colorScheme ?? 'light'].icon} size={20} /> : <PageEmptyIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />}
       </View>
       <View style={styles.textContainer}>
         <ThemedText type="defaultSemiBold">{note.title}</ThemedText>

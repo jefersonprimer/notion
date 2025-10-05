@@ -2,12 +2,13 @@ import React from 'react';
 import { Svg, Path, G } from 'react-native-svg';
 
 interface PageFilledDarkIconProps {
-  color?: string;
+  color: string;
+  size: number;
 }
 
-export function PageFilledDarkIcon({ color }: PageFilledDarkIconProps ) {
+export function PageFilledDarkIcon({ color, size }: PageFilledDarkIconProps ) {
   return (
-    <Svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" width={20} height={20} fill={color}> 
+    <Svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" width={size} height={size} fill={color}> 
       <G>
         <Path d="M4.35986 15.3999C2.89697 15.3999 2.13818 14.6343 2.13818 13.1577V2.84229C2.13818 1.37256 2.89697 0.600098 4.35986 0.600098H7.65479C8.50928 0.600098 8.98096 0.736816 9.55518 1.31787L13.144 4.96826C13.7388 5.56982 13.8618 6.00732 13.8618 6.95752V13.1577C13.8618 14.6274 13.103 15.3999 11.6401 15.3999H4.35986Z" fill="#252525">
         </Path>
