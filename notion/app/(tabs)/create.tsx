@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { TextInput, Button, Alert, ActivityIndicator, StyleSheet, View, TouchableOpacity } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useState, useEffect, useCallback } from 'react';
+import { TextInput, Alert, ActivityIndicator, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import api from '@/lib/axios';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
+import { useDebounce } from '@/hooks/use-debouncer';
 
 import { AngleLeftIcon } from '@/components/ui/AngleLeftIcon';
 import { PadLockIcon } from '@/components/ui/PadLockIcon';
@@ -15,10 +16,22 @@ import { EllipsisIcon } from '@/components/ui/EllipsisIcon';
 export default function CreateNoteScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [noteId, setNoteId] = useState<string | null>(null);
   const router = useRouter();
   const { parentId } = useLocalSearchParams<{ parentId?: string }>();
   const colorScheme = useColorScheme();
+
+  const debouncedTitle = useDebounce(title, 500);
+  const debouncedDescription = useDebounce(description, 500);
+
+  useFocusEffect(
+    useCallback(() => {
+      // Reset state when the screen is focused
+      setNoteId(null);
+      setTitle('');
+      setDescription('');
+    }, [])
+  );
 
   const styles = StyleSheet.create({
     input: {
@@ -37,27 +50,32 @@ export default function CreateNoteScreen() {
     },
   });
 
-  async function handleSaveNote() {
-    if (!title.trim()) {
-      Alert.alert('Título Necessário', 'Por favor, dê um título para a sua nota.');
-      return;
-    }
+  useEffect(() => {
+    const saveNote = async () => {
+      if (noteId) {
+        // Update existing note
+        await api.put(`/notes/${noteId}`, { 
+          title: debouncedTitle || 'sem titulo', 
+          description: debouncedDescription 
+        });
+      } else {
+        // Create new note
+        try {
+          const response = await api.post('/notes', { 
+            title: debouncedTitle || 'sem titulo', 
+            description: debouncedDescription, 
+            parentId 
+          });
+          const newNoteId = response.data.id;
+          setNoteId(newNoteId);
+        } catch (error) {
+          console.error('Failed to create note', error);
+        }
+      }
+    };
 
-    setLoading(true);
-    try {
-      await api.post('/notes', { title, description, parentId });
-      Alert.alert('Sucesso', 'Sua nota foi salva!');
-      // Navigate to home screen after creation and reset fields
-      setTitle('');
-      setDescription('');
-      router.push('/(tabs)'); 
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Não foi possível salvar a nota.';
-      Alert.alert('Erro', errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }
+    saveNote();
+  }, [debouncedTitle, debouncedDescription, noteId, parentId, router]);
 
   return (
     <ThemedView style={{ flex: 1, padding: 16 }}>
@@ -91,11 +109,7 @@ export default function CreateNoteScreen() {
         placeholderTextColor={Colors[colorScheme ?? 'light'].gray}
       />
 
-      {loading ? (
-        <ActivityIndicator size="large" color={Colors[colorScheme ?? 'light'].tint} />
-      ) : (
-        <Button title="Salvar Nota" onPress={handleSaveNote} />
-      )}
+
     </ThemedView>
   );
 }

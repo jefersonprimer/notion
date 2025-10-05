@@ -102,57 +102,57 @@ export default function HomeHeader({ onOpenAccountSwitcher }: HomeHeaderProps) {
 
           <TouchableOpacity onPress={onOpenAccountSwitcher} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
             <ThemedText style={styles.emailText}>Notion de {session?.user?.displayName || session?.user?.email}</ThemedText>
-            <ArrowChevronSingleDownIcon color={Colors[colorScheme ?? 'light'].icon}/>
-          </TouchableOpacity>
-        </View>
-        
-        <View>
-          <TouchableOpacity ref={ellipsisIconRef} onPress={openMenuModal}>
-            <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={20}/>
-          </TouchableOpacity>
+      <ArrowChevronSingleDownIcon color={Colors[colorScheme ?? 'light'].icon} size={20}/>
+    </TouchableOpacity>
+  </View>
+  
+  <View style={{ zIndex: 1 }}>
+    <TouchableOpacity ref={ellipsisIconRef} onPress={openMenuModal}>
+      <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={20}/>
+    </TouchableOpacity>
           
-          <Modal
-            animationType="fade"
-            transparent={true}
-            visible={menuModalVisible}
-            onRequestClose={() => setMenuModalVisible(false)}
-          >
-            <TouchableOpacity style={styles.menuModalOverlay} activeOpacity={1} onPressOut={() => setMenuModalVisible(false)}>
-              <View style={[styles.menuModalContent, { top: menuModalPosition.top, right: menuModalPosition.right }]}>
-                <TouchableOpacity onPress={() => handleNavigate('#')}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                    <ArrowInCircleUpFillIcon color='#2383E2'/>
-                    <ThemedText>Fazer upgrade do plano</ThemedText>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleNavigate('#')}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                    <PeopleIcon color={Colors[colorScheme ?? 'light'].text}/>
-                    <ThemedText>Membros</ThemedText>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleNavigate('/settings')}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                    <SettingsIcon color={Colors[colorScheme ?? 'light'].text}/>
-                    <ThemedText>Configurações</ThemedText>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleNavigate('/trash')}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                    <TrashIcon color={Colors[colorScheme ?? 'light'].text}/>
-                    <ThemedText>Lixeira</ThemedText>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleNavigate('#')}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                    <SacIcon color={Colors[colorScheme ?? 'light'].text}/>
-                    <ThemedText>Ajuda e suporte</ThemedText>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          </Modal>
+    <Modal
+      animationType="fade"
+      transparent={true}
+      visible={menuModalVisible}
+      onRequestClose={() => setMenuModalVisible(false)}
+    >
+      <TouchableOpacity style={styles.menuModalOverlay} activeOpacity={1} onPressOut={() => setMenuModalVisible(false)}>
+        <View style={[styles.menuModalContent, { top: menuModalPosition.top, right: menuModalPosition.right }]}>
+          <TouchableOpacity onPress={() => handleNavigate('#')}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+              <ArrowInCircleUpFillIcon color='#2383E2'/>
+              <ThemedText>Fazer upgrade do plano</ThemedText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleNavigate('#')}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+              <PeopleIcon color={Colors[colorScheme ?? 'light'].text}/>
+              <ThemedText>Membros</ThemedText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleNavigate('/settings')}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+              <SettingsIcon color={Colors[colorScheme ?? 'light'].text}/>
+              <ThemedText>Configurações</ThemedText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleNavigate('/trash')}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+              <TrashIcon color={Colors[colorScheme ?? 'light'].text}/>
+              <ThemedText>Lixeira</ThemedText>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleNavigate('#')}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+              <SacIcon color={Colors[colorScheme ?? 'light'].text}/>
+              <ThemedText>Ajuda e suporte</ThemedText>
+            </View>
+          </TouchableOpacity>
         </View>
+      </TouchableOpacity>
+    </Modal>
+  </View>
       </View>
     </SafeAreaView>
   );
