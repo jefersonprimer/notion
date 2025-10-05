@@ -143,37 +143,35 @@ export default function NoteScreen() {
         alignItems: 'flex-start',
     },
     modalButtonText: {
-        fontSize: 18,
+      fontSize: 18,
     }
   });
 
-  if (loading) {
-    return <ActivityIndicator style={{ flex: 1 }} size="large" />;
-  }
-
-  if (error) {
-    return <ThemedText>Error: {error}</ThemedText>;
-  }
-
   return (
     <ThemedView style={{ flex: 1, padding: 16 }}>
-        <Stack.Screen
-            options={{
-                headerTitle: '',
-                headerBackVisible: false,
-                headerLeft: () => (
-                    <TouchableOpacity onPress={() => router.back()}>
-                        <AngleLeftIcon color={Colors[colorScheme ?? 'light'].icon} size={30} />
-                    </TouchableOpacity>
-                ),
-                headerRight: () => (
-                    <TouchableOpacity onPress={() => setModalVisible(true)}>
-                        <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={24} />
-                    </TouchableOpacity>
-                ),
-            }}
-        />
-        {isEditingTitle ? (
+      <Stack.Screen
+        options={{
+          headerTitle: '',
+          headerBackVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()}>
+              <AngleLeftIcon color={Colors[colorScheme ?? 'light'].icon} size={30} />
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={24} />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+      {loading ? (
+        <ActivityIndicator style={{ flex: 1 }} size="large" />
+      ) : error ? (
+        <ThemedText>Error: {error}</ThemedText>
+      ) : (
+        <>
+          {isEditingTitle ? (
             <TextInput
                 value={title}
                 onChangeText={setTitle}
@@ -237,6 +235,8 @@ export default function NoteScreen() {
                 </View>
             </TouchableOpacity>
         </Modal>
+        </>
+      )}
     </ThemedView>
   );
 }
