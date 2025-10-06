@@ -32,8 +32,20 @@ const NoteCard: React.FC<NoteCardProps> = ({ item, onNoteUpdate, onToggleFavorit
   const router = useRouter();
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [parentNote, setParentNote] = useState<Note | null>(null);
 
-  const openModal = () => {
+  const openModal = async () => {
+    if (item.parentId) {
+      try {
+        const response = await api.get(`/notes/${item.parentId}`);
+        setParentNote(response.data);
+      } catch (err) {
+        console.error(`Failed to fetch parent note for ${item.id}`, err);
+        setParentNote(null);
+      }
+    } else {
+      setParentNote(null);
+    }
     setModalVisible(true);
   };
 
@@ -104,6 +116,7 @@ const NoteCard: React.FC<NoteCardProps> = ({ item, onNoteUpdate, onToggleFavorit
         isVisible={modalVisible}
         onClose={() => setModalVisible(false)}
         note={item}
+        parentNote={parentNote}
         variant="all-notes"
         onToggleFavorite={handleToggleFavorite}
         onDuplicate={handleDuplicate}
