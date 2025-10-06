@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View, TextInput, Text, Alert, ActivityIndicator, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
+
 import api from '@/lib/axios';
 import { useDebounce } from '@/hooks/use-debouncer';
 import { ThemedView } from '@/components/themed-view';
@@ -10,6 +11,7 @@ import { Colors } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 
 import { AngleLeftIcon } from '@/components/ui/AngleLeftIcon';
+import { SquareAndArrowUpIcon } from '@/components/ui/SquareAndArrowUpIcon'; 
 import { EllipsisIcon } from '@/components/ui/EllipsisIcon';
 import { StarIcon } from '@/components/ui/StarIcon';
 import { StarSlashIcon } from '@/components/ui/StarSlashIcon';
@@ -114,39 +116,6 @@ export default function NoteScreen() {
     );
   };
 
-  const styles = StyleSheet.create({
-    title: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        paddingVertical: 10,
-        color: Colors[colorScheme ?? 'light'].text,
-    },
-    description: {
-        fontSize: 18,
-        paddingVertical: 10,
-        lineHeight: 24,
-        color: Colors[colorScheme ?? 'light'].text,
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        backgroundColor: 'rgba(0,0,0,0.5)',
-    },
-    modalContent: {
-        backgroundColor: Colors[colorScheme ?? 'light'].background,
-        padding: 20,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-    },
-    modalButton: {
-        padding: 15,
-        alignItems: 'flex-start',
-    },
-    modalButtonText: {
-      fontSize: 18,
-    }
-  });
-
   return (
     <ThemedView style={{ flex: 1, padding: 16 }}>
       <Stack.Screen
@@ -159,9 +128,15 @@ export default function NoteScreen() {
             </TouchableOpacity>
           ),
           headerRight: () => (
-            <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={24} />
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
+              <TouchableOpacity>
+                <SquareAndArrowUpIcon color={Colors[colorScheme ?? 'light'].icon} size={26} />  
+              </TouchableOpacity>
+            
+              <TouchableOpacity onPress={() => setModalVisible(true)}>
+                <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={24} />
+              </TouchableOpacity>
+            </View>
           ),
         }}
       />
@@ -240,3 +215,36 @@ export default function NoteScreen() {
     </ThemedView>
   );
 }
+
+const styles = StyleSheet.create({
+  title: {
+      fontSize: 32,
+      fontWeight: 'bold',
+      paddingVertical: 10,
+      color: 'white' 
+  },
+  description: {
+      fontSize: 18,
+      paddingVertical: 10,
+      lineHeight: 24,
+      color: 'white' 
+  },
+  modalContainer: {
+      flex: 1,
+      justifyContent: 'flex-end',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+      backgroundColor: 'gray',
+      padding: 20,
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
+  },
+  modalButton: {
+      padding: 15,
+      alignItems: 'flex-start',
+  },
+  modalButtonText: {
+    fontSize: 18,
+  }
+});
