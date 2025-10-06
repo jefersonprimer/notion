@@ -188,7 +188,9 @@ export default function HomeScreen() {
           <ThemedText type="subtitle" style={styles.subtitle}>Particular</ThemedText>
           <NoteTree 
             notes={notes}
-            openModal={openModal}
+            onToggleFavorite={handleToggleFavorite}
+            onDelete={handleDelete}
+            onNoteUpdate={() => {}}
             onToggleExpand={handleToggleExpand}
             expandedNotes={expandedNotes}
             childNodes={childNodes}

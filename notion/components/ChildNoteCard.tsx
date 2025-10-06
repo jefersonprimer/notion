@@ -132,7 +132,7 @@ const ChildNoteCard: React.FC<ChildNoteCardProps> = ({ item }) => {
           <View style={styles.modalContent}>
             <TouchableOpacity style={styles.modalButton} onPress={handleToggleFavorite}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                {isFavorite ? <StarSlashIcon color={Colors[colorScheme ?? 'light'].text} /> : <StarIcon color={Colors[colorScheme ?? 'light'].text} />}
+                {isFavorite ? <StarSlashIcon color={Colors[colorScheme ?? 'light'].text} size={20} /> : <StarIcon color={Colors[colorScheme ?? 'light'].text} size={20} />}
                 <Text style={[styles.modalButtonText, { color: Colors[colorScheme ?? 'light'].text, marginLeft: 10 }]}>
                   {isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
                 </Text>
@@ -140,7 +140,7 @@ const ChildNoteCard: React.FC<ChildNoteCardProps> = ({ item }) => {
             </TouchableOpacity>
             <TouchableOpacity style={styles.modalButton} onPress={handleDelete}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <TrashIcon color={Colors[colorScheme ?? 'light'].text} />
+                <TrashIcon color={Colors[colorScheme ?? 'light'].text} size={20} />
                 <Text style={[styles.modalButtonText, { color: Colors[colorScheme ?? 'light'].text, marginLeft: 10 }]}>Mover para Lixeira</Text>
               </View>
             </TouchableOpacity>

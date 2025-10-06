@@ -1,7 +1,9 @@
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { ThemedText } from './themed-text';
 import { Note } from '../types/note';
+import api from '@/lib/axios';
+import NoteActionsModal from './NoteActionsModal';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
@@ -16,15 +18,64 @@ import { PlusSmallIcon } from './ui/PlusSmallIcon';
 
 type NoteCardProps = {
   item: Note;
-  openModal: (note: Note) => void;
+  onNoteUpdate: (notes: Note[]) => void;
+  onToggleFavorite: (noteId: string, isFavorite: boolean) => void;
+  onDelete: (noteId: string) => void;
   onToggleExpand: (noteId: string) => void;
   isExpanded: boolean;
   indentationLevel: number;
+  notes: Note[];
 };
 
-const NoteCard: React.FC<NoteCardProps> = ({ item, openModal, onToggleExpand, isExpanded, indentationLevel }) => {
+const NoteCard: React.FC<NoteCardProps> = ({ item, onNoteUpdate, onToggleFavorite, onDelete, onToggleExpand, isExpanded, indentationLevel, notes }) => {
   const colorScheme = useColorScheme();
   const router = useRouter();
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  const handleToggleFavorite = () => {
+    const newFavStatus = !item.is_favorite;
+    api.patch(`/notes/${item.id}/favorite`, { isFavorite: newFavStatus }).then(() => {
+      if (typeof onToggleFavorite === 'function') {
+        onToggleFavorite(item.id, newFavStatus);
+      }
+    }).catch(err => {
+        console.error('Failed to toggle favorite', err);
+        Alert.alert('Erro', 'Não foi possível atualizar o favorito.');
+    });
+    setModalVisible(false);
+  };
+
+  const handleMoveToTrash = () => {
+    if (typeof onDelete === 'function') {
+      onDelete(item.id);
+    }
+    setModalVisible(false);
+  };
+
+  const handleDuplicate = () => {
+    api.post(`/notes/${item.id}/duplicate`).then(response => {
+        const newNote = response.data;
+        const updatedNotes = [...notes, newNote];
+        onNoteUpdate(updatedNotes);
+    }).catch(err => {
+        Alert.alert('Erro', 'Não foi possível duplicar a nota.');
+    });
+    setModalVisible(false);
+  };
+  
+  const handleMakeOffline = (isOffline: boolean) => {
+    api.patch(`/notes/${item.id}/offline`, { isOffline }).then(() => {
+        const updatedNotes = notes.map(n => n.id === item.id ? {...n, is_offline: isOffline} : n);
+        onNoteUpdate(updatedNotes);
+    }).catch(err => {
+        Alert.alert('Erro', 'Não foi possível alterar o status offline.');
+    });
+  };
 
   const handleCreateChild = () => {
     router.push({ pathname: '/create', params: { parentId: item.id } });
@@ -42,13 +93,23 @@ const NoteCard: React.FC<NoteCardProps> = ({ item, openModal, onToggleExpand, is
         </View>
       </Link>
       <View style={styles.noteTail}>
-        <TouchableOpacity onPress={() => openModal(item)}>
+        <TouchableOpacity onPress={openModal}>
           <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleCreateChild}>
           <PlusSmallIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />
         </TouchableOpacity>
       </View>
+      <NoteActionsModal
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        note={item}
+        variant="all-notes"
+        onToggleFavorite={handleToggleFavorite}
+        onDuplicate={handleDuplicate}
+        onMoveToTrash={handleMoveToTrash}
+        onMakeOffline={handleMakeOffline}
+      />
     </View>
   );
 };

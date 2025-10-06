@@ -6,7 +6,9 @@ import { ThemedText } from './themed-text';
 
 type NoteTreeProps = {
   notes: Note[];
-  openModal: (note: Note) => void;
+  onNoteUpdate: (notes: Note[]) => void;
+  onToggleFavorite: (noteId: string, isFavorite: boolean) => void;
+  onDelete: (noteId: string) => void;
   onToggleExpand: (noteId: string) => void;
   expandedNotes: Record<string, boolean>;
   childNodes: Record<string, Note[]>;
@@ -15,7 +17,9 @@ type NoteTreeProps = {
 
 const NoteTree: React.FC<NoteTreeProps> = ({ 
   notes, 
-  openModal, 
+  onNoteUpdate,
+  onToggleFavorite,
+  onDelete,
   onToggleExpand, 
   expandedNotes, 
   childNodes, 
@@ -27,15 +31,20 @@ const NoteTree: React.FC<NoteTreeProps> = ({
         <View key={note.id}>
           <NoteCard 
             item={note} 
-            openModal={openModal}
+            onNoteUpdate={onNoteUpdate}
+            onToggleFavorite={onToggleFavorite}
+            onDelete={onDelete}
             onToggleExpand={onToggleExpand}
             isExpanded={!!expandedNotes[note.id]}
             indentationLevel={indentationLevel}
+            notes={notes}
           />
           {expandedNotes[note.id] && childNodes[note.id] && childNodes[note.id].length > 0 && (
             <NoteTree
               notes={childNodes[note.id]}
-              openModal={openModal}
+              onNoteUpdate={onNoteUpdate}
+              onToggleFavorite={onToggleFavorite}
+              onDelete={onDelete}
               onToggleExpand={onToggleExpand}
               expandedNotes={expandedNotes}
               childNodes={childNodes}

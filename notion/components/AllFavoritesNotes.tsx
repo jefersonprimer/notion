@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Modal, Alert } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Modal, Alert, Switch } from 'react-native';
 import { ThemedText } from './themed-text';
 
 import api from '@/lib/axios';
@@ -7,9 +7,10 @@ import api from '@/lib/axios';
 import NoteTree from './NoteTree';
 import { Note } from '../types/note';
 
-import { StarIcon } from '@/components/ui/StarIcon';
-import { StarSlashIcon } from '@/components/ui/StarSlashIcon';
-import { TrashIcon } from '@/components/ui/TrashIcon';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Colors } from '@/constants/theme';
+
+import NoteActionsModal from './NoteActionsModal';
 
 type AllFavoritesNotesProps = {
   notes: Note[];
@@ -20,6 +21,7 @@ type AllFavoritesNotesProps = {
 const AllFavoritesNotes: React.FC<AllFavoritesNotesProps> = ({ notes, onToggleFavorite, onDelete }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [parentNote, setParentNote] = useState<Note | null>(null);
   const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>({});
   const [childNodes, setChildNodes] = useState<Record<string, Note[]>>({});
 
@@ -44,43 +46,42 @@ const AllFavoritesNotes: React.FC<AllFavoritesNotesProps> = ({ notes, onToggleFa
     }
   };
 
-  const handleToggleFavorite = async (id: string, isFavorite: boolean) => {
-    onToggleFavorite(id, isFavorite);
-    try {
-      await api.patch(`/notes/${id}/favorite`, { isFavorite });
-    } catch (err) {
-      console.error('Failed to toggle favorite', err);
-      onToggleFavorite(id, !isFavorite);
-    }
-  };
-
-  const handleDelete = () => {
+  const handleToggleFavorite = () => {
     if (!selectedNote) return;
-
-    Alert.alert(
-      'Mover para a Lixeira',
-      'Tem certeza que quer mover esta nota para a lixeira?',
-      [
-        { text: 'Cancelar', style: 'cancel', onPress: () => setModalVisible(false) },
-        {
-          text: 'Mover',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await api.delete(`/notes/${selectedNote.id}`);
-              onDelete(selectedNote.id);
-              setModalVisible(false);
-            } catch (err: any) {
-              Alert.alert('Erro', err.response?.data?.message || 'Não foi possível mover a nota.');
-            }
-          },
-        },
-      ]
-    );
+    onToggleFavorite(selectedNote.id, !selectedNote.is_favorite);
+    setModalVisible(false);
   };
 
-  const openModal = (note: Note) => {
+  const handleCopyLink = () => {
+    if (!selectedNote) return;
+    Alert.alert('Link Copiado', 'O link para a nota foi copiado.');
+    setModalVisible(false);
+  };
+
+  const handleMoveTo = () => {
+    if (!selectedNote) return;
+    Alert.alert('Mover Para', 'Funcionalidade de mover ainda não implementada.');
+    setModalVisible(false);
+  };
+
+  const openModal = async (note: Note) => {
     setSelectedNote(note);
+    if (note.parentId) {
+      const parent = notes.find(n => n.id === note.parentId);
+      if (parent) {
+        setParentNote(parent);
+      } else {
+        try {
+          const response = await api.get(`/notes/${note.parentId}`);
+          setParentNote(response.data);
+        } catch (err) {
+          console.error(`Failed to fetch parent note for ${note.id}`, err);
+          setParentNote(null);
+        }
+      }
+    } else {
+      setParentNote(null);
+    }
     setModalVisible(true);
   };
 
@@ -89,40 +90,23 @@ const AllFavoritesNotes: React.FC<AllFavoritesNotesProps> = ({ notes, onToggleFa
       <ThemedText type="subtitle" style={styles.subtitle}>Favoritos</ThemedText>
       <NoteTree
         notes={notes}
-        openModal={openModal}
+        onToggleFavorite={onToggleFavorite}
+        onDelete={onDelete}
+        onNoteUpdate={() => {}}
         onToggleExpand={handleToggleExpand}
         expandedNotes={expandedNotes}
         childNodes={childNodes}
       />
-      {selectedNote && (
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <TouchableOpacity style={styles.modalContainer} activeOpacity={1} onPressOut={() => setModalVisible(false)}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{selectedNote.title}</Text>
-              <TouchableOpacity style={styles.modalButton} onPress={() => {
-                handleToggleFavorite(selectedNote.id, !selectedNote.is_favorite);
-                setModalVisible(false);
-              }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                  <StarSlashIcon />
-                  <Text style={styles.modalButtonText}>Remover dos Favoritos</Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalButton} onPress={handleDelete}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                  <TrashIcon/>
-                  <Text style={[styles.modalButtonText, { color: 'red' }]}>Mover para a Lixeira</Text>
-                </View> 
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        </Modal>
-      )}
+      <NoteActionsModal
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        note={selectedNote}
+        parentNote={parentNote}
+        variant="favorites"
+        onToggleFavorite={handleToggleFavorite}
+        onCopyLink={handleCopyLink}
+        onMoveTo={handleMoveTo}
+      />
     </View>
   );
 };
@@ -147,27 +131,28 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end'
   },
   modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
+    backgroundColor: '#202020',
+    padding: 10,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '500'
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    fontWeight: '400'
   },
   modalButton: {
     padding: 15,
-    alignItems: 'center',
   },
   modalButtonText: {
     fontSize: 16,
+    color: '#D4D4D4'
   }
 });
 
