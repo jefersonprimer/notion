@@ -1,12 +1,12 @@
 import React from 'react';
 import { Svg, Path } from 'react-native-svg';
 
-interface ArrowChevronSingleDownIconProps {
+type Props = {
   color: string;
   size: number;
 }
 
-export function ArrowChevronSingleDownIcon({ color, size }: ArrowChevronSingleDownIconProps) { 
+export function ArrowChevronSingleDownIcon({ color, size }: Props) { 
 
   return (
     <Svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 20 20" width={size} height={size} fill={color}>

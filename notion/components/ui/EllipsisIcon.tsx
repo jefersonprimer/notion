@@ -1,12 +1,12 @@
 import React from 'react';
 import { Svg, Path } from 'react-native-svg';
 
-interface EllipsisIconProps {
+type Props = {
   color: string;
   size: number;
 }
 
-export function EllipsisIcon({ color, size }: EllipsisIconProps) {
+export function EllipsisIcon({ color, size }: Props) {
  
   return (
     <Svg viewBox="0 0 20 20" width={size} height={size} fill={color}>

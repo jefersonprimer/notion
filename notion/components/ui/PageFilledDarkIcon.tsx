@@ -1,12 +1,12 @@
 import React from 'react';
 import { Svg, Path, G } from 'react-native-svg';
 
-interface PageFilledDarkIconProps {
+type Props = {
   color: string;
   size: number;
 }
 
-export function PageFilledDarkIcon({ color, size }: PageFilledDarkIconProps ) {
+export function PageFilledDarkIcon({ color, size }: Props ) {
   return (
     <Svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" width={size} height={size} fill={color}> 
       <G>

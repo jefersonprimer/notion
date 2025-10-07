@@ -1,12 +1,12 @@
 import React from 'react';
 import { Svg, Path } from 'react-native-svg';
 
-interface TrashIconProps {
+type Props = {
   color: string;
   size: number;
 }
 
-export function TrashIcon({ color, size }: TrashIconProps) {
+export function TrashIcon({ color, size }: Props) {
   return (
     <Svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 20 20" width={size} height={size} fill={color}>
       <Path d="M8.806 8.505a.55.55 0 0 0-1.1 0v5.979a.55.55 0 1 0 1.1 0zm3.488 0a.55.55 0 0 0-1.1 0v5.979a.55.55 0 1 0 1.1 0z">

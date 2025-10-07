@@ -1,12 +1,12 @@
 import React from 'react';
 import { Svg, Path } from 'react-native-svg';
 
-interface ChevronRightIconProps {
+type Props = {
   color: string;
   size: number;
 }
 
-export function ChevronRightIcon({ color, size }: ChevronRightIconProps) { 
+export function ChevronRightIcon({ color, size }: Props) { 
 
   return (
     <Svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 16 16" width={size} height={size} fill={color}>

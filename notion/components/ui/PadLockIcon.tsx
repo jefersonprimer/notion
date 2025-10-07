@@ -1,12 +1,12 @@
 import React from 'react';
 import { Svg, Path, Rect, Circle } from 'react-native-svg';
 
-interface PadLockIconProps {
+type Props = {
   color: string;
   size: number;
 }
 
-export function PadLockIcon({ color, size }: PadLockIconProps) {
+export function PadLockIcon({ color, size }: Props) {
   return (
     <Svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/Svg" width={size} height={size}>
       <Rect x="4.5" y="8" width="11" height="9" rx="2" stroke={color} strokeWidth="1.25" />
