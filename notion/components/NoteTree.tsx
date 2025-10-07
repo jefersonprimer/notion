@@ -6,24 +6,22 @@ import { ThemedText } from './themed-text';
 
 type NoteTreeProps = {
   notes: Note[];
-  onNoteUpdate: (notes: Note[]) => void;
-  onToggleFavorite: (noteId: string, isFavorite: boolean) => void;
-  onDelete: (noteId: string) => void;
   onToggleExpand: (noteId: string) => void;
   expandedNotes: Record<string, boolean>;
   childNodes: Record<string, Note[]>;
   indentationLevel?: number;
+  onOpenModal: (note: Note) => void;
+  onAddChild: (noteId: string) => void;
 };
 
 const NoteTree: React.FC<NoteTreeProps> = ({ 
   notes, 
-  onNoteUpdate,
-  onToggleFavorite,
-  onDelete,
   onToggleExpand, 
   expandedNotes, 
   childNodes, 
-  indentationLevel = 0 
+  indentationLevel = 0, 
+  onOpenModal,
+  onAddChild
 }) => {
   return (
     <View>
@@ -31,24 +29,21 @@ const NoteTree: React.FC<NoteTreeProps> = ({
         <View key={note.id}>
           <NoteCard 
             item={note} 
-            onNoteUpdate={onNoteUpdate}
-            onToggleFavorite={onToggleFavorite}
-            onDelete={onDelete}
             onToggleExpand={onToggleExpand}
             isExpanded={!!expandedNotes[note.id]}
             indentationLevel={indentationLevel}
-            notes={notes}
+            onOpenModal={onOpenModal}
+            onAddChild={onAddChild}
           />
           {expandedNotes[note.id] && childNodes[note.id] && childNodes[note.id].length > 0 && (
             <NoteTree
               notes={childNodes[note.id]}
-              onNoteUpdate={onNoteUpdate}
-              onToggleFavorite={onToggleFavorite}
-              onDelete={onDelete}
               onToggleExpand={onToggleExpand}
               expandedNotes={expandedNotes}
               childNodes={childNodes}
               indentationLevel={indentationLevel + 1}
+              onOpenModal={onOpenModal}
+              onAddChild={onAddChild}
             />
           )}
           {expandedNotes[note.id] && childNodes[note.id] && childNodes[note.id].length === 0 && (

@@ -82,6 +82,14 @@ const NoteActionsModal: React.FC<NoteActionsModalProps> = ({
       </View>
 
       <View style={{ flexDirection: 'column', backgroundColor: '#252525', borderRadius: 10 }}>
+        <TouchableOpacity style={styles.modalButton} onPress={onCopyLink}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+            <LinkIcon color={iconColor} size={20} />
+            <Text style={[styles.modalButtonText, { color: textColor }]}>Copiar Link</Text>
+          </View>
+        </TouchableOpacity>
+        <View style={{ borderWidth: 0.3, borderColor: '#8D8D8D' }}/>
+
         <TouchableOpacity style={styles.modalButton} onPress={onToggleFavorite}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
             {note.is_favorite ? <StarSlashIcon color={iconColor} size={20} /> : <StarIcon color={iconColor} size={20} />}
@@ -100,6 +108,14 @@ const NoteActionsModal: React.FC<NoteActionsModalProps> = ({
         </TouchableOpacity>
         <View style={{ borderWidth: 0.3, borderColor: '#8D8D8D' }}/>
 
+        <TouchableOpacity style={styles.modalButton} onPress={onMoveTo}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+            <ArrowTurnUpRightIcon color={iconColor} size={20} />
+            <Text style={[styles.modalButtonText, { color: textColor }]}>Mover para</Text>
+          </View>
+        </TouchableOpacity>
+        <View style={{ borderWidth: 0.3, borderColor: '#8D8D8D' }}/>
+
         <TouchableOpacity style={styles.modalButton} onPress={onMoveToTrash}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
             <TrashIcon color={'red'} size={20} />
@@ -111,30 +127,47 @@ const NoteActionsModal: React.FC<NoteActionsModalProps> = ({
   );
 
   const renderFavoritesActions = () => (
-    <View style={{ flexDirection: 'column', backgroundColor: '#252525', borderRadius: 10, marginTop: 10 }}>
-      <TouchableOpacity style={styles.modalButton} onPress={onCopyLink}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-          <LinkIcon color={iconColor} size={20} />
-          <Text style={[styles.modalButtonText, { color: textColor }]}>Copiar Link</Text>
+    <>
+      <View style={{ backgroundColor: '#252525', borderRadius: 10, marginVertical: 10, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }} >
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15, paddingVertical: 15 }}>
+            <ArrowTurnUpRightIcon color={iconColor} size={20} />
+            <Text style={[styles.modalButtonText, { color: textColor }]}>Disponível offline</Text>
         </View>
-      </TouchableOpacity>
-      <View style={{ borderWidth: 0.3, borderColor: '#8D8D8D' }}/>
+        <Switch
+            value={isOffline}
+            onValueChange={handleOfflineSwitch}
+            trackColor={{ false: '#767577', true: '#81b0ff' }}
+            thumbColor={isOffline ? '#f5dd4b' : '#f4f3f4'}
+        />
+      </View>
 
-      <TouchableOpacity style={styles.modalButton} onPress={onToggleFavorite}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-          <StarSlashIcon color={iconColor} size={20} />
-          <Text style={[styles.modalButtonText, { color: textColor }]}>Remover dos Favoritos</Text>
-        </View>
-      </TouchableOpacity>
-      <View style={{ borderWidth: 0.3, borderColor: '#8D8D8D' }}/>
+      <View style={{ flexDirection: 'column', backgroundColor: '#252525', borderRadius: 10 }}>
+        <TouchableOpacity style={styles.modalButton} onPress={onCopyLink}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+            <LinkIcon color={iconColor} size={20} />
+            <Text style={[styles.modalButtonText, { color: textColor }]}>Copiar Link</Text>
+          </View>
+        </TouchableOpacity>
+        <View style={{ borderWidth: 0.3, borderColor: '#8D8D8D' }}/>
 
-      <TouchableOpacity style={styles.modalButton} onPress={onMoveTo}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-          <ArrowTurnUpRightIcon color={iconColor} size={20} />
-          <Text style={[styles.modalButtonText, { color: textColor }]}>Mover para</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.modalButton} onPress={onToggleFavorite}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+            {note.is_favorite ? <StarSlashIcon color={iconColor} size={20} /> : <StarIcon color={iconColor} size={20} />}
+            <Text style={[styles.modalButtonText, { color: textColor }]}>
+              {note.is_favorite ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}
+            </Text>
+          </View>
+        </TouchableOpacity>
+        <View style={{ borderWidth: 0.3, borderColor: '#8D8D8D' }}/>
+
+        <TouchableOpacity style={styles.modalButton} onPress={onMoveTo}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+            <ArrowTurnUpRightIcon color={iconColor} size={20} />
+            <Text style={[styles.modalButtonText, { color: textColor }]}>Mover para</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    </>
   );
 
   return (

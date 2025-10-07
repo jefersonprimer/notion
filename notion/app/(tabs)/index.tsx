@@ -1,18 +1,16 @@
 import { useEffect, useState, useCallback } from 'react';
-import { View, ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Modal, TouchableOpacity, Text, Alert, Button } from 'react-native';
+import { View, ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Alert, Button, Clipboard } from 'react-native';
 import api from '@/lib/axios';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useAuth } from '@/context/AuthProvider';
+import { useRouter } from 'expo-router';
 
 import { Note } from '@/types/note';
 import RecentNotes from '@/components/RecentNotes';
 import AllFavoritesNotes from '@/components/AllFavoritesNotes';
 import NoteTree from '@/components/NoteTree';
-
-import { StarSlashIcon } from '@/components/ui/StarSlashIcon';
-import { StarIcon } from '@/components/ui/StarIcon';
-import { TrashIcon } from '@/components/ui/TrashIcon';
+import NoteActionsModal from '@/components/NoteActionsModal';
 
 export default function HomeScreen() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -22,15 +20,19 @@ export default function HomeScreen() {
   
   const [childNodes, setChildNodes] = useState<Record<string, Note[]>>({});
   const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>({});
+  const [favoriteExpandedNotes, setFavoriteExpandedNotes] = useState<Record<string, boolean>>({});
 
+  // Modal State
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [parentNote, setParentNote] = useState<Note | null>(null);
+  const [modalVariant, setModalVariant] = useState<'all-notes' | 'favorites'>('all-notes');
 
   const { session, signOut } = useAuth();
+  const router = useRouter();
 
   const fetchNotes = useCallback(async () => {
     if (!session) return;
-
     setLoading(true);
     setError(null);
     try {
@@ -50,7 +52,6 @@ export default function HomeScreen() {
 
   const fetchFavoriteNotes = useCallback(async () => {
     if (!session) return;
-
     try {
       const response = await api.get('/notes/favorites');
       setFavoriteNotes(response.data);
@@ -80,49 +81,93 @@ export default function HomeScreen() {
     }
   };
 
-  const openModal = (note: Note) => {
+  const handleFavoriteToggleExpand = async (noteId: string) => {
+    const isCurrentlyExpanded = !!favoriteExpandedNotes[noteId];
+    const newExpandedState = { ...favoriteExpandedNotes, [noteId]: !isCurrentlyExpanded };
+    setFavoriteExpandedNotes(newExpandedState);
+
+    // Child fetching logic can be shared
+    if (!isCurrentlyExpanded && !childNodes[noteId]) {
+      try {
+        const response = await api.get(`/notes/${noteId}/children`);
+        setChildNodes(prev => ({ ...prev, [noteId]: response.data }));
+      } catch (err) {
+        console.error(`Failed to fetch child notes for ${noteId}`, err);
+        setFavoriteExpandedNotes(favoriteExpandedNotes); // Rollback on error
+      }
+    }
+  };
+
+  const openModal = async (note: Note, variant: 'all-notes' | 'favorites') => {
     setSelectedNote(note);
+    setModalVariant(variant);
+    if (note.parentId) {
+      try {
+        const response = await api.get(`/notes/${note.parentId}`);
+        setParentNote(response.data);
+      } catch (err) {
+        console.error(`Failed to fetch parent note for ${note.id}`, err);
+        setParentNote(null);
+      }
+    } else {
+      setParentNote(null);
+    }
     setModalVisible(true);
   };
 
-  const handleToggleFavorite = (id: string, isFavorite: boolean) => {
+  const updateNoteInState = (updatedNote: Note) => {
     const recursiveUpdate = (noteList: Note[]): Note[] => {
       return noteList.map(note => {
-        if (note.id === id) {
-          return { ...note, is_favorite: isFavorite };
+        if (note.id === updatedNote.id) {
+          return updatedNote;
         }
         return note;
       });
     };
-
-    setNotes(prevNotes => recursiveUpdate(prevNotes));
-    setChildNodes(prevChildNodes => {
+    setNotes(prev => recursiveUpdate(prev));
+    setChildNodes(prev => {
       const newChildNodes: Record<string, Note[]> = {};
-      for (const parentId in prevChildNodes) {
-        newChildNodes[parentId] = recursiveUpdate(prevChildNodes[parentId]);
+      for (const parentId in prev) {
+        newChildNodes[parentId] = recursiveUpdate(prev[parentId]);
       }
       return newChildNodes;
     });
+  };
 
-    if (isFavorite) {
-      const noteToAdd = notes.find(note => note.id === id) || Object.values(childNodes).flat().find(note => note.id === id);
-      if (noteToAdd) {
-        setFavoriteNotes(prevFavorites => [...prevFavorites, { ...noteToAdd, is_favorite: true }]);
+  // Modal Action Handlers
+  const handleToggleFavorite = () => {
+    if (!selectedNote) return;
+    const isFavorite = !selectedNote.is_favorite;
+
+    api.patch(`/notes/${selectedNote.id}/favorite`, { isFavorite }).then(() => {
+      const updatedNote = { ...selectedNote, is_favorite: isFavorite };
+      
+      // Update the note in the modal
+      setSelectedNote(updatedNote);
+      
+      // Update the note in the main lists
+      updateNoteInState(updatedNote);
+
+      // Add or remove from the dedicated favorites list
+      if (isFavorite) {
+        setFavoriteNotes(prev => {
+          // To prevent duplicates, only add if it's not already there
+          if (prev.some(n => n.id === updatedNote.id)) {
+            return prev.map(n => n.id === updatedNote.id ? updatedNote : n);
+          }
+          return [...prev, updatedNote];
+        });
+      } else {
+        setFavoriteNotes(prev => prev.filter(n => n.id !== selectedNote.id));
       }
-    } else {
-      setFavoriteNotes(prevFavorites => prevFavorites.filter(note => note.id !== id));
-    }
-
-    api.patch(`/notes/${id}/favorite`, { isFavorite }).catch(err => {
+    }).catch(err => {
       console.error('Failed to toggle favorite', err);
+      Alert.alert("Erro", "Não foi possível atualizar o favorito.");
     });
   };
 
-  const handleDelete = (id: string) => {
-    const recursiveDelete = (noteList: Note[]): Note[] => {
-        return noteList.filter(note => note.id !== id);
-    };
-
+  const handleDelete = () => {
+    if (!selectedNote) return;
     Alert.alert(
       'Mover para a Lixeira',
       'Tem certeza que quer mover esta nota para a lixeira?',
@@ -133,15 +178,16 @@ export default function HomeScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
-              await api.delete(`/notes/${id}`);
-              setNotes(prevNotes => recursiveDelete(prevNotes));
-              setFavoriteNotes(prevFavorites => prevFavorites.filter(note => note.id !== id));
-              setChildNodes(prevChildNodes => {
-                const newChildNodes: Record<string, Note[]> = {};
-                for (const parentId in prevChildNodes) {
-                  newChildNodes[parentId] = recursiveDelete(prevChildNodes[parentId]);
-                }
-                return newChildNodes;
+              await api.delete(`/notes/${selectedNote.id}`);
+              setNotes(prev => prev.filter(n => n.id !== selectedNote.id));
+              setFavoriteNotes(prev => prev.filter(n => n.id !== selectedNote.id));
+              // Also remove from childNodes if present
+              setChildNodes(prev => {
+                  const newChildNodes = { ...prev };
+                  for (const parentId in newChildNodes) {
+                      newChildNodes[parentId] = newChildNodes[parentId].filter(n => n.id !== selectedNote.id);
+                  }
+                  return newChildNodes;
               });
               setModalVisible(false);
             } catch (err: any) {
@@ -153,12 +199,47 @@ export default function HomeScreen() {
     );
   };
 
+  const handleDuplicate = () => {
+    if (!selectedNote) return;
+    api.post(`/notes/${selectedNote.id}/duplicate`).then(response => {
+        const newNote = response.data;
+        setNotes(prev => [...prev, newNote]);
+    }).catch(err => {
+        Alert.alert('Erro', 'Não foi possível duplicar a nota.');
+    });
+    setModalVisible(false);
+  };
+  
+  const handleMakeOffline = (isOffline: boolean) => {
+    if (!selectedNote) return;
+    api.patch(`/notes/${selectedNote.id}/offline`, { isOffline }).then(() => {
+        const updatedNote = { ...selectedNote, is_offline: isOffline };
+        updateNoteInState(updatedNote);
+    }).catch(err => {
+        Alert.alert('Erro', 'Não foi possível alterar o status offline.');
+    });
+    // Do not close modal, so user can see switch state
+  };
+
+  const handleCopyLink = () => {
+    if (!selectedNote) return;
+    Clipboard.setString(`https://notion.app/note/${selectedNote.id}`);
+    Alert.alert('Link Copiado', 'O link para a nota foi copiado.');
+    setModalVisible(false);
+  };
+
+  const handleMoveTo = () => {
+    if (!selectedNote) return;
+    Alert.alert('Mover Para', 'Funcionalidade de mover ainda não implementada.');
+    setModalVisible(false);
+  };
+
+  const handleAddChild = (noteId: string) => {
+    router.push({ pathname: '/create', params: { parentId: noteId } });
+  };
+
   if (loading && notes.length === 0) {
-    return (
-      <ThemedView style={styles.centerContainer}>
-        <ActivityIndicator size="large" />
-      </ThemedView>
-    );
+    return <ThemedView style={styles.centerContainer}><ActivityIndicator size="large" /></ThemedView>;
   }
 
   if (error) {
@@ -177,57 +258,44 @@ export default function HomeScreen() {
     <ThemedView style={styles.flex1}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={() => { fetchNotes(); fetchFavoriteNotes(); }} />
-        }
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={() => { fetchNotes(); fetchFavoriteNotes(); }} />}
       >
         <RecentNotes notes={recentNotes} />
-        <AllFavoritesNotes notes={favoriteNotes} onToggleFavorite={handleToggleFavorite} onDelete={handleDelete} />
+        <AllFavoritesNotes 
+          notes={favoriteNotes} 
+          onOpenModal={(note) => openModal(note, 'favorites')}
+          onAddChild={handleAddChild}
+          onToggleExpand={handleFavoriteToggleExpand}
+          expandedNotes={favoriteExpandedNotes}
+          childNodes={childNodes}
+        />
         
         <View style={styles.container}>
           <ThemedText type="subtitle" style={styles.subtitle}>Particular</ThemedText>
           <NoteTree 
             notes={notes}
-            onToggleFavorite={handleToggleFavorite}
-            onDelete={handleDelete}
-            onNoteUpdate={() => {}}
             onToggleExpand={handleToggleExpand}
             expandedNotes={expandedNotes}
             childNodes={childNodes}
+            onOpenModal={(note) => openModal(note, 'all-notes')}
+            onAddChild={handleAddChild}
           />
         </View>
-
       </ScrollView>
 
-      {selectedNote && (
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <TouchableOpacity style={styles.modalContainer} activeOpacity={1} onPressOut={() => setModalVisible(false)}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{selectedNote.title}</Text>
-              <TouchableOpacity style={styles.modalButton} onPress={() => {
-                handleToggleFavorite(selectedNote.id, !selectedNote.is_favorite);
-                setModalVisible(false);
-              }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                  {selectedNote.is_favorite ? <StarSlashIcon /> : <StarIcon />}
-                  <Text style={styles.modalButtonText}>{selectedNote.is_favorite ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'}</Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalButton} onPress={() => handleDelete(selectedNote.id)}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                  <TrashIcon />
-                  <Text style={[styles.modalButtonText, { color: 'red' }]}>Mover para a Lixeira</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        </Modal>
-      )}
+      <NoteActionsModal
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        note={selectedNote}
+        parentNote={parentNote}
+        variant={modalVariant}
+        onToggleFavorite={handleToggleFavorite}
+        onDuplicate={handleDuplicate}
+        onMoveToTrash={handleDelete}
+        onMakeOffline={handleMakeOffline}
+        onCopyLink={handleCopyLink}
+        onMoveTo={handleMoveTo}
+      />
     </ThemedView>
   );
 }
@@ -256,28 +324,4 @@ const styles = StyleSheet.create({
       fontSize: 14,
       marginBottom: 10,
     },
-    modalContainer: {
-      flex: 1,
-      justifyContent: 'flex-end',
-      backgroundColor: 'rgba(0,0,0,0.5)',
-    },
-    modalContent: {
-      backgroundColor: 'white',
-      padding: 20,
-      borderTopLeftRadius: 10,
-      borderTopRightRadius: 10,
-    },
-    modalTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      marginBottom: 20,
-      textAlign: 'center',
-    },
-    modalButton: {
-      padding: 15,
-      alignItems: 'center',
-    },
-    modalButtonText: {
-      fontSize: 16,
-    }
 });
