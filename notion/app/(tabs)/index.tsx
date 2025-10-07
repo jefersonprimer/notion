@@ -4,11 +4,12 @@ import api from '@/lib/axios';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useAuth } from '@/context/AuthProvider';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 
 import { Note } from '@/types/note';
 import RecentNotes from '@/components/RecentNotes';
 import AllFavoritesNotes from '@/components/AllFavoritesNotes';
+import AllNotes from '@/components/AllNotes';
 import NoteTree from '@/components/NoteTree';
 import NoteActionsModal from '@/components/NoteActionsModal';
 
@@ -60,10 +61,40 @@ export default function HomeScreen() {
     }
   }, [session]);
 
-  useEffect(() => {
-    fetchNotes();
-    fetchFavoriteNotes();
-  }, [fetchNotes, fetchFavoriteNotes]);
+  useFocusEffect(
+    useCallback(() => {
+      const refreshData = async () => {
+        await Promise.all([fetchNotes(), fetchFavoriteNotes()]);
+
+        const expandedIds = Object.keys(expandedNotes).filter(id => expandedNotes[id]);
+        const favExpandedIds = Object.keys(favoriteExpandedNotes).filter(id => favoriteExpandedNotes[id]);
+        const uniqueExpandedIds = [...new Set([...expandedIds, ...favExpandedIds])];
+
+        if (uniqueExpandedIds.length > 0) {
+          try {
+            const childPromises = uniqueExpandedIds.map(id => 
+              api.get(`/notes/${id}/children`).then(response => ({ id, children: response.data }))
+            );
+            
+            const results = await Promise.all(childPromises);
+            
+            setChildNodes(prevChildNodes => {
+              const newChildNodes = { ...prevChildNodes };
+              results.forEach(result => {
+                newChildNodes[result.id] = result.children;
+              });
+              return newChildNodes;
+            });
+
+          } catch (err) {
+            console.error("Failed to refresh child notes on focus", err);
+          }
+        }
+      };
+
+      refreshData();
+    }, [fetchNotes, fetchFavoriteNotes, expandedNotes, favoriteExpandedNotes])
+  );
 
   const handleToggleExpand = async (noteId: string) => {
     const isCurrentlyExpanded = !!expandedNotes[noteId];
@@ -270,17 +301,14 @@ export default function HomeScreen() {
           childNodes={childNodes}
         />
         
-        <View style={styles.container}>
-          <ThemedText type="subtitle" style={styles.subtitle}>Particular</ThemedText>
-          <NoteTree 
-            notes={notes}
-            onToggleExpand={handleToggleExpand}
-            expandedNotes={expandedNotes}
-            childNodes={childNodes}
-            onOpenModal={(note) => openModal(note, 'all-notes')}
-            onAddChild={handleAddChild}
-          />
-        </View>
+        <AllNotes 
+          notes={notes}
+          onOpenModal={(note) => openModal(note, 'all-notes')}
+          onAddChild={handleAddChild}
+          onToggleExpand={handleToggleExpand}
+          expandedNotes={expandedNotes}
+          childNodes={childNodes}
+        />
       </ScrollView>
 
       <NoteActionsModal
