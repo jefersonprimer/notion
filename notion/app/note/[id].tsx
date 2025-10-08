@@ -23,6 +23,7 @@ import { FolderOutlineIcon } from '@/components/ui/FolderOutlineIcon';
 import { SlidersIcon } from '@/components/ui/SlidersIcon';
 import { PadLockOpenIcon } from '@/components/ui/PadLockOpenIcon';
 import { TextTranslaterIcon } from '@/components/ui/TextTranslaterIcon';
+import { ArrowChevronSingleRightSmallIcon } from '@/components/ui/ArrowChevronSingleRightSmallIcon';
 import { ArrowLineUpIcon } from '@/components/ui/ArrowLineUpIcon';
 import { ArrowSquarePathUpDownIcon } from '@/components/ui/ArrowSquarePathUpDownIcon';
 import { ClockIcon } from '@/components/ui/ClockIcon';
@@ -421,15 +422,19 @@ export default function NoteScreen() {
                     />
                   </View>
 
-                  <View style={{ flexDirection: 'column', backgroundColor: '#252525', borderRadius: 10, marginVertical: 10, }}>
-                    <TouchableOpacity style={styles.modalButton}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#252525', borderRadius: 10, marginVertical: 10, padding: 15 }}>
+                    <TouchableOpacity>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                         <TextTranslaterIcon color={Colors[colorScheme ?? 'light'].text} size={20} />                 
-                        <Text style={[styles.modalButtonText, { color: Colors[colorScheme ?? 'light'].text, marginLeft: 10 }]}>
+                        <Text style={[styles.modalButtonText, { color: Colors[colorScheme ?? 'light'].text }]}>
                           Traduzir
                         </Text>
                       </View>
                     </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <ArrowChevronSingleRightSmallIcon color={Colors[colorScheme ?? 'light'].text} size={20} />
+                    </View>
+
                   </View>
 
                   <View style={{ flexDirection: 'column', backgroundColor: '#252525', borderRadius: 10, marginVertical: 10, }}>
@@ -476,8 +481,8 @@ export default function NoteScreen() {
                     </TouchableOpacity>
                   </View>
 
-                  <View style={{ flexDirection: 'column', backgroundColor: '#252525', borderRadius: 10, marginVertical: 10, }}>
-                    <TouchableOpacity style={styles.modalButton}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between',backgroundColor: '#252525', borderRadius: 10, marginVertical: 10, padding: 15 }}>
+                    <TouchableOpacity>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <BellIcon color={Colors[colorScheme ?? 'light'].text} size={20} />
                         <Text style={[styles.modalButtonText, { color: Colors[colorScheme ?? 'light'].text, marginLeft: 10 }]}>
@@ -485,10 +490,14 @@ export default function NoteScreen() {
                         </Text>
                       </View>
                     </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <ArrowChevronSingleRightSmallIcon color={Colors[colorScheme ?? 'light'].text} size={20} />
+                    </View>
+
                   </View>
 
-                  <View style={{ flexDirection: 'column', backgroundColor: '#252525', borderRadius: 10, marginVertical: 10, }}>
-                    <TouchableOpacity style={styles.modalButton}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between',backgroundColor: '#252525', borderRadius: 10, marginVertical: 10, padding: 15 }}>
+                    <TouchableOpacity>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <SquareGrid2X2Icon color={Colors[colorScheme ?? 'light'].text} size={20} />
                         <Text style={[styles.modalButtonText, { color: Colors[colorScheme ?? 'light'].text, marginLeft: 10 }]}>
@@ -496,6 +505,10 @@ export default function NoteScreen() {
                         </Text>
                       </View>
                     </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <ArrowChevronSingleRightSmallIcon color={Colors[colorScheme ?? 'light'].text} size={20} />
+                    </View>
+
                   </View>
 
                   <View style={{ flexDirection: 'column', backgroundColor: '#252525', padding: 20,borderRadius: 10, marginVertical: 10, }}>
