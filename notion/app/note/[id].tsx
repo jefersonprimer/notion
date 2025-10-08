@@ -283,7 +283,7 @@ export default function NoteScreen() {
 
 
                       <View style={{ flexDirection: 'column', backgroundColor: '#252525', borderRadius: 10, marginVertical: 10, }}>
-                        <TouchableOpacity style={styles.modalButton}>
+                        <TouchableOpacity style={styles.modalButton} onPress={handleToggleFavorite}>
                           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             {isFavorite ? <StarSlashIcon color={Colors[colorScheme ?? 'light'].text} size={20} /> : <StarIcon color={Colors[colorScheme ?? 'light'].text} size={20} />}
                               <Text style={[styles.modalButtonText, { color: Colors[colorScheme ?? 'light'].text, marginLeft: 10 }]}>
