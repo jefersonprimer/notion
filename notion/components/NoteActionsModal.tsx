@@ -6,10 +6,10 @@ import { Note } from '../types/note';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 
-// Icons
 import { StarIcon } from '@/components/ui/StarIcon';
 import { StarSlashIcon } from '@/components/ui/StarSlashIcon';
 import { ArrowTurnUpRightIcon } from '@/components/ui/ArrowTurnUpRightIcon';
+import { ArrowChevronSingleRightSmallIcon } from '@/components/ui/ArrowChevronSingleRightSmallIcon';
 import { PageFilledDarkIcon } from '@/components/ui/PageFilledDarkIcon';
 import { PageEmptyIcon } from './ui/PageEmptyIcon';
 import { LinkIcon } from './ui/LinkIcon';
@@ -109,17 +109,21 @@ const NoteActionsModal: React.FC<NoteActionsModalProps> = ({
         <View style={{ borderWidth: 0.3, borderColor: '#8D8D8D' }}/>
 
         <TouchableOpacity style={styles.modalButton} onPress={onMoveTo}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-            <ArrowTurnUpRightIcon color={iconColor} size={20} />
-            <Text style={[styles.modalButtonText, { color: textColor }]}>Mover para</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+              <ArrowTurnUpRightIcon color={iconColor} size={20} />
+              <Text style={[styles.modalButtonText, { color: textColor }]}>Mover para</Text>
+            </View>
+            <ArrowChevronSingleRightSmallIcon color={Colors[colorScheme ?? 'light'].text} size={20} />
           </View>
         </TouchableOpacity>
+
         <View style={{ borderWidth: 0.3, borderColor: '#8D8D8D' }}/>
 
         <TouchableOpacity style={styles.modalButton} onPress={onMoveToTrash}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-            <TrashIcon color={'red'} size={20} />
-            <Text style={[styles.modalButtonText, { color: 'red' }]}>Excluir</Text>
+            <TrashIcon color={'#DC5353'} size={20} />
+            <Text style={[styles.modalButtonText, { color: '#DC5353' }]}>Excluir</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -161,9 +165,12 @@ const NoteActionsModal: React.FC<NoteActionsModalProps> = ({
         <View style={{ borderWidth: 0.3, borderColor: '#8D8D8D' }}/>
 
         <TouchableOpacity style={styles.modalButton} onPress={onMoveTo}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-            <ArrowTurnUpRightIcon color={iconColor} size={20} />
-            <Text style={[styles.modalButtonText, { color: textColor }]}>Mover para</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+              <ArrowTurnUpRightIcon color={iconColor} size={20} />
+              <Text style={[styles.modalButtonText, { color: textColor }]}>Mover para</Text>
+            </View>
+            <ArrowChevronSingleRightSmallIcon color={Colors[colorScheme ?? 'light'].text} size={20} />
           </View>
         </TouchableOpacity>
       </View>
