@@ -225,8 +225,8 @@ const ChildNoteCard: React.FC<ChildNoteCardProps> = ({ item }) => {
 
                 <TouchableOpacity style={styles.modalButton} onPress={handleDelete}>
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <TrashIcon color={Colors[colorScheme ?? 'light'].text} size={20} />
-                    <Text style={[styles.modalButtonText, { color: Colors[colorScheme ?? 'light'].text, marginLeft: 10 }]}>Excluir</Text>
+                    <TrashIcon color='#D4524E' size={20} />
+                    <Text style={[styles.modalButtonText, { color: '#D4524E', marginLeft: 10 }]}>Excluir</Text>
                   </View>
                 </TouchableOpacity>
               </View>

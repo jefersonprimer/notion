@@ -34,7 +34,7 @@ const NoteCard: React.FC<NoteCardProps> = ({
 
   return (
     <View style={[styles.noteItem, { marginLeft: indentationLevel * 20 }]}>
-      <TouchableOpacity onPress={() => onToggleExpand(item.id)} style={styles.nestedListview}>
+      <TouchableOpacity onPress={() => onToggleExpand(item.id)}>
         {isExpanded ? <ArrowChevronSingleDownIcon color={Colors[colorScheme ?? 'light'].icon} size={20} /> : <ChevronRightIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />}
       </TouchableOpacity>
       <Link href={`/note/${item.id}`} style={styles.noteHead}>
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 10,
-    gap: 10
+    gap: 16
   }, 
   noteHead: {
     flexDirection: 'row',
@@ -78,10 +78,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
-  },
-  nestedListview: {
-
-  }
+  } 
 });
 
 export default NoteCard;

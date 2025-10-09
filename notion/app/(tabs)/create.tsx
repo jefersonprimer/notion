@@ -55,14 +55,14 @@ export default function CreateNoteScreen() {
       if (noteId) {
         // Update existing note
         await api.put(`/notes/${noteId}`, { 
-          title: debouncedTitle || 'sem titulo', 
+          title: debouncedTitle || 'Sem título', 
           description: debouncedDescription 
         });
       } else {
         // Create new note
         try {
           const response = await api.post('/notes', { 
-            title: debouncedTitle || 'sem titulo', 
+            title: debouncedTitle || 'Sem título', 
             description: debouncedDescription, 
             parentId 
           });

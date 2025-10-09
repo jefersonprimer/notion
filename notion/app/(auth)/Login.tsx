@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthProvider";
 
 export default function AuthScreen() {
   const [authView, setAuthView] = useState<'login' | 'register' | 'forgotPassword'>('login');
-  const { setSession } = useAuth();
+  const { signIn } = useAuth();
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -20,7 +20,7 @@ export default function AuthScreen() {
         const expiresIn = params.get('expires_in');
 
         if (accessToken && refreshToken && expiresIn) {
-          setSession({
+          signIn({
             access_token: accessToken,
             refresh_token: refreshToken,
             expires_in: parseInt(expiresIn),
@@ -30,7 +30,7 @@ export default function AuthScreen() {
         }
       }
     }
-  }, [setSession]);
+  }, [signIn]);
 
   // Renderiza o componente com base no estado
   switch (authView) {

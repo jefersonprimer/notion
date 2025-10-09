@@ -330,8 +330,8 @@ export default function NoteScreen() {
 
                       <TouchableOpacity style={styles.modalButton}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <TrashIcon color={Colors[colorScheme ?? 'light'].text} size={20} />
-                          <Text style={[styles.modalButtonText, { color: Colors[colorScheme ?? 'light'].text, marginLeft: 10 }]}>
+                          <TrashIcon color='#D4524E' size={20} />
+                          <Text style={[styles.modalButtonText, { color: '#D4524E', marginLeft: 10 }]}>
                             Mover para a lixeira
                           </Text>
                         </View>

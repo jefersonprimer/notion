@@ -2,15 +2,14 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { ThemedText } from './themed-text';
 
+import { Note } from '../types/note';
 import NoteTree from './NoteTree';
 
-import { Note } from '../types/note';
-
 import { useColorScheme } from '@/hooks/use-color-scheme';
-
 import { Colors } from '@/constants/theme';
-import { EllipsisIcon } from '@/components/ui/EllipsisIcon';
-import { PlusSmallIcon } from '@/components/ui/PlusSmallIcon';
+
+import { EllipsisIcon } from './ui/EllipsisIcon';
+import { PlusSmallIcon } from './ui/PlusSmallIcon';
 
 type AllNotesProps = {
   notes: Note[];
@@ -65,7 +64,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
   },
   headerIcons: {
     flexDirection: 'row',
