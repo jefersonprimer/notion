@@ -8,9 +8,10 @@ type OptionsModalProps = {
   onClose: () => void;
   onOrderByPress: () => void;
   onDisplayPress: () => void;
+  notesToShow: number;
 };
 
-const OptionsModal: React.FC<OptionsModalProps> = ({ visible, onClose, onOrderByPress, onDisplayPress }) => {
+const OptionsModal: React.FC<OptionsModalProps> = ({ visible, onClose, onOrderByPress, onDisplayPress, notesToShow }) => {
   return (
     <Modal
       animationType="slide"
@@ -30,7 +31,10 @@ const OptionsModal: React.FC<OptionsModalProps> = ({ visible, onClose, onOrderBy
           </TouchableOpacity>
           <View style={styles.separator} />
           <TouchableOpacity style={styles.option} onPress={onDisplayPress}>
-            <ThemedText>Display</ThemedText>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+              <ThemedText>Display</ThemedText>
+              <ThemedText>{notesToShow === Infinity ? 'All' : notesToShow}</ThemedText>
+            </View>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>

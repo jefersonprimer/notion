@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemedText } from './themed-text';
 
 import { Note } from '../types/note';
@@ -36,6 +37,23 @@ const AllNotes: React.FC<AllNotesProps> = ({
   const [modalVisible, setModalVisible] = React.useState(false);
   const [orderByModalVisible, setOrderByModalVisible] = React.useState(false);
   const [displayModalVisible, setDisplayModalVisible] = React.useState(false);
+  const [notesToShow, setNotesToShow] = React.useState(Infinity);
+
+  React.useEffect(() => {
+    const loadNotesToShow = async () => {
+      const savedValue = await AsyncStorage.getItem('notesToShow');
+      if (savedValue) {
+        setNotesToShow(JSON.parse(savedValue));
+      }
+    };
+    loadNotesToShow();
+  }, []);
+
+  const handleDisplayChange = async (value: number) => {
+    setNotesToShow(value);
+    await AsyncStorage.setItem('notesToShow', JSON.stringify(value));
+    setDisplayModalVisible(false);
+  };
 
   const handleOpenModal = () => {
     setModalVisible(true);
@@ -81,7 +99,7 @@ const AllNotes: React.FC<AllNotesProps> = ({
         </View>
       </View> 
       <NoteTree
-        notes={notes}
+        notes={notes.slice(0, notesToShow)}
         onToggleExpand={onToggleExpand}
         expandedNotes={expandedNotes}
         childNodes={childNodes}
@@ -93,9 +111,15 @@ const AllNotes: React.FC<AllNotesProps> = ({
         onClose={handleCloseModal} 
         onOrderByPress={handleOrderByPress}
         onDisplayPress={handleDisplayPress}
+        notesToShow={notesToShow}
       />
       <OrderByModal visible={orderByModalVisible} onClose={handleCloseOrderByModal} />
-      <DisplayModal visible={displayModalVisible} onClose={handleCloseDisplayModal} />
+      <DisplayModal 
+        visible={displayModalVisible} 
+        onClose={handleCloseDisplayModal} 
+        onDisplayChange={handleDisplayChange}
+        totalNotes={notes.length}
+      />
     </View>
   );
 };

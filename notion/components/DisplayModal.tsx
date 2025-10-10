@@ -6,9 +6,11 @@ import { ThemedText } from './themed-text';
 type DisplayModalProps = {
   visible: boolean;
   onClose: () => void;
+  onDisplayChange: (value: number) => void;
+  totalNotes: number;
 };
 
-const DisplayModal: React.FC<DisplayModalProps> = ({ visible, onClose }) => {
+const DisplayModal: React.FC<DisplayModalProps> = ({ visible, onClose, onDisplayChange, totalNotes }) => {
   return (
     <Modal
       animationType="slide"
@@ -23,25 +25,25 @@ const DisplayModal: React.FC<DisplayModalProps> = ({ visible, onClose }) => {
       >
         <View style={styles.modalView}>
           <ThemedText type="subtitle" style={{paddingBottom: 20}}>Display</ThemedText>
-          <View style={styles.option}>
+          <TouchableOpacity style={styles.option} onPress={() => onDisplayChange(5)}>
             <ThemedText>5</ThemedText>
-          </View>
+          </TouchableOpacity>
           <View style={styles.separator} />
-          <View style={styles.option}>
+          <TouchableOpacity style={styles.option} onPress={() => onDisplayChange(10)}>
             <ThemedText>10</ThemedText>
-          </View>
+          </TouchableOpacity>
           <View style={styles.separator} />
-          <View style={styles.option}>
+          <TouchableOpacity style={styles.option} onPress={() => onDisplayChange(15)}>
             <ThemedText>15</ThemedText>
-          </View>
+          </TouchableOpacity>
           <View style={styles.separator} />
-          <View style={styles.option}>
+          <TouchableOpacity style={styles.option} onPress={() => onDisplayChange(20)}>
             <ThemedText>20</ThemedText>
-          </View>
+          </TouchableOpacity>
           <View style={styles.separator} />
-          <View style={styles.option}>
+          <TouchableOpacity style={styles.option} onPress={() => onDisplayChange(Infinity)}>
             <ThemedText>All</ThemedText>
-          </View>
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
     </Modal>
