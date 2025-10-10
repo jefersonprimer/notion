@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { ThemedText } from './themed-text';
 
 import { Note } from '../types/note';
@@ -9,6 +9,9 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 
 import { EllipsisIcon } from './ui/EllipsisIcon';
+import OptionsModal from './OptionsModal';
+import OrderByModal from './OrderByModal';
+import DisplayModal from './DisplayModal';
 import { PlusSmallIcon } from './ui/PlusSmallIcon';
 import { Link } from 'expo-router';
 
@@ -30,6 +33,35 @@ const AllNotes: React.FC<AllNotesProps> = ({
   childNodes 
 }) => {
   const colorScheme = useColorScheme();
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [orderByModalVisible, setOrderByModalVisible] = React.useState(false);
+  const [displayModalVisible, setDisplayModalVisible] = React.useState(false);
+
+  const handleOpenModal = () => {
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
+  const handleOrderByPress = () => {
+    setModalVisible(false);
+    setOrderByModalVisible(true);
+  };
+
+  const handleDisplayPress = () => {
+    setModalVisible(false);
+    setDisplayModalVisible(true);
+  };
+
+  const handleCloseOrderByModal = () => {
+    setOrderByModalVisible(false);
+  };
+
+  const handleCloseDisplayModal = () => {
+    setDisplayModalVisible(false);
+  };
 
   if (!notes || notes.length === 0) {
     return null;
@@ -40,7 +72,9 @@ const AllNotes: React.FC<AllNotesProps> = ({
       <View style={styles.header}>
         <ThemedText type="subtitle" style={styles.title}>Particular</ThemedText>
         <View style={styles.headerIcons}>
-          <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />
+          <TouchableOpacity onPress={handleOpenModal}>
+            <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />
+          </TouchableOpacity>
           <Link href="/create">
             <PlusSmallIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />
           </Link>
@@ -54,6 +88,14 @@ const AllNotes: React.FC<AllNotesProps> = ({
         onOpenModal={onOpenModal}
         onAddChild={onAddChild}
       />
+      <OptionsModal 
+        visible={modalVisible} 
+        onClose={handleCloseModal} 
+        onOrderByPress={handleOrderByPress}
+        onDisplayPress={handleDisplayPress}
+      />
+      <OrderByModal visible={orderByModalVisible} onClose={handleCloseOrderByModal} />
+      <DisplayModal visible={displayModalVisible} onClose={handleCloseDisplayModal} />
     </View>
   );
 };
