@@ -10,6 +10,7 @@ import { Colors } from '@/constants/theme';
 
 import { EllipsisIcon } from './ui/EllipsisIcon';
 import { PlusSmallIcon } from './ui/PlusSmallIcon';
+import { Link } from 'expo-router';
 
 type AllNotesProps = {
   notes: Note[];
@@ -40,7 +41,9 @@ const AllNotes: React.FC<AllNotesProps> = ({
         <ThemedText type="subtitle" style={styles.title}>Particular</ThemedText>
         <View style={styles.headerIcons}>
           <EllipsisIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />
-          <PlusSmallIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />
+          <Link href="/create">
+            <PlusSmallIcon color={Colors[colorScheme ?? 'light'].icon} size={20} />
+          </Link>
         </View>
       </View> 
       <NoteTree
