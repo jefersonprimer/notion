@@ -1,0 +1,1 @@
+{"version":3,"file":"RestoreNoteUseCase.d.ts","sourceRoot":"","sources":["RestoreNoteUseCase.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,eAAe,EAAE,MAAM,2CAA2C,CAAC;AAE5E,qBAAa,kBAAkB;IACjB,OAAO,CAAC,cAAc;gBAAd,cAAc,EAAE,eAAe;IAE7C,OAAO,CAAC,KAAK,EAAE;QAAE,EAAE,EAAE,MAAM,CAAC;QAAC,MAAM,EAAE,MAAM,CAAA;KAAE,GAAG,OAAO,CAAC,IAAI,CAAC;CAMpE"}
