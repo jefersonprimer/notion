@@ -31,6 +31,7 @@ import UserModal from './UserModal';
 import SearchModal from './SearchModal';
 import TrashModal from './TrashModal';
 import SettingsModal from './SettingsModal';
+import MoreOptionsModal from  './MoreOptionsModal';
 
 export default function Sidebar({ isFloating = false }: { isFloating?: boolean }) {
   const { session } = useAuth();
@@ -48,7 +49,9 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isTrashModalOpen, setIsTrashModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isMoreOptionsModalOpen, setIsMoreOptionsModalOpen] = useState(false);
   const [userModalPos, setUserModalPos] = useState({ top: 0, left: 0 });
+  const [moreOptionsModalPos, setMoreOptionsModalPos] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
     async function fetchRootNotes() {
@@ -118,14 +121,15 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
     <div className={`group/sidebar w-60 bg-[#202020] text-[#9b9b9b] flex flex-col text-sm border-r border-[#2f2f2f] select-none ${isFloating ? 'h-full max-h-[70vh] overflow-y-auto' : 'h-screen'}`}>
       {/* Header */}
       <div
-        onClick={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          setUserModalPos({ top: rect.bottom + 5, left: rect.left + 10 });
-          setIsUserModalOpen(true);
-        }}
         className={`group relative flex items-center justify-between  transition-colors cursor-pointer gap-2 hover:bg-[#252525] ${isUserModalOpen ? 'bg-[#252525]' : ''}`}
       >
-        <div className="flex items-center p-2 px-4 gap-2 transition-all duration-200 group-hover:opacity-100 flex-1 min-w-0">
+        <div
+          onClick={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            setUserModalPos({ top: rect.bottom + 5, left: rect.left + 10 });
+            setIsUserModalOpen(true);
+          }}
+          className="flex items-center p-2 px-4 gap-2 transition-all duration-200 group-hover:opacity-100 flex-1 min-w-0">
           <div className="w-5 h-5 bg-[#2f2f2f] rounded flex items-center justify-center text-xs font-medium text-white shrink-0">
             P
           </div>
@@ -163,7 +167,13 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           </button>
 
           <button
-            className="py-2 hover:bg-[#3f3f3f] rounded text-[#9b9b9b] hover:text-white"
+            onClick={(e) => {
+              e.stopPropagation(); 
+              const rect = e.currentTarget.getBoundingClientRect();
+              setMoreOptionsModalPos({ top: rect.bottom + 5, left: rect.left - 40 }); 
+              setIsMoreOptionsModalOpen(true); 
+            }}
+            className={`py-2 hover:bg-[#3f3f3f] rounded hover:text-white ${isMoreOptionsModalOpen ? 'bg-[#3f3f3f] text-white' : 'text-[#9b9b9b]'}`}
             title="Mais opções"
           >
             <ChevronDown size={14} />
@@ -273,7 +283,13 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
         open={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
       />
+      <MoreOptionsModal
+        open={isMoreOptionsModalOpen}
+        onClose={() => setIsMoreOptionsModalOpen(false)}
+        position={moreOptionsModalPos}
+      />
     </div>
+
   );
 }
 

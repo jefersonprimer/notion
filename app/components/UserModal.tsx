@@ -7,7 +7,7 @@ interface UserModalProps {
   onClose: () => void;
   position: { top: number; left: number };
   onOpenSettings?: () => void;
-}
+} 
 
 export default function UserModal({ isOpen, onClose, position, onOpenSettings }: UserModalProps) {
   const { session, signOut } = useAuth();
