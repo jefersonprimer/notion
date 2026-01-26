@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { listNotesUseCase, createNoteUseCase, searchNotesUseCase } from '@/api/main/factories/noteFactory';
+import { listNotesUseCase, createNoteUseCase, searchNotesUseCase, listFavoriteNotesUseCase } from '@/api/main/factories/noteFactory';
 import { getUserId } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
@@ -10,10 +10,15 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const search = searchParams.get('search');
+  const favorites = searchParams.get('favorites');
 
   try {
     if (search) {
       const notes = await searchNotesUseCase.execute({ userId, query: search });
+      return NextResponse.json(notes);
+    }
+    if (favorites === 'true') {
+      const notes = await listFavoriteNotesUseCase.execute(userId);
       return NextResponse.json(notes);
     }
     const notes = await listNotesUseCase.execute(userId);

@@ -20,10 +20,12 @@ import {
   Layers,
   Trash2,
   MoreHorizontal,
-  ChevronsLeft
+  ChevronsLeft,
+  Star
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useLayout } from '@/context/LayoutContext';
+import { useFavorite } from '@/context/FavoriteContext';
 import api from '@/lib/api';
 import { Note } from '@/types/note';
 import { createNoteSlug } from '@/lib/utils';
@@ -36,10 +38,12 @@ import MoreOptionsModal from  './MoreOptionsModal';
 export default function Sidebar({ isFloating = false }: { isFloating?: boolean }) {
   const { session } = useAuth();
   const { setIsSidebarOpen } = useLayout();
+  const { favoriteNotes, toggleFavorite } = useFavorite();
   const router = useRouter();
   const pathname = usePathname();
   const [rootNotes, setRootNotes] = useState<Note[]>([]);
   const [expandedSections, setExpandedSections] = useState({
+    favoritos: true,
     particular: true,
     compartilhado: true,
     aplicativos: true,
@@ -193,6 +197,30 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
       <div className="flex-1 overflow-y-auto">
         {/* Main Navigation */}
 
+        {/* Favorites Section */}
+        {favoriteNotes.length > 0 && (
+          <div className="mt-4 px-2">
+            <div className="px-2 py-1 text-xs font-semibold text-[#787774]">
+              Favoritos
+            </div>
+            {expandedSections.favoritos && (
+              <div className="py-1">
+                {favoriteNotes.map(note => (
+                  <SidebarItem
+                    key={`fav-${note.id}`}
+                    note={note}
+                    session={session}
+                    onAddChild={handleAddChild}
+                    onDelete={() => {}} // Placeholder, overridden by onRemove
+                    onRemove={() => toggleFavorite(note)}
+                    currentPathname={pathname}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Particular Section */}
         <div className="mt-4 px-2">
           <button
@@ -314,6 +342,7 @@ function SidebarItem({
   session,
   onAddChild,
   onDelete,
+  onRemove,
   currentPathname
 }: {
   note: Note;
@@ -321,6 +350,7 @@ function SidebarItem({
   session: any;
   onAddChild: (parentId: string, e: React.MouseEvent) => void;
   onDelete: (noteId: string) => void;
+  onRemove?: () => void;
   currentPathname: string | null;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -329,6 +359,9 @@ function SidebarItem({
   const [hasLoaded, setHasLoaded] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  
+  const { favoriteNotes, toggleFavorite } = useFavorite();
+  const isFavorite = favoriteNotes.some(n => n.id === note.id);
 
   const noteHref = `/${createNoteSlug(note.title || "Sem título", note.id)}`;
   const isActive = currentPathname === noteHref;
@@ -370,17 +403,26 @@ function SidebarItem({
   const handleAddChildLocal = (e: React.MouseEvent) => {
     onAddChild(note.id, e);
     if (!isOpen) setIsOpen(true);
-    // Ideally we would trigger a refresh or optimistically add the child here
-    // But since onAddChild in parent just pushes, we might miss the update in this specific list
-    // if we don't refetch. For now, we rely on the user expanding/collapsing or manual refresh logic if needed.
-    // To make it better: The parent `handleAddChild` should probably return the new note 
-    // and we should add it to `children` state here. 
-    // For this iteration, let's keep it simple as implemented.
   };
 
-  const handleDelete = async (e: React.MouseEvent) => {
+  const handleToggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    toggleFavorite(note);
+    setShowOptions(false);
+  };
+
+  const handleDeleteAction = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // If onRemove is present (e.g. for favorites), simply call it and close menu
+    if (onRemove) {
+        onRemove();
+        setShowOptions(false);
+        return;
+    }
+
     if (!confirm("Tem certeza que deseja excluir esta nota?")) return;
 
     try {
@@ -455,12 +497,31 @@ function SidebarItem({
             // Dynamic positioning could be better but sticking to simple relative for now
           }}
         >
+          {!onRemove && (
+            <button
+                onClick={handleToggleFavorite}
+                className="w-full text-left px-3 py-1.5 text-xs text-[#9b9b9b] hover:text-white hover:bg-[#3f3f3f] flex items-center gap-2"
+            >
+                <Star size={14} fill={isFavorite ? "currentColor" : "none"} className={isFavorite ? "text-yellow-400" : ""} />
+                <span>{isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}</span>
+            </button>
+          )}
+
           <button
-            onClick={handleDelete}
-            className="w-full text-left px-3 py-1.5 text-xs text-[#ff5f5f] hover:bg-[#3f3f3f] flex items-center gap-2"
+            onClick={handleDeleteAction}
+            className={`w-full text-left px-3 py-1.5 text-xs hover:bg-[#3f3f3f] flex items-center gap-2 ${onRemove ? 'text-[#9b9b9b] hover:text-white' : 'text-[#ff5f5f]'}`}
           >
-            <Trash2 size={14} />
-            Excluir
+            {onRemove ? (
+                <>
+                    <Star size={14} /> {/* Or Minus/X icon */}
+                    <span>Remover dos favoritos</span>
+                </>
+            ) : (
+                <>
+                    <Trash2 size={14} />
+                    <span>Excluir</span>
+                </>
+            )}
           </button>
         </div>
       )}
@@ -486,6 +547,8 @@ function SidebarItem({
               session={session}
               onAddChild={onAddChild}
               onDelete={handleDeleteChild}
+              // onRemove is NOT passed recursively to children. 
+              // Children of favorites are not favorites themselves by default (in this view).
               currentPathname={currentPathname}
             />
           ))}

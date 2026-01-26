@@ -7,6 +7,7 @@ import api from '@/lib/api';
 import { Note } from '@/types/note';
 import { useAuth } from '@/context/AuthContext';
 import { useLayout } from '@/context/LayoutContext';
+import { useFavorite } from '@/context/FavoriteContext';
 import { extractIdFromSlug, createNoteSlug } from '@/lib/utils';
 import { MoreHorizontal, Menu, ChevronsRight, LockKeyhole, ChevronDown, Star } from 'lucide-react';
 import {
@@ -43,6 +44,7 @@ export default function NotePage() {
   const params = useParams();
   const { session } = useAuth();
   const { isSidebarOpen, setIsSidebarOpen } = useLayout();
+  const { favoriteNotes, toggleFavorite } = useFavorite();
   const [note, setNote] = useState<Note | null>(null);
   const [title, setTitle] = useState('');
   const [blocks, setBlocks] = useState<{ id: string; type: string; content: string }[]>([]);
@@ -275,6 +277,15 @@ export default function NotePage() {
       }
   };
 
+  const isFavorite = note ? favoriteNotes.some(n => n.id === note.id) : false;
+
+  const handleToggleFavorite = () => {
+    if (!note) return;
+    toggleFavorite(note);
+    // Optimistically update local note state as well so the UI reflects it immediately if it depends on note state
+    setNote(prev => prev ? { ...prev, is_favorite: !prev.is_favorite } : null);
+  };
+
   // Helper for Sidebar logic in Loading/Error states
   const SidebarElement = () => (
       isSidebarOpen ? <Sidebar /> : null
@@ -355,10 +366,11 @@ export default function NotePage() {
               </button>
 
               <button 
-                className="p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded"
-                title="Adicionar aos favoritos"
+                onClick={handleToggleFavorite}
+                className={`p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded transition-colors ${isFavorite ? 'text-yellow-400' : 'text-gray-500'}`}
+                title={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
               >
-                <Star size={16}/>
+                <Star size={18} fill={isFavorite ? "currentColor" : "none"} />
               </button>
 
               <button 
