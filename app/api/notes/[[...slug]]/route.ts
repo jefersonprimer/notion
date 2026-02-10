@@ -12,7 +12,7 @@ import {
   listDeletedNotesUseCase,
   permanentDeleteNoteUseCase,
   restoreNoteUseCase
-} from '@/api/main/factories/noteFactory';
+} from '@/server/main/factories/noteFactory';
 import { getUserId } from '@/lib/auth';
 
 type Params = Promise<{ slug?: string[] }>;

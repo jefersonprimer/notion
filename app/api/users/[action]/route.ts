@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { loginUseCase, createUserUseCase } from '@/api/main/factories/userFactory';
+import { loginUseCase, createUserUseCase } from '@/server/main/factories/userFactory';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ action: string }> }) {
   const { action } = await params;
