@@ -122,10 +122,10 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
   };
 
   return (
-    <div className={`group/sidebar w-60 bg-[#202020] text-[#9b9b9b] flex flex-col text-sm border-r border-[#2f2f2f] select-none ${isFloating ? 'h-full max-h-[70vh] overflow-y-auto' : 'h-screen'}`}>
+    <div className={`group/sidebar w-60 bg-[#202020] text-[#ada9a3] flex flex-col text-sm border-r border-[#2f2f2f] select-none ${isFloating ? 'h-full max-h-[70vh] overflow-y-auto' : 'h-screen'}`}>
       {/* Header */}
       <div
-        className={`group relative flex items-center justify-between  transition-colors cursor-pointer gap-2 hover:bg-[#252525] ${isUserModalOpen ? 'bg-[#252525]' : ''}`}
+        className={`group relative flex items-center justify-between mt-2 mx-2 rounded-sm transition-colors cursor-pointer hover:bg-[#252525] ${isUserModalOpen ? 'bg-[#252525]' : ''}`}
       >
         <div
           onClick={(e) => {
@@ -133,38 +133,38 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
             setUserModalPos({ top: rect.bottom + 5, left: rect.left + 10 });
             setIsUserModalOpen(true);
           }}
-          className="flex items-center p-2 px-4 gap-2 transition-all duration-200 group-hover:opacity-100 flex-1 min-w-0">
-          <div className="w-5 h-5 bg-[#2f2f2f] rounded flex items-center justify-center text-xs font-medium text-white shrink-0">
-            P
+          className="flex items-center p-2 gap-2 transition-all duration-200 group-hover:opacity-100 flex-1 min-w-0"
+        >
+          <div className="w-5.5 h-6 bg-[#2f2f2f] rounded flex items-center justify-center text-sm font-medium text-white shrink-0">
+            <span className="leading-none select-none">P</span>
           </div>
-          <span className="text-white text-sm truncate font-medium">
-            Notion de {session?.user.displayName || 'Usuário'}
-          </span>
-
-          {/* User Menu Button */}
-          <div className="hidden group-hover:block text-[#9b9b9b] hover:text-white">
-            <ChevronDown size={14} />
+          <div className="flex items-center gap-1 min-w-0">
+            <span className="text-white text-sm truncate font-medium leading-none">
+              Notion de {session?.user.displayName || 'Usuário'}
+            </span>
+            <div className="hidden group-hover:flex items-center text-[#ada9a3] hover:text-white">
+              <ChevronDown size={14} />
+            </div>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center shrink-0 px-2">
-
+        <div className="flex items-center shrink-0 pr-2 gap-0.5">
           {/* Collapse Button (Shown on Hover) */}
           {!isFloating && (
             <button
               onClick={(e) => { e.stopPropagation(); setIsSidebarOpen(false); }}
-              className="hidden group-hover/sidebar:block p-1 mr-1 hover:bg-[#3f3f3f] rounded text-[#9b9b9b] hover:text-white"
+              className="hidden group-hover/sidebar:flex items-center justify-center w-7 h-7 hover:bg-[#3f3f3f] rounded text-[#ada9a3] hover:text-white"
               title="Fechar barra lateral"
             >
-              <ChevronsLeft size={22} />
+              <ChevronsLeft size={20} />
             </button>
           )}
 
           {/* Default Icons */}
           <button
             onClick={(e) => { e.stopPropagation(); handleCreateNote(); }}
-            className="text-white hover:bg-[#2f2f2f] p-1.5 rounded transition-colors"
+            className="flex items-center justify-center w-7 h-7 text-white hover:bg-[#2f2f2f] rounded transition-colors"
             title="Crie uma nova página"
           >
             <SquarePen size={18} />
@@ -177,7 +177,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
               setMoreOptionsModalPos({ top: rect.bottom + 5, left: rect.left - 40 }); 
               setIsMoreOptionsModalOpen(true); 
             }}
-            className={`py-2 hover:bg-[#3f3f3f] rounded hover:text-white ${isMoreOptionsModalOpen ? 'bg-[#3f3f3f] text-white' : 'text-[#9b9b9b]'}`}
+            className={`flex items-center justify-center w-5 h-7 hover:bg-[#3f3f3f] rounded hover:text-white ${isMoreOptionsModalOpen ? 'bg-[#3f3f3f] text-white' : 'text-[#ada9a3]'}`}
             title="Mais opções"
           >
             <ChevronDown size={14} />
@@ -185,12 +185,12 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
         </div>
       </div>
 
-      <div className="px-2 py-1">
-        <NavItem icon={<Search size={18} />} label="Buscar" onClick={() => setIsSearchModalOpen(true)} />
-        <NavItem icon={<Home size={18} />} label="Página inicial" href="/" isActive={pathname === '/'} />
-        <NavItem icon={<Users size={18} />} label="Reuniões" />
-        <NavItem icon={<Sparkles size={18} />} label="IA do Notion" />
-        <NavItem icon={<Inbox size={18} />} label="Caixa de entrada" />
+      <div className="px-2 py-1 text-base">
+        <NavItem icon={<Search size={22} />} label="Buscar" onClick={() => setIsSearchModalOpen(true)} />
+        <NavItem icon={<Home size={22} />} label="Página inicial" href="/" isActive={pathname === '/'} />
+        <NavItem icon={<Users size={22} />} label="Reuniões" />
+        <NavItem icon={<Sparkles size={22} />} label="IA do Notion" />
+        <NavItem icon={<Inbox size={22} />} label="Caixa de entrada" />
       </div>
 
       {/* Scrollable Content */}
@@ -200,7 +200,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
         {/* Favorites Section */}
         {favoriteNotes.length > 0 && (
           <div className="mt-4 px-2">
-            <div className="px-2 py-1 text-xs font-semibold text-[#787774]">
+            <div className="px-2 py-1 text-xs font-medium text-[#9b9b9b]">
               Favoritos
             </div>
             {expandedSections.favoritos && (
@@ -225,7 +225,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
         <div className="mt-4 px-2">
           <button
             onClick={() => toggleSection('particular')}
-            className="w-full flex items-center justify-between px-2 py-1 text-xs font-semibold text-[#787774] hover:bg-[#2f2f2f] hover:text-[#9b9b9b] transition-colors group"
+            className="w-full flex items-center justify-between px-2 py-1 text-xs font-medium text-[#9b9b9b] hover:bg-[#2f2f2f] hover:text-[#ada9a3] transition-colors group"
           >
             <span>Particular</span>
             <Plus size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -253,11 +253,11 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
 
         {/* Compartilhado Section */}
         <div className="mt-4 px-2">
-          <div className="px-2 py-1 text-xs font-semibold text-[#787774]">
+          <div className="px-2 py-1 text-xs font-medium text-[#9b9b9b]">
             Compartilhado
           </div>
           <div className=" py-1">
-            <button className="flex items-center gap-2 px-2 py-1.5 hover:bg-[#2f2f2f] rounded w-full text-left transition-colors">
+            <button className="flex items-center text-base gap-2 px-2 py-1.5 hover:bg-[#2f2f2f] rounded w-full text-left transition-colors">
               <Plus size={16} />
               <span>Começar a colaborar</span>
             </button>
@@ -266,20 +266,20 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
 
         {/* Aplicativos do Notion */}
         <div className="mt-4 px-2">
-          <div className="px-2 py-1 text-xs font-semibold text-[#787774]">
+          <div className="px-2 py-1 text-xs font-medium text-[#9b9b9b]">
             Aplicativos do Notion
           </div>
-          <div className="py-1">
-            <NavItem icon={<Mail size={16} />} label="Notion Mail" />
-            <NavItem icon={<Calendar size={16} />} label="Notion Calendar" />
-            <NavItem icon={<Monitor size={16} />} label="Notion para desktop" />
+          <div className="py-1 text-base">
+            <NavItem icon={<Mail size={22} />} label="Notion Mail" />
+            <NavItem icon={<Calendar size={22} />} label="Notion Calendar" />
+            <NavItem icon={<Monitor size={22} />} label="Notion para desktop" />
 
           </div>
 
-          <div className="my-4">
-            <NavItem icon={<Settings size={16} />} label="Settings" onClick={() => setIsSettingsModalOpen(true)} />
-            <NavItem icon={<Layers size={16} />} label="Modelos" />
-            <NavItem icon={<Trash2 size={16} />} label="Lixeira" onClick={() => setIsTrashModalOpen(true)} />
+          <div className="my-4 text-base">
+            <NavItem icon={<Settings size={22} />} label="Settings" onClick={() => setIsSettingsModalOpen(true)} />
+            <NavItem icon={<Layers size={22} />} label="Modelos" />
+            <NavItem icon={<Trash2 size={22} />} label="Lixeira" onClick={() => setIsTrashModalOpen(true)} />
           </div>
         </div>
       </div>
@@ -287,8 +287,8 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
       {/* Bottom Section */}
       <div className="border-t border-[#2f2f2f]">
         <div className="p-2">
-          <button className="hover:bg-[#2f2f2f] p-2 rounded w-full flex items-center transition-colors text-[#9b9b9b] hover:text-white">
-            <HelpCircle size={16} />
+          <button className="hover:bg-[#2f2f2f] p-2 rounded w-full flex items-center transition-colors text-base text-[#ada9a3] hover:text-white">
+            <HelpCircle size={22} />
           </button>
         </div>
       </div>
@@ -323,7 +323,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
 
 function NavItem({ icon, label, href, onClick, isActive }: { icon: React.ReactNode; label: string; href?: string; onClick?: () => void; isActive?: boolean }) {
   const content = (
-    <div className={`flex items-center gap-2 px-2 py-1.5 rounded w-full text-left transition-colors truncate ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#2f2f2f] text-[#9b9b9b] hover:text-white'}`}>
+    <div className={`flex items-center gap-2 px-2 py-1.5 rounded w-full text-left transition-colors truncate ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#2f2f2f] text-[#ada9a3] hover:text-white'}`}>
       <span className="shrink-0">{icon}</span>
       <span className="truncate">{label}</span>
     </div>
@@ -444,19 +444,19 @@ function SidebarItem({
     <div className="flex flex-col relative">
       <Link
         href={noteHref}
-        className={`group flex items-center gap-1 px-2 py-1 rounded transition-colors relative ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#2f2f2f] text-[#9b9b9b] hover:text-white'}`}
+        className={`group flex items-center gap-2 px-2 py-1.5 rounded transition-colors relative text-base ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#2f2f2f] text-[#ada9a3] hover:text-white'}`}
         style={{ paddingLeft: `${depth * 12 + 8}px` }}
       >
         {/* Icon & Toggle */}
         <div
           role="button"
           onClick={handleToggle}
-          className="relative flex items-center justify-center w-5 h-5 shrink-0 z-10 cursor-pointer rounded hover:bg-[#3f3f3f]"
+          className="relative flex items-center justify-center w-6 h-6 shrink-0 z-10 cursor-pointer rounded hover:bg-[#3f3f3f]"
         >
-          <FileText size={16} className="transition-opacity duration-200 group-hover:opacity-0" />
+          <FileText size={22} className="transition-opacity duration-200 group-hover:opacity-0" />
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <ChevronRight
-              size={14}
+              size={18}
               className={`transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
             />
           </div>
@@ -468,7 +468,7 @@ function SidebarItem({
         {/* Hover Actions */}
         <div className="hidden group-hover:flex items-center absolute right-2 bg-[#2f2f2f]">
           <button
-            className="p-0.5 hover:bg-[#3f3f3f] rounded text-[#9b9b9b] hover:text-white relative"
+            className="p-0.5 hover:bg-[#3f3f3f] rounded text-[#ada9a3] hover:text-white relative"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -478,7 +478,7 @@ function SidebarItem({
             <MoreHorizontal size={14} />
           </button>
           <button
-            className="p-0.5 hover:bg-[#3f3f3f] rounded text-[#9b9b9b] hover:text-white"
+            className="p-0.5 hover:bg-[#3f3f3f] rounded text-[#ada9a3] hover:text-white"
             onClick={handleAddChildLocal}
           >
             <Plus size={14} />
@@ -500,7 +500,7 @@ function SidebarItem({
           {!onRemove && (
             <button
                 onClick={handleToggleFavorite}
-                className="w-full text-left px-3 py-1.5 text-xs text-[#9b9b9b] hover:text-white hover:bg-[#3f3f3f] flex items-center gap-2"
+                className="w-full text-left px-3 py-1.5 text-xs text-[#ada9a3] hover:text-white hover:bg-[#3f3f3f] flex items-center gap-2"
             >
                 <Star size={14} fill={isFavorite ? "currentColor" : "none"} className={isFavorite ? "text-yellow-400" : ""} />
                 <span>{isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}</span>
@@ -509,7 +509,7 @@ function SidebarItem({
 
           <button
             onClick={handleDeleteAction}
-            className={`w-full text-left px-3 py-1.5 text-xs hover:bg-[#3f3f3f] flex items-center gap-2 ${onRemove ? 'text-[#9b9b9b] hover:text-white' : 'text-[#ff5f5f]'}`}
+            className={`w-full text-left px-3 py-1.5 text-xs hover:bg-[#3f3f3f] flex items-center gap-2 ${onRemove ? 'text-[#ada9a3] hover:text-white' : 'text-[#ff5f5f]'}`}
           >
             {onRemove ? (
                 <>
