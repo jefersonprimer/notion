@@ -279,6 +279,14 @@ export default function NotePage() {
 
   const isFavorite = note ? favoriteNotes.some(n => n.id === note.id) : false;
 
+  useEffect(() => {
+    if (title) {
+      document.title = `${title}`;
+    } else if (note) {
+      document.title = `Sem título`;
+    }
+  }, [title, note]);
+
   const handleToggleFavorite = () => {
     if (!note) return;
     toggleFavorite(note);
@@ -347,34 +355,40 @@ export default function NotePage() {
                      </div>
                  )}
 
-                 <span className="truncate max-w-[200px] hover:bg-[#202020] px-2 py-1 rounded">{title.trim() || 'Sem título'}</span>
-                 <button 
-                    className="flex items-center gap-2 hover:bg-[#202020] px-2 py-1 rounded"
-                    title="Somente voce tem acesso"
-                 >
-                    <LockKeyhole size={14}/>
-                    Particular
-                    <ChevronDown size={14}/>
-                 </button>
-             </div>
+                <div className="flex items-center">
+                  <button className="text-sm text-[#f0efed] font-normal truncate max-w-[240px] hover:bg-[#fffff315] px-2 py-1 rounded-md">
+                    {title.trim() || 'Sem título'}
+                  </button>
+                  <button 
+                      className="flex items-center justify-center text-sm font-normal text-[#7d7a75] hover:text-[#f0efed] gap-2 hover:bg-[#202020] px-2 py-1 rounded-md"
+                      title="Somente voce tem acesso"
+                  >
+                      <LockKeyhole size={14}/>
+                      Particular
+                      <ChevronDown size={14}/>
+                  </button>
+                </div>
+              </div>
              <div className="flex items-center gap-2">
               <button 
-                className="text-sm hover:bg-[#202020] px-2 py-1 rounded"
+                className="flex items-center justify-center gap-2 border border-[#383836] text-sm hover:bg-[#fffff315] px-2 py-1 rounded-md"
                 title="Compartilhar"
               >
+                <LockKeyhole size={14}/>
                 Compartilhar
+                <ChevronDown size={14}/>
               </button>
 
               <button 
                 onClick={handleToggleFavorite}
-                className={`p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded transition-colors ${isFavorite ? 'text-yellow-400' : 'text-gray-500'}`}
+                className={`p-1.5 hover:bg-gray-100 dark:hover:bg-[#fffff315] rounded-md transition-colors ${isFavorite ? 'text-[#ca984d]' : 'text-[#f0efed]'}`}
                 title={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
               >
                 <Star size={18} fill={isFavorite ? "currentColor" : "none"} />
               </button>
 
               <button 
-                className="p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded"
+                className="p-1.5 text-[#f0efed] hover:bg-gray-100 dark:hover:bg-[#fffff315] rounded-md"
                 title="Mais opções"
               >
                 <MoreHorizontal size={20}/>

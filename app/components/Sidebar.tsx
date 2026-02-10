@@ -122,7 +122,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
   };
 
   return (
-    <div className={`group/sidebar w-60 bg-[#202020] text-[#ada9a3] flex flex-col text-sm border-r border-[#2f2f2f] select-none ${isFloating ? 'h-full max-h-[70vh] overflow-y-auto' : 'h-screen'}`}>
+    <div className={`group/sidebar w-68 bg-[#202020] text-[#ada9a3] flex flex-col text-sm border-r border-[#2f2f2f] select-none ${isFloating ? 'h-full max-h-[70vh] overflow-y-auto' : 'h-screen'}`}>
       {/* Header */}
       <div
         className={`group relative flex items-center justify-between mt-2 mx-2 rounded-sm transition-colors cursor-pointer hover:bg-[#252525] ${isUserModalOpen ? 'bg-[#252525]' : ''}`}

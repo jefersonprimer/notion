@@ -63,12 +63,30 @@ export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef
 
   const getStyles = () => {
     switch (type) {
-      case 'h1': return 'text-3xl font-bold mt-4 mb-2';
-      case 'h2': return 'text-2xl font-bold mt-3 mb-2';
-      case 'h3': return 'text-xl font-bold mt-2 mb-1';
-      case 'toggle': return 'italic border-l-2 border-gray-300 dark:border-gray-600 pl-4';
-      case 'todo_checked': return 'line-through text-gray-400';
+      case 'h1': return 'text-3xl font-bold';
+      case 'h2': return 'text-2xl font-bold';
+      case 'h3': return 'text-xl font-bold';
+      case 'toggle': return 'text-base italic border-l-2 border-gray-300 dark:border-gray-600 pl-4';
+      case 'todo_checked': return 'text-base line-through text-gray-400';
       default: return 'text-base';
+    }
+  };
+
+  const getContainerMargins = () => {
+    switch (type) {
+      case 'h1': return 'mt-6 mb-2';
+      case 'h2': return 'mt-5 mb-2';
+      case 'h3': return 'mt-4 mb-1';
+      default: return '';
+    }
+  };
+
+  const getLineHeight = () => {
+    switch (type) {
+      case 'h1': return 'h-[2.25rem]';
+      case 'h2': return 'h-[2rem]';
+      case 'h3': return 'h-[1.75rem]';
+      default: return 'h-[1.5rem]';
     }
   };
 
@@ -79,14 +97,16 @@ export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef
     onChange(id, content, isChecked ? 'todo' : 'todo_checked');
   };
 
+  const lineHeight = getLineHeight();
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="group flex items-start -ml-12 pl-2 py-1 relative rounded"
+      className={`group flex items-start -ml-12 pl-2 py-1 relative rounded transition-colors hover:bg-gray-50 dark:hover:bg-white/5 ${getContainerMargins()}`}
     >
       {/* Drag Handle & Add Button Container */}
-      <div className="absolute left-0 top-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 select-none z-10">
+      <div className={`absolute left-0 top-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 select-none z-10 ${lineHeight}`}>
          <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
             <Plus size={16} />
          </button>
@@ -100,17 +120,17 @@ export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef
       </div>
 
       {/* Prefix Indicators */}
-      <div className="flex items-start ml-10 shrink-0 select-none">
+      <div className={`flex items-center ml-10 shrink-0 select-none ${lineHeight}`}>
         {isTodo && (
           <button 
             onClick={toggleTodo}
-            className="mr-2 mt-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            className="mr-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             {isChecked ? <CheckSquare size={16} /> : <Square size={16} />}
           </button>
         )}
-        {type === 'bullet' && <span className="mr-3 mt-1 text-gray-500">•</span>}
-        {type === 'number' && <span className="mr-2 mt-1 text-gray-500">1.</span>}
+        {type === 'bullet' && <span className="mr-3 text-gray-500">•</span>}
+        {type === 'number' && <span className="mr-2 text-gray-500">1.</span>}
       </div>
 
       {/* Content Input */}
@@ -127,7 +147,7 @@ export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef
         {/* Slash Menu */}
         {showMenu && (
           <SlashMenu 
-            position={{ top: 35, left: 0 }} 
+            position={{ top: type.startsWith('h') ? 40 : 32, left: 0 }} 
             onSelect={handleMenuSelect}
             onClose={() => setShowMenu(false)}
           />
