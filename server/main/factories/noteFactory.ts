@@ -13,6 +13,7 @@ import { SearchNotesUseCase } from '../../application/use-cases/SearchNotesUseCa
 import { FavoriteNoteUseCase } from '../../application/use-cases/FavoriteNoteUseCase';
 import { ListFavoriteNotesUseCase } from '../../application/use-cases/ListFavoriteNotesUseCase';
 import { ListChildNotesUseCase } from '../../application/use-cases/ListChildNotesUseCase';
+import { DuplicateNoteUseCase } from '../../application/use-cases/DuplicateNoteUseCase';
 
 // 1. Instantiate Repository
 const supabaseNoteRepository = new SupabaseNoteRepository();
@@ -30,6 +31,7 @@ const searchNotesUseCase = new SearchNotesUseCase(supabaseNoteRepository);
 const favoriteNoteUseCase = new FavoriteNoteUseCase(supabaseNoteRepository);
 const listFavoriteNotesUseCase = new ListFavoriteNotesUseCase(supabaseNoteRepository);
 const listChildNotesUseCase = new ListChildNotesUseCase(supabaseNoteRepository);
+const duplicateNoteUseCase = new DuplicateNoteUseCase(supabaseNoteRepository);
 
 export { 
   createNoteUseCase,
@@ -43,5 +45,6 @@ export {
   searchNotesUseCase,
   favoriteNoteUseCase,
   listFavoriteNotesUseCase,
-  listChildNotesUseCase
+  listChildNotesUseCase,
+  duplicateNoteUseCase
 };

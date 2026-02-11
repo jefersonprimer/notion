@@ -11,7 +11,8 @@ import {
   listChildNotesUseCase,
   listDeletedNotesUseCase,
   permanentDeleteNoteUseCase,
-  restoreNoteUseCase
+  restoreNoteUseCase,
+  duplicateNoteUseCase
 } from '@/server/main/factories/noteFactory';
 import { getUserId } from '@/lib/auth';
 
@@ -43,7 +44,7 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
     }
 
     // GET /api/notes/search
-    if (slug[0] === 'search') {
+    if (slug && slug[0] === 'search') {
       const query = searchParams.get('q') || '';
       const titleOnly = searchParams.get('titleOnly') === 'true';
       const sortBy = searchParams.get('sortBy') as any;
@@ -60,20 +61,20 @@ export async function GET(req: NextRequest, { params }: { params: Params }) {
     }
 
     // GET /api/notes/trash
-    if (slug[0] === 'trash' && slug.length === 1) {
+    if (slug && slug[0] === 'trash' && slug.length === 1) {
       const notes = await listDeletedNotesUseCase.execute(userId);
       return NextResponse.json(notes);
     }
 
     // GET /api/notes/[id]/children
-    if (slug.length === 2 && slug[1] === 'children') {
+    if (slug && slug.length === 2 && slug[1] === 'children') {
       const id = slug[0];
       const notes = await listChildNotesUseCase.execute(id);
       return NextResponse.json(notes);
     }
 
     // GET /api/notes/[id]
-    if (slug.length === 1) {
+    if (slug && slug.length === 1) {
       const id = slug[0];
       const note = await getNoteByIdUseCase.execute({ id, userId });
       if (!note) return NextResponse.json({ message: 'Note not found' }, { status: 404 });
@@ -99,6 +100,20 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
       const { title, description, parentId } = body;
       const note = await createNoteUseCase.execute({ userId, title, description, parentId });
       return NextResponse.json(note, { status: 201 });
+    }
+
+    // POST /api/notes/[id]/duplicate
+    if (slug && slug.length === 2 && slug[1] === 'duplicate') {
+      const id = slug[0];
+      const note = await duplicateNoteUseCase.execute({ id, userId });
+      return NextResponse.json(note, { status: 201 });
+    }
+
+    // POST /api/notes/[id]/restore
+    if (slug && slug.length === 2 && slug[1] === 'restore') {
+      const id = slug[0];
+      await restoreNoteUseCase.execute({ id, userId });
+      return new Response(null, { status: 200 });
     }
 
     return NextResponse.json({ message: 'Not Found' }, { status: 404 });
@@ -168,6 +183,13 @@ export async function DELETE(req: NextRequest, { params }: { params: Params }) {
   const { slug } = await params;
 
   try {
+    // DELETE /api/notes/[id]/permanent (Permanent Delete)
+    if (slug && slug.length === 2 && slug[1] === 'permanent') {
+      const id = slug[0];
+      await permanentDeleteNoteUseCase.execute({ id, userId });
+      return new Response(null, { status: 204 });
+    }
+
     // DELETE /api/notes/trash/[id] (Permanent Delete)
     if (slug && slug.length === 2 && slug[0] === 'trash') {
       const id = slug[1];

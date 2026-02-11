@@ -10,6 +10,7 @@ interface FavoriteContextType {
   isLoading: boolean;
   toggleFavorite: (note: Note) => Promise<void>;
   refreshFavorites: () => Promise<void>;
+  removeNoteFromFavorites: (noteId: string) => void;
 }
 
 const FavoriteContext = createContext<FavoriteContextType | undefined>(undefined);
@@ -40,18 +41,19 @@ export function FavoriteProvider({ children }: { children: ReactNode }) {
     fetchFavorites();
   }, [fetchFavorites]);
 
+  const removeNoteFromFavorites = useCallback((noteId: string) => {
+    setFavoriteNotes(prev => prev.filter(n => n.id !== noteId));
+  }, []);
+
   const toggleFavorite = async (note: Note) => {
     if (!session) return;
 
     // Optimistic update
-    const isCurrentlyFavorite = note.is_favorite; // Or check if it's in favoriteNotes list
+    const isCurrentlyFavorite = favoriteNotes.some(n => n.id === note.id);
     const newStatus = !isCurrentlyFavorite;
 
     // Update local list optimistically
     if (newStatus) {
-        // If adding, we assume the note object passed is mostly correct, but we update the flag
-        // However, if we don't have the full note object (e.g. from a partial list), it might be tricky.
-        // Usually, the note passed in has current state.
         setFavoriteNotes(prev => [...prev, { ...note, is_favorite: true }]);
     } else {
         setFavoriteNotes(prev => prev.filter(n => n.id !== note.id));
@@ -69,7 +71,7 @@ export function FavoriteProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <FavoriteContext.Provider value={{ favoriteNotes, isLoading, toggleFavorite, refreshFavorites: fetchFavorites }}>
+    <FavoriteContext.Provider value={{ favoriteNotes, isLoading, toggleFavorite, refreshFavorites: fetchFavorites, removeNoteFromFavorites }}>
       {children}
     </FavoriteContext.Provider>
   );

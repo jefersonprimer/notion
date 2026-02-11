@@ -24,6 +24,10 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
+    document.title = 'Página inicial';
+  }, []);
+
+  useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting('Bom dia');
     else if (hour < 18) setGreeting('Boa tarde');
@@ -109,7 +113,11 @@ export default function Home() {
                 )}
               </div>
             )}
-
+            
+            <div className="flex items-center gap-2 px-2 py-1 rounded hover:bg-[#2f2f2f] cursor-pointer transition-colors group">
+              <HomeIcon size={16} className="text-gray-400 group-hover:text-white" />
+              <span className="text-white font-medium">Página inicial</span>
+            </div>
           </div>
 
           <div className="flex items-center gap-2" ref={moreMenuRef}>

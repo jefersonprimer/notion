@@ -1,17 +1,17 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import api from '../lib/api';
 
 // --- Types ---
-type User = {
+export type User = {
   id: string;
   email: string;
   displayName: string | null;
 };
 
-type Session = {
+export type Session = {
   accessToken: string;
   user: User;
 };
@@ -58,18 +58,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadSession();
   }, []);
 
-  const signIn = (newSession: Session) => {
+  const signIn = useCallback((newSession: Session) => {
     setSession(newSession);
     localStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
     // api.defaults.headers.common['Authorization'] = `Bearer ${newSession.access_token}`;
-  };
+  }, []);
 
-  const signOut = () => {
-    setSession(null);
+  const signOut = useCallback(() => {
     localStorage.removeItem(SESSION_KEY);
+    setSession(null);
     // delete api.defaults.headers.common['Authorization'];
-    router.push('/login');
-  };
+    window.location.href = '/login';
+  }, []);
 
   // Redirection Logic
   useEffect(() => {
