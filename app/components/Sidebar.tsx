@@ -38,6 +38,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
   const router = useRouter();
   const pathname = usePathname();
   const [rootNotes, setRootNotes] = useState<Note[]>([]);
+  const [loadingRootNotes, setLoadingRootNotes] = useState(true);
   const [expandedSections, setExpandedSections] = useState({
     favoritos: true,
     particular: true,
@@ -56,6 +57,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
   useEffect(() => {
     async function fetchRootNotes() {
       if (!session) return;
+      setLoadingRootNotes(true);
       try {
         const response = await api.get('/notes', {
           headers: {
@@ -65,6 +67,8 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
         setRootNotes(response.data);
       } catch (error) {
         console.error('Error fetching root notes:', error);
+      } finally {
+        setLoadingRootNotes(false);
       }
     }
     fetchRootNotes();
@@ -227,7 +231,9 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
 
           {expandedSections.particular && (
             <div className="py-1">
-              {rootNotes.length === 0 ? (
+              {loadingRootNotes ? (
+                <div className="px-2 py-1 text-xs text-[#555]">Carregando notas...</div>
+              ) : rootNotes.length === 0 ? (
                 <div className="px-2 py-1 text-xs text-[#555]">Nenhuma nota</div>
               ) : (
                 rootNotes.map(note => (

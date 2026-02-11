@@ -64,6 +64,16 @@ export default function TrashModal({ open, onClose }: Props) {
     }
   };
 
+  const handleEmptyTrash = async () => {
+    if (!confirm("Tem certeza que deseja esvaziar a lixeira? Essa ação não pode ser desfeita.")) return;
+    try {
+      await api.delete('/notes/trash');
+      setNotes([]);
+    } catch (error) {
+      console.error('Failed to empty trash:', error);
+    }
+  };
+
   if (!open) return null;
 
   return (
@@ -81,12 +91,22 @@ export default function TrashModal({ open, onClose }: Props) {
             <Trash2 size={16} />
             Lixeira
           </span>
-          <button 
-            onClick={onClose}
-            className="text-[#9b9b9b] hover:text-white p-1 rounded hover:bg-[#3f3f3f] transition-colors"
-          >
-            <X size={16} />
-          </button>
+          <div className="flex items-center gap-2">
+            {notes.length > 0 && (
+              <button 
+                onClick={handleEmptyTrash}
+                className="text-xs text-[#ff5f5f] hover:text-[#ff8f8f] px-2 py-1 rounded hover:bg-[#3f3f3f] transition-colors"
+              >
+                Esvaziar lixeira agora
+              </button>
+            )}
+            <button 
+              onClick={onClose}
+              className="text-[#9b9b9b] hover:text-white p-1 rounded hover:bg-[#3f3f3f] transition-colors"
+            >
+              <X size={16} />
+            </button>
+          </div>
         </div>
 
         {/* Content */}

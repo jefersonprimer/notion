@@ -12,7 +12,8 @@ import {
   listDeletedNotesUseCase,
   permanentDeleteNoteUseCase,
   restoreNoteUseCase,
-  duplicateNoteUseCase
+  duplicateNoteUseCase,
+  emptyTrashUseCase
 } from '@/server/main/factories/noteFactory';
 import { getUserId } from '@/lib/auth';
 
@@ -183,6 +184,12 @@ export async function DELETE(req: NextRequest, { params }: { params: Params }) {
   const { slug } = await params;
 
   try {
+    // DELETE /api/notes/trash
+    if (slug && slug.length === 1 && slug[0] === 'trash') {
+      await emptyTrashUseCase.execute(userId);
+      return new Response(null, { status: 204 });
+    }
+
     // DELETE /api/notes/[id]/permanent (Permanent Delete)
     if (slug && slug.length === 2 && slug[1] === 'permanent') {
       const id = slug[0];

@@ -208,6 +208,19 @@ export class SupabaseNoteRepository implements INoteRepository {
     }
   }
 
+  async emptyTrash(userId: string): Promise<void> {
+    const { error } = await supabase
+      .from('notes')
+      .delete()
+      .eq('user_id', userId)
+      .eq('is_deleted', true);
+
+    if (error) {
+      console.error("Supabase empty trash error:", error.message);
+      throw new Error("Could not empty trash.");
+    }
+  }
+
   async favorite(id: string, userId: string, isFavorite: boolean): Promise<Note | null> {
     const { data, error } = await supabase
       .from('notes')

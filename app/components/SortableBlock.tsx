@@ -12,10 +12,23 @@ interface SortableBlockProps {
   content: string;
   onChange: (id: string, newContent: string, newType?: string) => void;
   onKeyDown: (e: React.KeyboardEvent, id: string) => void;
-  inputRef?: (el: HTMLInputElement | null) => void;
+  inputRef?: (el: HTMLDivElement | null) => void; // Changed from HTMLInputElement
+  onPasteMultiLine?: (id: string, newLines: string[]) => void;
+  listNumber?: number; // New prop for numbered lists
 }
 
-export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef }: SortableBlockProps) {
+const PREFIXES: Record<string, string> = {
+  h1: '# ',
+  h2: '## ',
+  h3: '### ',
+  bullet: '- ',
+  number: '1. ',
+  todo: '[] ',
+  todo_checked: '[x] ', // todo_checked should not trigger auto-format on typing
+  toggle: '> ',
+};
+
+export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef, onPasteMultiLine, listNumber }: SortableBlockProps) {
   const {
     attributes,
     listeners,
@@ -26,7 +39,15 @@ export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef
   } = useSortable({ id });
 
   const [showMenu, setShowMenu] = useState(false);
-  const localInputRef = useRef<HTMLInputElement>(null);
+  const [isInputFocused, setIsInputFocused] = useState(false); // New state for input focus
+  const localInputRef = useRef<HTMLDivElement>(null); // Changed to HTMLDivElement
+
+  // Effect to update the contentEditable div's innerText when content prop changes
+  useEffect(() => {
+    if (localInputRef.current && localInputRef.current.innerText !== content) {
+      localInputRef.current.innerText = content;
+    }
+  }, [content]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -36,14 +57,28 @@ export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const setRefs = (el: HTMLInputElement | null) => {
+  const setRefs = (el: HTMLDivElement | null) => { // Changed to HTMLDivElement
       localInputRef.current = el;
       if (inputRef) inputRef(el);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
+  const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
+    const val = (e.target as HTMLDivElement).innerText;
     
+    // Check for auto-formatting
+    if (type === 'text' && val.endsWith(' ')) {
+        for (const [key, prefix] of Object.entries(PREFIXES)) {
+            if (key !== 'todo_checked' && val.startsWith(prefix)) { // Exclude todo_checked from auto-format trigger
+                // Instead of clearing content, we update content to remove the prefix
+                // and then trigger a type change
+                onChange(id, val.slice(prefix.length), key); 
+                // Manual focus is needed after type change if content is modified
+                // setTimeout(() => localInputRef.current?.focus(), 0);
+                return; // Stop after first match
+            }
+        }
+    }
+
     if (val === '/') {
       setShowMenu(true);
     } else if (showMenu && !val.includes('/')) {
@@ -51,6 +86,33 @@ export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef
     }
     
     onChange(id, val);
+  };
+
+  const handleFocus = () => setIsInputFocused(true);
+  const handleBlur = () => {
+    setIsInputFocused(false);
+    // When blurring, ensure content is clean (e.g., no extra newlines from contentEditable)
+    if (localInputRef.current) {
+        onChange(id, localInputRef.current.innerText.trim());
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => { // Changed to HTMLDivElement
+    e.preventDefault(); // Prevent default paste behavior
+    const text = e.clipboardData.getData('text/plain'); // Get plain text from clipboard
+    const lines = text.split('\n');
+
+    if (lines.length > 1 && onPasteMultiLine) {
+        // If multi-line, use the multi-line handler
+        onPasteMultiLine(id, lines);
+    } else {
+        // If single line, insert text at cursor position
+        document.execCommand('insertText', false, text);
+        // And then call onChange to update the block content
+        if (localInputRef.current) {
+            onChange(id, localInputRef.current.innerText);
+        }
+    }
   };
 
   const handleMenuSelect = (newType: string) => {
@@ -83,10 +145,10 @@ export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef
 
   const getLineHeight = () => {
     switch (type) {
-      case 'h1': return 'h-[2.25rem]';
-      case 'h2': return 'h-[2rem]';
-      case 'h3': return 'h-[1.75rem]';
-      default: return 'h-[1.5rem]';
+      case 'h1': return 'min-h-[2.25rem]'; // Use min-h for contentEditable
+      case 'h2': return 'min-h-[2rem]';
+      case 'h3': return 'min-h-[1.75rem]';
+      default: return 'min-h-[1.5rem]';
     }
   };
 
@@ -99,11 +161,17 @@ export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef
 
   const lineHeight = getLineHeight();
 
+  const isVisuallyCollapsed = content === '' && !isInputFocused && type === 'text';
+
+  const currentPlaceholder = (isInputFocused && content === '' && type === 'text') ? "Digite '/' para comandos" : "";
+
+  const isContentEmptyAndUnfocused = content === '' && !isInputFocused && type === 'text';
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`group flex items-start -ml-12 pl-2 py-1 relative rounded transition-colors hover:bg-gray-50 dark:hover:bg-white/5 ${getContainerMargins()}`}
+      className={`group flex items-start -ml-12 pl-2 py-1 relative rounded transition-colors ${getContainerMargins()}`}
     >
       {/* Drag Handle & Add Button Container */}
       <div className={`absolute left-0 top-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 select-none z-10 ${lineHeight}`}>
@@ -130,18 +198,23 @@ export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef
           </button>
         )}
         {type === 'bullet' && <span className="mr-3 text-gray-500">•</span>}
-        {type === 'number' && <span className="mr-2 text-gray-500">1.</span>}
+        {type === 'number' && <span className="mr-2 text-gray-500">{listNumber}.</span>}
       </div>
 
-      {/* Content Input */}
+      {/* Content Editable Div */}
       <div className="flex-1 relative">
-        <input
+        <div
             ref={setRefs}
-            className={`w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-300 resize-none ${getStyles()}`}
-            value={content}
-            onChange={handleChange}
+            contentEditable="true"
+            className={`w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-300 resize-none focus:outline-none ${getStyles()} ${isContentEmptyAndUnfocused ? 'py-0' : ''}`}
+            onInput={handleInput}
             onKeyDown={(e) => onKeyDown(e, id)}
-            placeholder={type === 'text' ? "Digite '/' para comandos" : ""}
+            onPaste={handlePaste}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            // Placeholder for contentEditable can be handled with CSS or by inserting a span
+            data-placeholder={currentPlaceholder} 
+            suppressContentEditableWarning={true} // To suppress React warning
         />
         
         {/* Slash Menu */}

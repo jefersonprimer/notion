@@ -17,6 +17,7 @@ export interface INoteRepository {
   findDeletedByUserId(userId: string): Promise<Note[]>;
   search(userId: string, query: string, titleOnly?: boolean, sortBy?: 'created_at' | 'updated_at', sortDirection?: 'asc' | 'desc'): Promise<Note[]>;
   deleteAllByUserId(userId: string): Promise<void>;
+  emptyTrash(userId: string): Promise<void>;
   favorite(id: string, userId: string, isFavorite: boolean): Promise<Note | null>;
   findFavoritesByUserId(userId: string): Promise<Note[]>;
 }

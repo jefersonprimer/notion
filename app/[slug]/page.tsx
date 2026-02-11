@@ -55,7 +55,7 @@ export default function NotePage() {
   const titleDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const blocksDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
-  const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
+  const inputRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -117,6 +117,36 @@ export default function NotePage() {
 
     fetchNote();
   }, [session, params]);
+
+  const handleTitlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedText = e.clipboardData.getData('text');
+    const lines = pastedText.split('\n');
+
+    if (lines.length > 1) {
+        e.preventDefault();
+        const newTitle = lines[0];
+        const newContentBlocks = lines.slice(1).filter(line => line.trim() !== '').map(line => ({
+            id: generateId(),
+            type: 'text',
+            content: line
+        }));
+
+        setTitle(newTitle);
+        
+        // Insert new content blocks at the beginning of the blocks array
+        setBlocks(prevBlocks => [...newContentBlocks, ...prevBlocks]);
+
+        // Focus the first new block if any were added
+        if (newContentBlocks.length > 0) {
+            setTimeout(() => {
+                inputRefs.current.get(newContentBlocks[0].id)?.focus();
+            }, 0);
+        } else {
+            // If only title was pasted or only empty lines after title, focus title
+            titleInputRef.current?.focus();
+        }
+    }
+  };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
@@ -197,6 +227,19 @@ export default function NotePage() {
       }
   };
 
+  const setCursor = (el: HTMLDivElement, position: number) => {
+    const range = document.createRange();
+    const sel = window.getSelection();
+    if (el.childNodes.length > 0) {
+      range.setStart(el.childNodes[0], position);
+      range.collapse(true);
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+  };
+
   const handleBlockKeyDown = (e: React.KeyboardEvent, id: string) => {
       const index = blocks.findIndex(b => b.id === id);
       const el = inputRefs.current.get(id);
@@ -220,7 +263,6 @@ export default function NotePage() {
           e.preventDefault();
           const currentBlock = blocks[index];
           
-          // Carry over type for lists
           let nextType = 'text';
           if (['bullet', 'number', 'todo', 'toggle'].includes(currentBlock.type)) {
               nextType = currentBlock.type;
@@ -231,26 +273,46 @@ export default function NotePage() {
           newBlocks.splice(index + 1, 0, newBlock);
           setBlocks(newBlocks);
           
-          // Focus next block after render
           setTimeout(() => {
               inputRefs.current.get(newBlock.id)?.focus();
           }, 0);
 
       } else if (e.key === 'Backspace') {
           if (!el) return;
-          const { selectionStart, selectionEnd } = el;
+          const selection = window.getSelection();
+          if (!selection || !selection.anchorNode) return;
 
-          // If cursor is at the beginning and no selection range
-          if (selectionStart === 0 && selectionEnd === 0) {
-              if (index > 0) {
+          const isAtStart = selection.isCollapsed && selection.anchorOffset === 0;
+
+          const prefixedTypes = ['bullet', 'number', 'todo', 'toggle'];
+          const isPrefixedType = prefixedTypes.includes(blocks[index].type);
+
+          if (isAtStart) {
+              if (blocks[index].content.length === 0) {
+                  e.preventDefault();
+                  const newBlocks = blocks.filter(b => b.id !== id);
+                  setBlocks(newBlocks);
+
+                  setTimeout(() => {
+                      if (index > 0) {
+                          const prevBlock = blocks[index - 1];
+                          inputRefs.current.get(prevBlock.id)?.focus();
+                      } else {
+                          titleInputRef.current?.focus();
+                      }
+                  }, 0);
+              } else if (isPrefixedType) {
+                  e.preventDefault();
+                  setBlocks(prev => prev.map(b => 
+                      b.id === id ? { ...b, type: 'text' } : b
+                  ));
+              } else if (index > 0) {
                   e.preventDefault();
                   const prevBlock = blocks[index - 1];
                   const currentBlock = blocks[index];
                   
-                  // Calculate new cursor position (end of previous content)
                   const cursorPosition = prevBlock.content.length;
                   
-                  // Merge content
                   const updatedPrevBlock = {
                       ...prevBlock,
                       content: prevBlock.content + currentBlock.content
@@ -260,21 +322,83 @@ export default function NotePage() {
                   newBlocks[index - 1] = updatedPrevBlock;
                   setBlocks(newBlocks);
 
-                  // Focus previous block and set cursor position
                   setTimeout(() => {
                       const prevInput = inputRefs.current.get(prevBlock.id);
                       if (prevInput) {
                           prevInput.focus();
-                          prevInput.setSelectionRange(cursorPosition, cursorPosition);
+                          setCursor(prevInput, cursorPosition);
                       }
                   }, 0);
               } else {
-                  // Focus title if at first block
                   e.preventDefault();
                   titleInputRef.current?.focus();
               }
           }
+      } else if (e.key === 'Delete') {
+          if (!el) return;
+          const selection = window.getSelection();
+          if (!selection || !selection.anchorNode) return;
+
+          const isAtEnd = selection.isCollapsed && selection.anchorOffset === el.innerText.length;
+          
+          if (isAtEnd) {
+              const nextBlock = blocks[index + 1];
+              if (nextBlock) {
+                  e.preventDefault();
+                  const currentBlock = blocks[index];
+                  const cursorPosition = currentBlock.content.length;
+                  
+                  const updatedBlock = {
+                      ...currentBlock,
+                      content: currentBlock.content + nextBlock.content
+                  };
+                  
+                  const newBlocks = [...blocks];
+                  newBlocks[index] = updatedBlock;
+                  newBlocks.splice(index + 1, 1);
+                  setBlocks(newBlocks);
+
+                  setTimeout(() => {
+                      const currentInput = inputRefs.current.get(id);
+                      if (currentInput) {
+                          currentInput.focus();
+                          setCursor(currentInput, cursorPosition);
+                      }
+                  }, 0);
+              }
+          }
       }
+  };
+
+  const handlePasteMultiLine = (id: string, newLines: string[]) => {
+      setBlocks(prevBlocks => {
+          const index = prevBlocks.findIndex(b => b.id === id);
+          if (index === -1) return prevBlocks;
+
+          const updatedBlocks = [...prevBlocks];
+          const currentBlock = updatedBlocks[index];
+
+          // Update current block with the first line
+          updatedBlocks[index] = { ...currentBlock, content: currentBlock.content + newLines[0] };
+
+          // Add remaining lines as new blocks
+          const newBlockElements = newLines.slice(1).map(line => ({
+              id: generateId(),
+              type: 'text', // New blocks are text by default
+              content: line
+          }));
+
+          updatedBlocks.splice(index + 1, 0, ...newBlockElements);
+          
+          // Focus the last new block if any were added
+          if (newBlockElements.length > 0) {
+              setTimeout(() => {
+                  inputRefs.current.get(newBlockElements[newBlockElements.length - 1].id)?.focus();
+              }, 0);
+          }
+
+          return updatedBlocks;
+      });
   };
 
   const isFavorite = note ? favoriteNotes.some(n => n.id === note.id) : false;
@@ -406,6 +530,7 @@ export default function NotePage() {
                     value={title}
                     onChange={handleTitleChange}
                     onKeyDown={handleTitleKeyDown}
+                    onPaste={handleTitlePaste} // Add onPaste handler here
                     placeholder="Sem título"
                     className="w-full text-4xl font-bold text-gray-900 dark:text-gray-100 mb-6 bg-transparent border-none outline-none placeholder:text-gray-300 dark:placeholder:text-gray-600"
                 />
@@ -421,20 +546,35 @@ export default function NotePage() {
                             items={blocks.map(b => b.id)}
                             strategy={verticalListSortingStrategy}
                         >
-                            {blocks.map(block => (
-                                <SortableBlock
-                                    key={block.id}
-                                    id={block.id}
-                                    type={block.type}
-                                    content={block.content}
-                                    onChange={handleBlockChange}
-                                    onKeyDown={handleBlockKeyDown}
-                                    inputRef={(el) => {
-                                        if (el) inputRefs.current.set(block.id, el);
-                                        else inputRefs.current.delete(block.id);
-                                    }}
-                                />
-                            ))}
+                            {blocks.map((block, i) => {
+                                let listNumber = undefined;
+                                if (block.type === 'number') {
+                                    // Find previous number block to determine sequence
+                                    let currentNumber = 1;
+                                    for (let j = 0; j < i; j++) {
+                                        if (blocks[j].type === 'number') {
+                                            currentNumber++;
+                                        }
+                                    }
+                                    listNumber = currentNumber;
+                                }
+                                return (
+                                    <SortableBlock
+                                        key={block.id}
+                                        id={block.id}
+                                        type={block.type}
+                                        content={block.content}
+                                        onChange={handleBlockChange}
+                                        onKeyDown={handleBlockKeyDown}
+                                        inputRef={(el) => {
+                                            if (el) inputRefs.current.set(block.id, el);
+                                            else inputRefs.current.delete(block.id);
+                                        }}
+                                        onPasteMultiLine={handlePasteMultiLine}
+                                        listNumber={listNumber}
+                                    />
+                                );
+                            })}
                         </SortableContext>
                     </DndContext>
                     
