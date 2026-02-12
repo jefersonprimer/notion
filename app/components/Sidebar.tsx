@@ -26,7 +26,7 @@ import { useFavorite } from '@/context/FavoriteContext';
 import api from '@/lib/api';
 import { Note } from '@/types/note';
 import UserModal from './UserModal';
-import SidebarItem from './SidebarItem';
+import SidebarItem, { SidebarItemSkeleton } from './SidebarItem';
 import SearchModal from './SearchModal';
 import TrashModal from './TrashModal';
 import SettingsModal from './SettingsModal';
@@ -252,7 +252,11 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           {expandedSections.particular && (
             <div className="py-1">
               {loadingRootNotes ? (
-                <div className="px-2 py-1 text-xs text-[#555]">Carregando notas...</div>
+                <div className="flex flex-col gap-0.5">
+                   {[...Array(5)].map((_, i) => (
+                    <SidebarItemSkeleton key={i} />
+                  ))}
+                </div>
               ) : rootNotes.length === 0 ? (
                 <div className="px-2 py-1 text-xs text-[#555]">Nenhuma nota</div>
               ) : (

@@ -80,6 +80,33 @@ export default function Home() {
     fetchNotes();
   }, [session]);
 
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-white dark:bg-[#191919]">
+        {isSidebarOpen && <Sidebar />}
+        <main className="flex-1 flex flex-col h-screen overflow-hidden">
+          {/* Header Skeleton */}
+          <div className="h-12 flex items-center justify-between px-4 relative z-20">
+            <div className="flex items-center gap-4">
+               {!isSidebarOpen && <div className="w-8 h-8 bg-[#2f2f2f] rounded animate-pulse" />}
+               <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 bg-[#2f2f2f] rounded animate-pulse" />
+                  <div className="h-4 w-32 bg-[#2f2f2f] rounded animate-pulse" />
+               </div>
+            </div>
+            <div className="flex items-center gap-2">
+               <div className="h-7 w-7 bg-[#2f2f2f] rounded animate-pulse" />
+            </div>
+          </div>
+
+          <div className="flex-1 flex flex-col items-center justify-center p-8 w-full max-w-5xl mx-auto">
+             <div className="w-6 h-6 border-2 border-[#383836] border-t-white/80 rounded-full animate-spin" />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen bg-white dark:bg-[#191919]">
       {/* Main Sidebar (when open) */}
@@ -221,22 +248,16 @@ export default function Home() {
             </h1>
           </header>
 
-          {loading ? (
-            <div className="flex items-center justify-center h-40 text-gray-500">
-              Carregando notas...
-            </div>
-          ) : (
-            <div className="space-y-8">
-              <Carousel title="Acessos recentes" notes={notes} />
-              {/* We can filter notes for different carousels if needed, e.g. Favorites */}
-              {notes.some(n => n.is_favorite) && (
-                <Carousel
-                  title="Favoritos"
-                  notes={notes.filter(n => n.is_favorite)}
-                />
-              )}
-            </div>
-          )}
+          <div className="space-y-8">
+            <Carousel title="Acessos recentes" notes={notes} />
+            {/* We can filter notes for different carousels if needed, e.g. Favorites */}
+            {notes.some(n => n.is_favorite) && (
+              <Carousel
+                title="Favoritos"
+                notes={notes.filter(n => n.is_favorite)}
+              />
+            )}
+          </div>
         </div>
       </main>
     </div>

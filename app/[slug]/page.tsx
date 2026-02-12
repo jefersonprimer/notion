@@ -27,6 +27,8 @@ import {
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import { SortableBlock } from '../components/SortableBlock';
+import PageOptionsModal from '../components/PageOptionsModal';
+import ShareModal from '../components/ShareModal';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -57,6 +59,8 @@ export default function NotePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFloatingOpen, setIsFloatingOpen] = useState(false);
+  const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   
   const titleDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const blocksDebounceRef = useRef<NodeJS.Timeout | null>(null);
@@ -478,6 +482,15 @@ export default function NotePage() {
 
   const isFavorite = note ? favoriteNotes.some(n => n.id === note.id) : false;
 
+  const calculateWordCount = () => {
+    const titleText = title || '';
+    const blocksText = blocks.map(b => b.content).join(' ');
+    const fullText = `${titleText} ${blocksText}`.trim();
+    return fullText ? fullText.split(/\s+/).length : 0;
+  };
+
+  const wordCount = calculateWordCount();
+
   useEffect(() => {
     if (title) {
       document.title = `${title}`;
@@ -502,9 +515,28 @@ export default function NotePage() {
     return (
        <div className="flex min-h-screen bg-white dark:bg-[#191919]">
         <SidebarElement />
-        <div className="flex-1 flex items-center justify-center text-gray-500">
-            Carregando...
-        </div>
+        <main className="flex-1 flex flex-col h-screen overflow-hidden">
+          {/* Header Skeleton */}
+          <div className="h-12 flex items-center justify-between px-4 relative z-20">
+            <div className="flex items-center gap-4">
+               {!isSidebarOpen && <div className="w-8 h-8 bg-[#2f2f2f] rounded animate-pulse" />}
+               <div className="flex items-center gap-2">
+                  <div className="h-4 w-32 bg-[#2f2f2f] rounded animate-pulse" />
+                  <div className="h-4 w-4 bg-[#2f2f2f] rounded animate-pulse" />
+                  <div className="h-4 w-24 bg-[#2f2f2f] rounded animate-pulse" />
+               </div>
+            </div>
+            <div className="flex items-center gap-2">
+               <div className="h-7 w-28 bg-[#2f2f2f] rounded animate-pulse" />
+               <div className="h-7 w-7 bg-[#2f2f2f] rounded animate-pulse" />
+               <div className="h-7 w-7 bg-[#2f2f2f] rounded animate-pulse" />
+            </div>
+          </div>
+
+          <div className="flex-1 flex items-center justify-center">
+              <div className="w-6 h-6 border-2 border-[#383836] border-t-white/80 rounded-full animate-spin" />
+          </div>
+        </main>
       </div>
     );
   }
@@ -580,14 +612,19 @@ export default function NotePage() {
                 </div>
               </div>
              <div className="flex items-center gap-2">
-              <button 
-                className="flex items-center justify-center gap-2 border border-[#383836] text-sm hover:bg-[#fffff315] px-2 py-1 rounded-md"
-                title="Compartilhar"
-              >
-                <LockKeyhole size={14}/>
-                Compartilhar
-                <ChevronDown size={14}/>
-              </button>
+              <div className="relative">
+                <button 
+                  onClick={() => setIsShareModalOpen(!isShareModalOpen)}
+                  className={`flex items-center justify-center gap-2 border border-[#383836] text-sm px-2 py-1 rounded-md transition-colors ${isShareModalOpen ? 'bg-[#fffff315]' : 'hover:bg-[#fffff315]'}`}
+                  title="Compartilhar"
+                >
+                  <LockKeyhole size={14}/>
+                  Compartilhar
+                  <ChevronDown size={14}/>
+                </button>
+
+                {isShareModalOpen && <ShareModal onClose={() => setIsShareModalOpen(false)} />}
+              </div>
 
               <button 
                 onClick={handleToggleFavorite}
@@ -597,12 +634,23 @@ export default function NotePage() {
                 <Star size={18} fill={isFavorite ? "currentColor" : "none"} />
               </button>
 
-              <button 
-                className="p-1.5 text-[#f0efed] hover:bg-gray-100 dark:hover:bg-[#fffff315] rounded-md"
-                title="Mais opções"
-              >
-                <MoreHorizontal size={20}/>
-              </button>
+              <div className="relative">
+                <button 
+                  onClick={() => setIsOptionsModalOpen(!isOptionsModalOpen)}
+                  className={`p-1.5 text-[#f0efed] rounded-md transition-colors ${isOptionsModalOpen ? 'bg-[#fffff315]' : 'hover:bg-gray-100 dark:hover:bg-[#fffff315]'}`}
+                  title="Mais opções"
+                >
+                  <MoreHorizontal size={20}/>
+                </button>
+
+                <PageOptionsModal 
+                  isOpen={isOptionsModalOpen} 
+                  onClose={() => setIsOptionsModalOpen(false)} 
+                  userName={session?.user?.displayName || session?.user?.name || session?.user?.email}
+                  updatedAt={note?.updatedAt || note?.updated_at}
+                  wordCount={wordCount}
+                />
+              </div>
              </div>
         </div>
 

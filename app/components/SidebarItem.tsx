@@ -35,6 +35,18 @@ interface SidebarItemProps {
   currentPathname: string | null;
 }
 
+export function SidebarItemSkeleton({ depth = 0 }: { depth?: number }) {
+  return (
+    <div 
+      className="flex items-center gap-2 px-2 py-1.5 animate-pulse"
+      style={{ paddingLeft: `${depth * 12 + 8}px` }}
+    >
+      <div className="w-6 h-6 bg-[#2f2f2f] rounded shrink-0" />
+      <div className="h-4 bg-[#2f2f2f] rounded w-full max-w-[140px]" />
+    </div>
+  );
+}
+
 export default function SidebarItem({
   note,
   depth = 0,
@@ -325,8 +337,10 @@ export default function SidebarItem({
       {isOpen && (
         <div>
           {isLoading && (
-            <div className="pl-4 py-1 text-xs text-[#555]" style={{ paddingLeft: `${(depth + 1) * 12 + 8}px` }}>
-              Carregando...
+            <div className="flex flex-col gap-0.5">
+              {[...Array(3)].map((_, i) => (
+                <SidebarItemSkeleton key={i} depth={depth + 1} />
+              ))}
             </div>
           )}
           {!isLoading && children.length === 0 && hasLoaded && (

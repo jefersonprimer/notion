@@ -8,6 +8,21 @@ interface NoteCardProps {
   note: Note;
 }
 
+export function NoteCardSkeleton() {
+  return (
+    <div className="w-38 h-38 rounded-2xl bg-[#ffffff0d] border border-[#2f2f2f] overflow-hidden flex flex-col animate-pulse">
+      <div className="h-11 bg-[#2a2a2a]" />
+      <div className="flex flex-col justify-between flex-1 px-4 pt-6 pb-3">
+        <div className="h-4 bg-[#2f2f2f] rounded w-full" />
+        <div className="flex items-center gap-1">
+          <div className="w-4 h-4 rounded-full bg-[#2f2f2f]" />
+          <div className="h-3 bg-[#2f2f2f] rounded w-12" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function NoteCard({ note }: NoteCardProps) {
   const { session } = useAuth();
   const noteSlug = createNoteSlug(note.title, note.id);
