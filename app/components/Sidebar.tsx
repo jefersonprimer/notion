@@ -18,6 +18,7 @@ import {
   Layers,
   Trash2,
   ChevronsLeft,
+  History,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useLayout } from '@/context/LayoutContext';
@@ -155,7 +156,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
             <button
               onClick={(e) => { e.stopPropagation(); setIsSidebarOpen(false); }}
               className="hidden group-hover/sidebar:flex items-center justify-center w-7 h-7 hover:bg-[#3f3f3f] rounded text-[#ada9a3] hover:text-white"
-              title="Fechar barra lateral"
+              title="Fechar barra lateral Ctrl+\"
             >
               <ChevronsLeft size={20} />
             </button>
@@ -186,11 +187,30 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
       </div>
 
       <div className="px-2 py-1 text-base">
-        <NavItem icon={<Search size={20} />} label="Buscar" onClick={() => setIsSearchModalOpen(true)} />
-        <NavItem icon={<Home size={20} />} label="Página inicial" href="/" isActive={pathname === '/'} />
-        <NavItem icon={<Users size={20} />} label="Reuniões" />
-        <NavItem icon={<Sparkles size={20} />} label="IA do Notion" />
-        <NavItem icon={<Inbox size={20} />} label="Caixa de entrada" />
+        <NavItem icon={<Search size={20} />} label="Buscar" onClick={() => setIsSearchModalOpen(true)} title="Encontre páginas e informações do seu espaço de trabalho Ctrl+k" />
+        <NavItem icon={<Home size={20} />} label="Página inicial" href="/" isActive={pathname === '/'} title="Veja páginas recentes, tarefas futuras e muito mais ^+ALT+^+H"/>
+        <NavItem 
+          icon={<Users size={20} />} 
+          label="Reuniões" 
+          title="Crie e gerencie anotações de IA em um só lugar" 
+          onHoverClick={() => {
+            // Logica para criar nova anotação IA
+            handleCreateNote();
+          }}
+          hoverIconTitle="Criar nova anotação IA"
+        />
+        <NavItem 
+          icon={<Sparkles size={20} />} 
+          label="IA do Notion" 
+          title="Pergunte, busque, crie com a IA" 
+          onHoverClick={() => {
+            // Logica para ver histórico do chat
+            console.log("Abrir histórico do chat");
+          }}
+          hoverIcon={History}
+          hoverIconTitle="Histórico do chat"
+        />
+        <NavItem icon={<Inbox size={20} />} label="Caixa de entrada" title="Revise notificaçães e atualizações ^+ALT+U" />
       </div>
 
       {/* Scrollable Content */}
@@ -321,17 +341,68 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
   );
 }
 
-function NavItem({ icon, label, href, onClick, isActive }: { icon: React.ReactNode; label: string; href?: string; onClick?: () => void; isActive?: boolean }) {
+function NavItem({ 
+  icon, 
+  label, 
+  href, 
+  onClick, 
+  isActive, 
+  title,
+  onHoverClick,
+  hoverIconTitle,
+  hoverIcon: HoverIcon = Plus
+}: { 
+  icon: React.ReactNode; 
+  label: string; 
+  href?: string; 
+  onClick?: () => void; 
+  isActive?: boolean; 
+  title?: string;
+  onHoverClick?: (e: React.MouseEvent) => void;
+  hoverIconTitle?: string;
+  hoverIcon?: any;
+}) {
   const content = (
-    <div className={`flex items-center gap-2 px-2 py-1.5 rounded-md w-full text-left transition-colors truncate ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#2f2f2f] text-[#ada9a3] hover:text-white'}`}>
-      <span className="shrink-0">{icon}</span>
-      <span className="truncate text-base">{label}</span>
-    </div>
+      <div className={`flex items-center gap-2 px-2 py-1.5 rounded-md w-full text-left transition-colors truncate ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#2f2f2f] text-[#ada9a3] hover:text-white'}`}>
+        <span className="shrink-0">{icon}</span>
+        <span className="truncate text-base flex-1">{label}</span>
+        {onHoverClick && (
+          <div 
+            className="hidden group-hover/navitem:flex items-center justify-center w-6 h-6 hover:bg-[#4a4a4a] rounded text-[#ada9a3] hover:text-white"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onHoverClick(e);
+            }}
+            title={hoverIconTitle}
+          >
+            <HoverIcon size={16} />
+          </div>
+        )}
+      </div>
   );
 
+  const containerClasses = "group/navitem relative block w-full";
+
+  const tooltip = title ? (
+    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 hidden group-hover/navitem:block bg-[#2f2f2f] text-white text-sm p-2 rounded-md shadow-lg whitespace-nowrap z-50">
+        {title}
+    </div>
+  ) : null;
+
   if (href) {
-    return <Link href={href} className="block w-full">{content}</Link>;
+    return (
+      <Link href={href} className={containerClasses}>
+        {content}
+        {tooltip}
+      </Link>
+    );
   }
 
-  return <button className="w-full" onClick={onClick}>{content}</button>;
+  return (
+    <button className={containerClasses} onClick={onClick}>
+      {content}
+      {tooltip}
+    </button>
+  );
 }

@@ -27,8 +27,13 @@ export function createNoteSlug(title: string, id: string): string {
 }
 
 export function extractIdFromSlug(slug: string): string {
-  // The hash is the last 32 characters
-  const potentialId = slug.slice(-32);
+  // If the slug is already a full UUID with dashes (36 chars)
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (uuidRegex.test(slug)) return slug;
+
+  // Otherwise, remove any dashes and take the last 32 characters
+  const cleanSlug = slug.replace(/-/g, '');
+  const potentialId = cleanSlug.slice(-32);
   return formatUuid(potentialId);
 }
 

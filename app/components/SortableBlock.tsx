@@ -3,13 +3,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Plus, Square, CheckSquare } from 'lucide-react';
+import Link from 'next/link';
+import { GripVertical, Plus, Square, CheckSquare, FileText } from 'lucide-react';
 import { SlashMenu } from './SlashMenu';
 
 interface SortableBlockProps {
   id: string;
   type: string;
   content: string;
+  childTitles?: Record<string, string>;
   onChange: (id: string, newContent: string, newType?: string) => void;
   onKeyDown: (e: React.KeyboardEvent, id: string) => void;
   inputRef?: (el: HTMLDivElement | null) => void; // Changed from HTMLInputElement
@@ -26,9 +28,10 @@ const PREFIXES: Record<string, string> = {
   todo: '[] ',
   todo_checked: '[x] ', // todo_checked should not trigger auto-format on typing
   toggle: '> ',
+  page: 'p: ',
 };
 
-export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef, onPasteMultiLine, listNumber }: SortableBlockProps) {
+export function SortableBlock({ id, type, content, childTitles = {}, onChange, onKeyDown, inputRef, onPasteMultiLine, listNumber }: SortableBlockProps) {
   const {
     attributes,
     listeners,
@@ -167,6 +170,10 @@ export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef
 
   const isContentEmptyAndUnfocused = content === '' && !isInputFocused && type === 'text';
 
+  const [pageId, ...titleParts] = content.split('|');
+  const storedTitle = titleParts.join('|');
+  const liveTitle = childTitles[pageId] || storedTitle || "Sem título";
+
   return (
     <div
       ref={setNodeRef}
@@ -203,19 +210,31 @@ export function SortableBlock({ id, type, content, onChange, onKeyDown, inputRef
 
       {/* Content Editable Div */}
       <div className="flex-1 relative">
-        <div
-            ref={setRefs}
-            contentEditable="true"
-            className={`w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-300 resize-none focus:outline-none ${getStyles()} ${isContentEmptyAndUnfocused ? 'py-0' : ''}`}
-            onInput={handleInput}
-            onKeyDown={(e) => onKeyDown(e, id)}
-            onPaste={handlePaste}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            // Placeholder for contentEditable can be handled with CSS or by inserting a span
-            data-placeholder={currentPlaceholder} 
-            suppressContentEditableWarning={true} // To suppress React warning
-        />
+        {type === 'page' ? (
+          <Link
+            href={`/${pageId}`}
+            className="flex items-center gap-2 w-full p-1 hover:bg-[#2f2f2f] rounded transition-colors group/link"
+          >
+            <FileText size={20} className="text-[#9b9b9b] group-hover/link:text-white shrink-0" />
+            <span className="text-base text-white font-medium truncate underline-offset-4 group-hover/link:underline">
+              {liveTitle}
+            </span>
+          </Link>
+        ) : (
+          <div
+              ref={setRefs}
+              contentEditable="true"
+              className={`w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-300 resize-none focus:outline-none ${getStyles()} ${isContentEmptyAndUnfocused ? 'py-0' : ''}`}
+              onInput={handleInput}
+              onKeyDown={(e) => onKeyDown(e, id)}
+              onPaste={handlePaste}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              // Placeholder for contentEditable can be handled with CSS or by inserting a span
+              data-placeholder={currentPlaceholder} 
+              suppressContentEditableWarning={true} // To suppress React warning
+          />
+        )}
         
         {/* Slash Menu */}
         {showMenu && (

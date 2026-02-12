@@ -130,8 +130,6 @@ export default function SidebarItem({
     e.preventDefault();
     e.stopPropagation();
     
-    if (!confirm("Tem certeza que deseja excluir esta nota?")) return;
-
     try {
       await api.delete(`/notes/${note.id}`, {
         headers: { Authorization: `Bearer ${session.accessToken}` }

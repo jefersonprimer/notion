@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import Sidebar from '../components/Sidebar';
 import api from '@/lib/api';
 import { Note } from '@/types/note';
@@ -9,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useLayout } from '@/context/LayoutContext';
 import { useFavorite } from '@/context/FavoriteContext';
 import { extractIdFromSlug, createNoteSlug } from '@/lib/utils';
-import { MoreHorizontal, Menu, ChevronsRight, LockKeyhole, ChevronDown, Star } from 'lucide-react';
+import { MoreHorizontal, Menu, ChevronsRight, LockKeyhole, ChevronDown, Star, FileText, ChevronRight } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -38,16 +39,21 @@ const PREFIXES: Record<string, string> = {
   todo: '[] ',
   todo_checked: '[x] ',
   toggle: '> ',
+  page: 'p: ',
 };
 
 export default function NotePage() {
+  const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const { session } = useAuth();
   const { isSidebarOpen, setIsSidebarOpen } = useLayout();
   const { favoriteNotes, toggleFavorite } = useFavorite();
   const [note, setNote] = useState<Note | null>(null);
+  const [parentNote, setParentNote] = useState<Note | null>(null);
   const [title, setTitle] = useState('');
   const [blocks, setBlocks] = useState<{ id: string; type: string; content: string }[]>([]);
+  const [childTitles, setChildTitles] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFloatingOpen, setIsFloatingOpen] = useState(false);
@@ -77,16 +83,44 @@ export default function NotePage() {
       if (note && note.id === noteId) return;
 
       try {
-        const response = await api.get(`/notes/${noteId}`, {
-            headers: {
-                Authorization: `Bearer ${session.accessToken}`
-            }
+        const [noteResponse, childrenResponse] = await Promise.all([
+          api.get(`/notes/${noteId}`, {
+            headers: { Authorization: `Bearer ${session.accessToken}` }
+          }),
+          api.get(`/notes/${noteId}/children`, {
+            headers: { Authorization: `Bearer ${session.accessToken}` }
+          })
+        ]);
+
+        const noteData = noteResponse.data;
+        const childrenData = childrenResponse.data;
+
+        setNote(noteData);
+        setTitle(noteData.title === 'Sem título' ? '' : noteData.title);
+
+        // Fetch parent note if exists
+        if (noteData.parentId) {
+          try {
+            const parentResponse = await api.get(`/notes/${noteData.parentId}`, {
+              headers: { Authorization: `Bearer ${session.accessToken}` }
+            });
+            setParentNote(parentResponse.data);
+          } catch (err) {
+            console.error("Error fetching parent note:", err);
+          }
+        } else {
+          setParentNote(null);
+        }
+        
+        const titlesMap: Record<string, string> = {};
+        childrenData.forEach((child: Note) => {
+          const cleanChildId = child.id.replace(/-/g, '');
+          titlesMap[cleanChildId] = child.title;
         });
-        setNote(response.data);
-        setTitle(response.data.title === 'Sem título' ? '' : response.data.title);
+        setChildTitles(titlesMap);
         
         // Parse description into typed blocks
-        const desc = response.data.description || '';
+        const desc = noteData.description || '';
         const initialBlocks = desc.split('\n').map((line: string) => {
             let type = 'text';
             let content = line;
@@ -117,6 +151,12 @@ export default function NotePage() {
 
     fetchNote();
   }, [session, params]);
+
+  useEffect(() => {
+    if (!loading && searchParams?.get('showMoveTo')) {
+      titleInputRef.current?.focus();
+    }
+  }, [loading, searchParams]);
 
   const handleTitlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     const pastedText = e.clipboardData.getData('text');
@@ -212,10 +252,45 @@ export default function NotePage() {
     }
   };
 
-  const handleBlockChange = (id: string, newContent: string, newType?: string) => {
-      setBlocks(prev => prev.map(b => 
-          b.id === id ? { ...b, content: newContent, type: newType ?? b.type } : b
-      ));
+  const handleBlockChange = async (id: string, newContent: string, newType?: string) => {
+    if (newType === 'page') {
+      if (!session || !note) return;
+      try {
+        const response = await api.post('/notes', { title: "Sem título", parentId: note.id }, {
+          headers: { Authorization: `Bearer ${session.accessToken}` }
+        });
+        const newNote = response.data;
+        const cleanId = newNote.id.replace(/-/g, '');
+        
+        // Add the block to current page content
+        const newBlock = { 
+            id: generateId(), 
+            type: 'page', 
+            content: `${cleanId}|${newNote.title || "Sem título"}` 
+        };
+        
+        const updatedBlocks = blocks.map(b => b.id === id ? newBlock : b);
+        setBlocks(updatedBlocks);
+
+        // Save explicitly before navigating
+        const description = updatedBlocks.map(b => {
+            const prefix = PREFIXES[b.type] || '';
+            return prefix + b.content;
+        }).join('\n');
+
+        await api.put(`/notes/${note.id}`, { description }, {
+            headers: { Authorization: `Bearer ${session.accessToken}` }
+        });
+
+        router.push(`/${cleanId}?showMoveTo=true&saveParent=true`);
+      } catch (error) {
+        console.error('Error creating child note from slash menu:', error);
+      }
+      return;
+    }
+    setBlocks(prev => prev.map(b => 
+        b.id === id ? { ...b, content: newContent, type: newType ?? b.type } : b
+    ));
   };
 
   const handleTitleKeyDown = (e: React.KeyboardEvent) => {
@@ -479,7 +554,18 @@ export default function NotePage() {
                      </div>
                  )}
 
-                <div className="flex items-center">
+                <div className="flex items-center gap-1">
+                  {parentNote && (
+                    <>
+                      <Link 
+                        href={`/${createNoteSlug(parentNote.title, parentNote.id)}`}
+                        className="text-sm text-[#ada9a3] hover:text-[#f0efed] truncate max-w-[150px] hover:bg-[#fffff315] px-2 py-1 rounded-md transition-colors"
+                      >
+                        {parentNote.title || 'Sem título'}
+                      </Link>
+                      <ChevronRight size={14} className="text-[#7d7a75]" />
+                    </>
+                  )}
                   <button className="text-sm text-[#f0efed] font-normal truncate max-w-[240px] hover:bg-[#fffff315] px-2 py-1 rounded-md">
                     {title.trim() || 'Sem título'}
                   </button>
@@ -522,7 +608,7 @@ export default function NotePage() {
 
         {/* Note Content Area */}
         <div className="flex-1 overflow-y-auto">
-            <div className="max-w-3xl mx-auto px-12 py-12">
+            <div className="max-w-4xl mx-auto px-12 py-12">
                 {/* Title Input */}
                 <input
                     ref={titleInputRef}
@@ -564,6 +650,7 @@ export default function NotePage() {
                                         id={block.id}
                                         type={block.type}
                                         content={block.content}
+                                        childTitles={childTitles}
                                         onChange={handleBlockChange}
                                         onKeyDown={handleBlockKeyDown}
                                         inputRef={(el) => {

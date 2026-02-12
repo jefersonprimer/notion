@@ -9,7 +9,8 @@ import {
   List, 
   ListOrdered, 
   CheckSquare, 
-  ChevronRight 
+  ChevronRight,
+  FileText
 } from 'lucide-react';
 
 interface SlashMenuProps {
@@ -20,6 +21,7 @@ interface SlashMenuProps {
 
 const MENU_ITEMS = [
   { id: 'text', label: 'Texto', icon: <Type size={18} /> },
+  { id: 'page', label: 'Página', icon: <FileText size={18} /> },
   { id: 'h1', label: 'Título 1', icon: <Heading1 size={18} /> },
   { id: 'h2', label: 'Título 2', icon: <Heading2 size={18} /> },
   { id: 'h3', label: 'Título 3', icon: <Heading3 size={18} /> },
