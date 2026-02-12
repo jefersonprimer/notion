@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useLayout } from '@/context/LayoutContext';
 import { useFavorite } from '@/context/FavoriteContext';
 import { extractIdFromSlug, createNoteSlug } from '@/lib/utils';
-import { MoreHorizontal, Menu, ChevronsRight, LockKeyhole, ChevronDown, Star, FileText, ChevronRight } from 'lucide-react';
+import { MoreHorizontal, Menu, ChevronsRight, LockKeyhole, ChevronDown, Star, ChevronRight } from 'lucide-react';
 import {
   DndContext,
   closestCenter,

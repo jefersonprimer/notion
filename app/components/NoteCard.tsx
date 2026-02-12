@@ -19,9 +19,9 @@ export default function NoteCard({ note }: NoteCardProps) {
     <Link href={`/${noteSlug}`} className="block">
       <div
         className="
-          w-36 h-36
+          w-38 h-38
           rounded-2xl
-          bg-white dark:bg-[#202020]
+          bg-white dark:bg-[#ffffff0d]
           border border-gray-200 dark:border-[#2f2f2f]
           overflow-hidden
           hover:bg-gray-50 dark:hover:bg-[#252525]
@@ -38,30 +38,30 @@ export default function NoteCard({ note }: NoteCardProps) {
               flex items-center justify-center
             "
           >
-            <FileText size={20} className="text-gray-600 dark:text-gray-300" />
+            <FileText size={20} className="text-gray-600 dark:text-[#7d7a75]" />
           </div>
         </div>
 
         {/* Conteúdo */}
         <div className="flex flex-col justify-between flex-1 px-4 pt-6 pb-3">
           {/* Título */}
-          <div className="text-sm font-medium text-gray-900 dark:text-gray-100 line-clamp-2">
+          <div className="text-sm font-medium text-gray-900 dark:text-[#f0efed] line-clamp-2">
             {note.title || 'Sem título'}
           </div>
 
           {/* Meta */}
-          <div className="flex items-center gap-1 text-xs text-gray-400">
+          <div className="flex items-center gap-1">
             <div
               className="
                 w-4 h-4 rounded-full
-                border border-gray-300 dark:border-[#3f3f3f]
+                border border-gray-300 dark:border-[#7d7a75]
                 flex items-center justify-center
-                text-[10px] font-semibold
+                text-xs text-[#7d7a75] font-medium
               "
             >
               {userInitial}
             </div>
-            <span title={`Última edição por ${userName} em ${formatFullDate(updatedDate)}`}>
+            <span className="text-sm text-[#7d7a75]" title={`Última edição por ${userName} em ${formatFullDate(updatedDate)}`}>
               {formatRelativeDate(updatedDate)}
             </span>
           </div>

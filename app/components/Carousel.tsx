@@ -56,10 +56,12 @@ export default function Carousel({ notes, title }: CarouselProps) {
 
   return (
     <div className="py-4 w-full relative">
-      {title && <h2 className="text-sm gap-2 flex items-center font-medium px-4 mb-4 text-gray-800 dark:text-neutral-400">
+      {title && 
+        <h2 className="text-sm gap-2 flex items-center font-medium px-4 mb-4 text-gray-800 dark:text-[#ada9a3]">
           <Clock10 size={14}/>
           {title}
-        </h2>}
+        </h2>
+      }
       
       <div className="relative group">
           {showLeftArrow && (

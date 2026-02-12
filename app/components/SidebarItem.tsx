@@ -14,9 +14,8 @@ import {
   Trash2,
   Link as LinkIcon,
   Copy,
-  Pencil,
   CornerRightUp,
-  
+  SquarePen,
   ExternalLink,
   PanelRightOpen,
 } from 'lucide-react';
@@ -25,6 +24,7 @@ import { Note } from '@/types/note';
 import { createNoteSlug, formatRelativeDate } from '@/lib/utils';
 import { useFavorite } from '@/context/FavoriteContext';
 import { Session } from '@/context/AuthContext';
+import Toast from './Toast';
 
 interface SidebarItemProps {
   note: Note;
@@ -48,6 +48,7 @@ export default function SidebarItem({
   const [isLoading, setIsLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   
   const { favoriteNotes, toggleFavorite, removeNoteFromFavorites } = useFavorite();
@@ -109,6 +110,7 @@ export default function SidebarItem({
     const url = `${window.location.origin}${noteHref}`;
     navigator.clipboard.writeText(url);
     setShowOptions(false);
+    setShowToast(true);
   };
 
   const handleDuplicate = async (e: React.MouseEvent) => {
@@ -151,7 +153,7 @@ export default function SidebarItem({
     <div className="flex flex-col relative">
       <Link
         href={noteHref}
-        className={`group flex items-center gap-2 px-2 py-1.5 rounded transition-colors relative text-base ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#ffffff0e] text-[#f0efed] hover:text-white'}`}
+        className={`group flex items-center gap-2 px-2 py-1.5 rounded transition-colors relative text-base font-medium ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#ffffff0e] text-[#9b9b9b] hover:text-white'}`}
         style={{ paddingLeft: `${depth * 12 + 8}px` }}
       >
         {/* Icon & Toggle */}
@@ -211,10 +213,10 @@ export default function SidebarItem({
 
     {/* Adicionar/Remover dos favoritos */}
     <button 
-      className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#ffffff0e] transition-colors"
+      className="w-full flex items-center justify-between px-3 py-2 text-[#f0efed] hover:text-white hover:bg-[#ffffff0e] transition-colors"
       onClick={handleToggleFavorite}
     >
-      <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
+      <div className="flex items-center gap-2 ">
         {
         isFavorite ?  
         <StarOff 
@@ -235,7 +237,7 @@ export default function SidebarItem({
       onClick={handleCopyLink}
     >
       <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-        <LinkIcon size={20} className="text-[#a8a8a8]" />
+        <LinkIcon size={20}/>
         <span className="text-base">Copiar link</span>
       </div>
     </button>
@@ -246,7 +248,7 @@ export default function SidebarItem({
       onClick={handleDuplicate}
     >
       <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-        <Copy size={20} className="text-[#a8a8a8]" />
+        <Copy size={20}/>
         <span className="text-base">Duplicar</span>
       </div>
       <span className="text-xs text-[#8a8a8a]">Ctrl+D</span>
@@ -255,7 +257,7 @@ export default function SidebarItem({
     {/* Renomear */}
     <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
       <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-        <Pencil size={20} className="text-[#a8a8a8]" />
+        <SquarePen size={20} />
         <span className="text-base">Renomear</span>
       </div>
       <span className="text-xs text-[#8a8a8a]">Ctrl+R</span>
@@ -264,7 +266,7 @@ export default function SidebarItem({
     {/* Mover para */}
     <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
       <div className="flex items-center gap-2 hover:text-[#f0efed] hover:text-white">
-        <CornerRightUp size={20} className="text-[#a8a8a8]" />
+        <CornerRightUp size={20}/>
         <span className="text-base">Mover para</span>
       </div>
       <span className="text-xs text-[#8a8a8a]">Ctrl+P</span>
@@ -287,7 +289,7 @@ export default function SidebarItem({
     {/* Transformar em wiki */}
     <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
       <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-        <FileText size={20} className="text-[#a8a8a8]" />
+        <FileText size={20} />
         <span className="text-base">Transformar em wiki</span>
       </div>
     </button>
@@ -295,7 +297,7 @@ export default function SidebarItem({
     {/* Abrir em nova guia */}
     <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
       <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-        <ExternalLink size={20} className="text-[#a8a8a8]" />
+        <ExternalLink size={20}/>
         <span className="text-base">Abrir em nova guia</span>
       </div>
       <span className="text-xs text-[#8a8a8a]">Ctrl+↵</span>
@@ -304,7 +306,7 @@ export default function SidebarItem({
     {/* Abrir no modo lado a lado */}
     <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
       <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-        <PanelRightOpen size={20} className="text-[#a8a8a8]" />
+        <PanelRightOpen size={20} />
         <span className="text-base flex-1 truncate max-w-40">Abrir no modo lado a lado</span>
       </div>
       <span className="text-xs text-[#8a8a8a]">Alt+Click</span>
@@ -344,6 +346,12 @@ export default function SidebarItem({
             />
           ))}
         </div>
+      )}
+      {showToast && (
+        <Toast 
+          message="Link copiado para o clipboard" 
+          onClose={() => setShowToast(false)} 
+        />
       )}
     </div>
   );

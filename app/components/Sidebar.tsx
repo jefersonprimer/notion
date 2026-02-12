@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import {
   Search,
   Home,
   Users,
-  Sparkles,
+  Sparkle,
   Inbox,
   Plus,
   Mail,
@@ -200,7 +200,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           hoverIconTitle="Criar nova anotação IA"
         />
         <NavItem 
-          icon={<Sparkles size={20} />} 
+          icon={<Sparkle size={20} />} 
           label="IA do Notion" 
           title="Pergunte, busque, crie com a IA" 
           onHoverClick={() => {
