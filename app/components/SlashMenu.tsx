@@ -10,7 +10,8 @@ import {
   ListOrdered, 
   CheckSquare, 
   ChevronRight,
-  FileText
+  FileText,
+  Code
 } from 'lucide-react';
 
 interface SlashMenuProps {
@@ -28,6 +29,7 @@ const MENU_ITEMS = [
   { id: 'number', label: 'Lista numerada', icon: <ListOrdered size={18} /> },
   { id: 'todo', label: 'Lista de tarefas', icon: <CheckSquare size={18} /> },
   { id: 'toggle', label: 'Lista de alternantes', icon: <ChevronRight size={18} /> },
+  { id: 'code', label: 'Bloco de código', icon: <Code size={18} /> },
   { id: 'page', label: 'Página', icon: <FileText size={18} /> }
 ];
 

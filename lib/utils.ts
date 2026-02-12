@@ -69,6 +69,41 @@ export function formatRelativeDate(date: Date): string {
   return `${date.getDate()} de ${month}. de ${date.getFullYear()}`;
 }
 
+export function isLikelyCode(text: string): boolean {
+  const lines = text.split('\n');
+  if (lines.length < 2) {
+    // Single line code detection
+    return /^(const|let|var|function|class|import|export|if|for|while|return|console\.log)\s/.test(text.trim()) || 
+           (/[{};]/.test(text) && text.includes('(') && text.includes(')')) ||
+           /^(public|private|protected|static|async|await)\s/.test(text.trim());
+  }
+
+  // Patterns that suggest code
+  const codePatterns = [
+    /[{}();]/,
+    /=>/,
+    /^(import|export|const|let|var|function|class|if|for|while|switch|return|try|catch|public|private|def|async|await|using|namespace|package)\s/m,
+    /^\s+(at|const|let|var|function|class|if|for|while|switch|return|try|catch|public|private|def|async|await)\s/m,
+    /<\/?[a-z][\s\S]*>/i, // HTML
+    /^[a-z0-9_-]+\s*:\s*.+;$/i, // CSS
+    /\b(void|int|string|bool|float|double|char)\b.*=/, // C-style declaration
+    /def\s+[a-z_][a-z0-9_]*\s*\(.*\)\s*:/, // Python function
+  ];
+
+  const matchingLines = lines.filter(line => 
+    line.trim() !== '' && codePatterns.some(pattern => pattern.test(line))
+  );
+
+  const nonEmptyLines = lines.filter(l => l.trim() !== '');
+  if (nonEmptyLines.length === 0) return false;
+  
+  // If more than 25% of non-empty lines match code patterns, it's likely code
+  // or if it has consistent significant indentation (typical of code blocks)
+  const hasConsistentIndentation = lines.length > 3 && lines.filter(l => l.trim().length > 0).every(l => l.startsWith('    ') || l.startsWith('\t'));
+
+  return matchingLines.length / nonEmptyLines.length >= 0.25 || hasConsistentIndentation;
+}
+
 export function formatFullDate(date: Date): string {
   const day = date.getDate();
   const month = date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');

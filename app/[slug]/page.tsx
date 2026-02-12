@@ -9,7 +9,7 @@ import { Note } from '@/types/note';
 import { useAuth } from '@/context/AuthContext';
 import { useLayout } from '@/context/LayoutContext';
 import { useFavorite } from '@/context/FavoriteContext';
-import { extractIdFromSlug, createNoteSlug } from '@/lib/utils';
+import { extractIdFromSlug, createNoteSlug, isLikelyCode } from '@/lib/utils';
 import { MoreHorizontal, Menu, ChevronsRight, LockKeyhole, ChevronDown, Star, ChevronRight } from 'lucide-react';
 import {
   DndContext,
@@ -270,11 +270,22 @@ export default function NotePage() {
     if (lines.length > 1) {
         e.preventDefault();
         const newTitle = lines[0];
-        const newContentBlocks = lines.slice(1).filter(line => line.trim() !== '').map(line => ({
-            id: generateId(),
-            type: 'text',
-            content: line
-        }));
+        const remainingText = lines.slice(1).join('\n');
+        
+        let newContentBlocks;
+        if (isLikelyCode(remainingText)) {
+            newContentBlocks = [{
+                id: generateId(),
+                type: 'code',
+                content: remainingText
+            }];
+        } else {
+            newContentBlocks = lines.slice(1).filter(line => line.trim() !== '').map(line => ({
+                id: generateId(),
+                type: 'text',
+                content: line
+            }));
+        }
 
         setTitle(newTitle);
         
@@ -641,13 +652,30 @@ export default function NotePage() {
       }
   };
 
-  const handlePasteMultiLine = (id: string, newLines: string[]) => {
+  const handlePasteMultiLine = (id: string, newLines: string[], isCode = false) => {
       setBlocks(prevBlocks => {
           const index = prevBlocks.findIndex(b => b.id === id);
           if (index === -1) return prevBlocks;
 
           const updatedBlocks = [...prevBlocks];
           const currentBlock = updatedBlocks[index];
+
+          if (isCode) {
+              const codeContent = newLines.join('\n');
+              const newBlock = { id: generateId(), type: 'code', content: codeContent };
+              
+              if (currentBlock.content === '') {
+                  updatedBlocks[index] = newBlock;
+              } else {
+                  updatedBlocks.splice(index + 1, 0, newBlock);
+              }
+
+              setTimeout(() => {
+                  inputRefs.current.get(newBlock.id)?.focus();
+              }, 0);
+
+              return updatedBlocks;
+          }
 
           // Update current block with the first line
           updatedBlocks[index] = { ...currentBlock, content: currentBlock.content + newLines[0] };

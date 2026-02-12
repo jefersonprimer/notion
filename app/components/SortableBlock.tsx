@@ -4,9 +4,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Link from 'next/link';
-import { GripVertical, Plus, Square, CheckSquare, FileText, Image as ImageIcon } from 'lucide-react';
+import { GripVertical, Plus, Square, CheckSquare, FileText, Image as ImageIcon, Copy, Check } from 'lucide-react';
 import { SlashMenu } from './SlashMenu';
 import UrlPasteModal from './UrlPasteModal';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { isLikelyCode } from '@/lib/utils';
 
 interface SortableBlockProps {
   id: string;
@@ -16,7 +19,7 @@ interface SortableBlockProps {
   onChange: (id: string, newContent: string, newType?: string) => void;
   onKeyDown: (e: React.KeyboardEvent, id: string) => void;
   inputRef?: (el: HTMLDivElement | null) => void; // Changed from HTMLInputElement
-  onPasteMultiLine?: (id: string, newLines: string[]) => void;
+  onPasteMultiLine?: (id: string, newLines: string[], isCode?: boolean) => void;
   listNumber?: number; // New prop for numbered lists
   isSelected?: boolean;
   onSelect?: (id: string, multi: boolean) => void;
@@ -34,6 +37,7 @@ const PREFIXES: Record<string, string> = {
   page: 'p: ',
   image: 'img: ',
   video: 'vid: ',
+  code: '``` ',
 };
 
 export function SortableBlock({ id, type, content, childTitles = {}, onChange, onKeyDown, inputRef, onPasteMultiLine, listNumber, isSelected, onSelect }: SortableBlockProps) {
@@ -52,12 +56,13 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
   const [pastedUrl, setPastedUrl] = useState('');
   const [isPastedVideo, setIsPastedVideo] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false); // New state for input focus
+  const [copied, setCopied] = useState(false);
   const localInputRef = useRef<HTMLDivElement>(null); // Changed to HTMLDivElement
   const resizerRef = useRef<HTMLDivElement>(null);
 
   // Effect to update the contentEditable div's innerText when content prop changes
   useEffect(() => {
-    if (localInputRef.current && localInputRef.current.innerText !== content && type !== 'image') {
+    if (localInputRef.current && localInputRef.current.innerText !== content && type !== 'image' && type !== 'code') {
       localInputRef.current.innerText = content;
     }
   }, [content, type]);
@@ -106,9 +111,15 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
   const handleBlur = () => {
     setIsInputFocused(false);
     // When blurring, ensure content is clean (e.g., no extra newlines from contentEditable)
-    if (localInputRef.current && type !== 'image') {
+    if (localInputRef.current && type !== 'image' && type !== 'code') {
         onChange(id, localInputRef.current.innerText.trim());
     }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => { // Changed to HTMLDivElement
@@ -134,11 +145,16 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
       return;
     }
 
+    if (isLikelyCode(text) && content === '') {
+      onChange(id, text, 'code');
+      return;
+    }
+
     const lines = text.split('\n');
 
     if (lines.length > 1 && onPasteMultiLine) {
         // If multi-line, use the multi-line handler
-        onPasteMultiLine(id, lines);
+        onPasteMultiLine(id, lines, isLikelyCode(text));
     } else {
         // If single line, insert text at cursor position
         document.execCommand('insertText', false, text);
@@ -301,6 +317,130 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
   };
+
+  if (type === 'code') {
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={`group/block flex items-start -ml-12 pl-2 py-1 relative rounded transition-colors my-2 ${isSelected ? 'bg-[#2383e233]' : ''}`}
+      >
+        <div className={`absolute left-0 top-1 flex items-center gap-1 opacity-0 group-hover/block:opacity-100 transition-opacity px-1 select-none z-10 h-8`}>
+          <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
+              <Plus size={16} />
+          </button>
+          <button 
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
+              {...attributes}
+              {...listeners}
+          >
+              <GripVertical size={16} />
+          </button>
+        </div>
+        
+        <div className="flex-1 ml-10 relative group/code overflow-hidden rounded-md bg-[#202020] border border-[#333]">
+          {/* Language badge or selector could go here */}
+          <div className="absolute right-2 top-2 z-20 opacity-0 group-hover/code:opacity-100 transition-opacity flex items-center gap-2">
+            <span className="text-[10px] text-gray-500 font-mono uppercase bg-[#2a2a2a] px-1.5 py-0.5 rounded border border-[#444]">
+              JS
+            </span>
+            <button
+              onClick={handleCopy}
+              className="p-1.5 rounded bg-[#2a2a2a] hover:bg-[#333] text-gray-400 hover:text-white transition-colors border border-[#444]"
+              title="Copiar código"
+            >
+              {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
+            </button>
+          </div>
+          
+          <div className="relative">
+            {isInputFocused ? (
+              <textarea
+                id={`textarea-${id}`}
+                autoFocus
+                value={content}
+                onChange={(e) => {
+                  onChange(id, e.target.value);
+                  // Auto-resize
+                  e.target.style.height = 'auto';
+                  e.target.style.height = e.target.scrollHeight + 'px';
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const start = e.currentTarget.selectionStart;
+                    const end = e.currentTarget.selectionEnd;
+                    const newValue = content.substring(0, start) + "  " + content.substring(end);
+                    onChange(id, newValue);
+                    // Reset cursor position after state update
+                    setTimeout(() => {
+                      const textarea = document.getElementById(`textarea-${id}`) as HTMLTextAreaElement;
+                      if (textarea) {
+                        textarea.selectionStart = textarea.selectionEnd = start + 2;
+                      }
+                    }, 0);
+                  } else if (e.key === 'Enter') {
+                    // Let the textarea handle Enter (newline)
+                    // and stop propagation to prevent page.tsx from creating a new block
+                    e.stopPropagation();
+                  } else if (e.key === 'Backspace' && content === '') {
+                    // If empty, let the parent handle backspace to delete the block
+                    onKeyDown(e, id);
+                  } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    // Only pass arrows to parent if we're at the very start/end
+                    const { selectionStart, selectionEnd, value } = e.currentTarget;
+                    const lines = value.split('\n');
+                    const isAtFirstLine = selectionStart <= lines[0].length;
+                    const isAtLastLine = selectionStart > value.length - (lines[lines.length - 1].length + 1);
+
+                    if ((e.key === 'ArrowUp' && isAtFirstLine) || (e.key === 'ArrowDown' && isAtLastLine)) {
+                      onKeyDown(e, id);
+                    }
+                  } else {
+                    // For other keys, just let the textarea handle them or stop propagation
+                    // to prevent global shortcuts if any
+                    e.stopPropagation();
+                  }
+                }}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                className="w-full bg-transparent text-gray-300 font-mono text-sm p-4 outline-none border-none resize-none min-h-[100px] block"
+                spellCheck={false}
+                style={{ height: content.split('\n').length * 20 + 32 + 'px' }}
+              />
+            ) : (
+              <div 
+                onClick={() => {
+                  setIsInputFocused(true);
+                }}
+                className="cursor-text"
+              >
+                <SyntaxHighlighter
+                  language="javascript"
+                  style={vscDarkPlus}
+                  customStyle={{
+                    margin: 0,
+                    padding: '1rem',
+                    fontSize: '0.875rem',
+                    lineHeight: '1.25rem',
+                    background: 'transparent',
+                    minHeight: '100px',
+                  }}
+                  codeTagProps={{
+                    style: {
+                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                    }
+                  }}
+                >
+                  {content || '// Clique para editar...'}
+                </SyntaxHighlighter>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (type === 'page') {
     const [pageId, ...titleParts] = content.split('|');
