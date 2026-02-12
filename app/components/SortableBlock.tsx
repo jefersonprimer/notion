@@ -4,8 +4,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Link from 'next/link';
-import { GripVertical, Plus, Square, CheckSquare, FileText } from 'lucide-react';
+import { GripVertical, Plus, Square, CheckSquare, FileText, Image as ImageIcon } from 'lucide-react';
 import { SlashMenu } from './SlashMenu';
+import ImagePasteModal from './ImagePasteModal';
 
 interface SortableBlockProps {
   id: string;
@@ -31,6 +32,7 @@ const PREFIXES: Record<string, string> = {
   todo_checked: '[x] ', // todo_checked should not trigger auto-format on typing
   toggle: '> ',
   page: 'p: ',
+  image: 'img: ',
 };
 
 export function SortableBlock({ id, type, content, childTitles = {}, onChange, onKeyDown, inputRef, onPasteMultiLine, listNumber, isSelected, onSelect }: SortableBlockProps) {
@@ -44,15 +46,19 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
   } = useSortable({ id });
 
   const [showMenu, setShowMenu] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
+  const [pastedUrl, setPastedUrl] = useState('');
   const [isInputFocused, setIsInputFocused] = useState(false); // New state for input focus
   const localInputRef = useRef<HTMLDivElement>(null); // Changed to HTMLDivElement
+  const resizerRef = useRef<HTMLDivElement>(null);
 
   // Effect to update the contentEditable div's innerText when content prop changes
   useEffect(() => {
-    if (localInputRef.current && localInputRef.current.innerText !== content) {
+    if (localInputRef.current && localInputRef.current.innerText !== content && type !== 'image') {
       localInputRef.current.innerText = content;
     }
-  }, [content]);
+  }, [content, type]);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -98,7 +104,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
   const handleBlur = () => {
     setIsInputFocused(false);
     // When blurring, ensure content is clean (e.g., no extra newlines from contentEditable)
-    if (localInputRef.current) {
+    if (localInputRef.current && type !== 'image') {
         onChange(id, localInputRef.current.innerText.trim());
     }
   };
@@ -106,6 +112,24 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => { // Changed to HTMLDivElement
     e.preventDefault(); // Prevent default paste behavior
     const text = e.clipboardData.getData('text/plain'); // Get plain text from clipboard
+
+    // Check if it's a URL
+    const isUrl = /^(https?:\/\/[^\s]+)$/i.test(text.trim());
+    const isImageUrl = /https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp|svg)(\?[^\s]*)?/i.test(text.trim());
+
+    if (isImageUrl || isUrl) {
+      setPastedUrl(text.trim());
+      const rect = localInputRef.current?.getBoundingClientRect();
+      if (rect) {
+        setModalPosition({ 
+          top: rect.bottom + window.scrollY, 
+          left: rect.left + window.scrollX 
+        });
+        setShowImageModal(true);
+      }
+      return;
+    }
+
     const lines = text.split('\n');
 
     if (lines.length > 1 && onPasteMultiLine) {
@@ -119,6 +143,23 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
             onChange(id, localInputRef.current.innerText);
         }
     }
+  };
+
+  const handleModalSelect = (option: 'mention' | 'url' | 'bookmark' | 'embed') => {
+    if (option === 'embed') {
+      onChange(id, `${pastedUrl}|100%|auto`, 'image');
+    } else {
+      // For other options, we just insert the URL for now or handle accordingly
+      // Notion usually creates a link or a bookmark
+      if (option === 'url') {
+        document.execCommand('insertText', false, pastedUrl);
+        if (localInputRef.current) {
+          onChange(id, localInputRef.current.innerText);
+        }
+      }
+      // Other options like mention and bookmark could be implemented later
+    }
+    setShowImageModal(false);
   };
 
   const handleMenuSelect = (newType: string) => {
@@ -173,9 +214,158 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
 
   const isContentEmptyAndUnfocused = content === '' && !isInputFocused && type === 'text';
 
-  const [pageId, ...titleParts] = content.split('|');
-  const storedTitle = titleParts.join('|');
-  const liveTitle = childTitles[pageId] || storedTitle || "Sem título";
+  // For image resizing
+  const handleResize = (e: React.MouseEvent, direction: 'horizontal' | 'vertical' | 'both') => {
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    
+    const element = resizerRef.current?.parentElement;
+    if (!element) return;
+    
+    const rect = element.getBoundingClientRect();
+    const startWidth = rect.width;
+    const startHeight = rect.height;
+    const containerWidth = element.parentElement?.getBoundingClientRect().width || 1;
+
+    const [imgUrl, currentWidth = '100%', currentHeight = 'auto'] = content.split('|');
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      let newWidthPercent = currentWidth;
+      let newHeight = currentHeight;
+
+      if (direction === 'horizontal' || direction === 'both') {
+        const deltaX = moveEvent.clientX - startX;
+        // Symmetric resize because it's centered
+        const calculatedWidth = Math.max(100, startWidth + deltaX * 2);
+        const widthPercent = Math.min(100, (calculatedWidth / containerWidth) * 100);
+        newWidthPercent = `${widthPercent}%`;
+      }
+
+      if (direction === 'vertical' || direction === 'both') {
+        const deltaY = moveEvent.clientY - startY;
+        const calculatedHeight = Math.max(50, startHeight + deltaY);
+        newHeight = `${calculatedHeight}px`;
+      }
+
+      onChange(id, `${imgUrl}|${newWidthPercent}|${newHeight}`, 'image');
+    };
+
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  };
+
+  if (type === 'page') {
+    const [pageId, ...titleParts] = content.split('|');
+    const storedTitle = titleParts.join('|');
+    const liveTitle = childTitles[pageId] || storedTitle || "Sem título";
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={`group flex items-start -ml-12 pl-2 py-1 relative rounded transition-colors ${getContainerMargins()}`}
+      >
+        <div className={`absolute left-0 top-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 select-none z-10 ${lineHeight}`}>
+          <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
+              <Plus size={16} />
+          </button>
+          <button 
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
+              {...attributes}
+              {...listeners}
+          >
+              <GripVertical size={16} />
+          </button>
+        </div>
+        <div className="flex-1 ml-10">
+          <Link
+            href={`/${pageId}`}
+            className="flex items-center gap-2 w-full p-1 hover:bg-[#2f2f2f] rounded transition-colors group/link"
+          >
+            <FileText size={20} className="text-[#9b9b9b] group-hover/link:text-white shrink-0" />
+            <span className="text-base text-white font-medium truncate underline-offset-4 group-hover/link:underline">
+              {liveTitle}
+            </span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (type === 'image') {
+    const [url, width = '100%', height = 'auto'] = content.split('|');
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        onClick={(e) => {
+          if (e.shiftKey && onSelect) {
+            e.preventDefault();
+            onSelect(id, true);
+          } else if (onSelect) {
+            onSelect(id, false);
+          }
+        }}
+        className={`group flex items-start -ml-12 pl-2 py-1 relative rounded transition-colors my-4 ${isSelected ? 'bg-[#2383e233]' : ''}`}
+      >
+        <div className={`absolute left-0 top-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 select-none z-10 h-8`}>
+          <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
+              <Plus size={16} />
+          </button>
+          <button 
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
+              {...attributes}
+              {...listeners}
+          >
+              <GripVertical size={16} />
+          </button>
+        </div>
+        <div className="flex-1 ml-10 flex flex-col items-center group/image relative">
+          <div 
+            ref={resizerRef}
+            className="relative" 
+            style={{ width: width, height: height }}
+          >
+            <img 
+              src={url} 
+              alt="Embedded content" 
+              className={`w-full h-full rounded-sm select-none object-cover ${isSelected ? 'ring-2 ring-[#2383e2]' : ''}`}
+              draggable={false}
+            />
+            
+            {/* Horizontal Resizers (Width) */}
+            <div 
+              onMouseDown={(e) => handleResize(e, 'horizontal')}
+              className="absolute top-0 -right-1.5 w-1.5 h-full hover:bg-[#2383e2] cursor-ew-resize opacity-0 group-hover/image:opacity-100 transition-all"
+            />
+            <div 
+              onMouseDown={(e) => handleResize(e, 'horizontal')}
+              className="absolute top-0 -left-1.5 w-1.5 h-full hover:bg-[#2383e2] cursor-ew-resize opacity-0 group-hover/image:opacity-100 transition-all"
+            />
+
+            {/* Vertical Resizer (Height) */}
+            <div 
+              onMouseDown={(e) => handleResize(e, 'vertical')}
+              className="absolute -bottom-1.5 left-0 w-full h-1.5 hover:bg-[#2383e2] cursor-ns-resize opacity-0 group-hover/image:opacity-100 transition-all"
+            />
+
+            {/* Corner Resizer (Both) */}
+            <div 
+              onMouseDown={(e) => handleResize(e, 'both')}
+              className="absolute -bottom-1.5 -right-1.5 w-4 h-4 hover:bg-[#2383e2] cursor-nwse-resize opacity-0 group-hover/image:opacity-100 transition-all z-20 rounded-full border-2 border-white dark:border-[#191919]"
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -221,17 +411,6 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
 
       {/* Content Editable Div */}
       <div className="flex-1 relative">
-        {type === 'page' ? (
-          <Link
-            href={`/${pageId}`}
-            className="flex items-center gap-2 w-full p-1 hover:bg-[#2f2f2f] rounded transition-colors group/link"
-          >
-            <FileText size={20} className="text-[#9b9b9b] group-hover/link:text-white shrink-0" />
-            <span className="text-base text-white font-medium truncate underline-offset-4 group-hover/link:underline">
-              {liveTitle}
-            </span>
-          </Link>
-        ) : (
           <div
               ref={setRefs}
               id={id}
@@ -246,7 +425,6 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
               data-placeholder={currentPlaceholder} 
               suppressContentEditableWarning={true} // To suppress React warning
           />
-        )}
         
         {/* Slash Menu */}
         {showMenu && (
@@ -257,6 +435,15 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
               setShowMenu(false);
               localInputRef.current?.focus();
             }}
+          />
+        )}
+
+        {/* Image Paste Modal */}
+        {showImageModal && (
+          <ImagePasteModal 
+            position={modalPosition}
+            onClose={() => setShowImageModal(false)}
+            onSelect={handleModalSelect}
           />
         )}
       </div>

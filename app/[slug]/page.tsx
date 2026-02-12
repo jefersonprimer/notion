@@ -43,6 +43,7 @@ const PREFIXES: Record<string, string> = {
   todo_checked: '[x] ',
   toggle: '> ',
   page: 'p: ',
+  image: 'img: ',
 };
 
 export default function NotePage() {
@@ -396,7 +397,13 @@ export default function NotePage() {
         const isEditingBlock = activeEl?.getAttribute('contenteditable') === 'true';
         const focusedBlockId = activeEl?.id;
         
-        if (selectedIds.size > 1 || !isEditingBlock || (focusedBlockId && selectedIds.has(focusedBlockId))) {
+        // Check if any selected block is an image or other non-contenteditable block
+        const hasNonEditableSelected = Array.from(selectedIds).some(id => {
+          const block = blocks.find(b => b.id === id);
+          return block && (block.type === 'image' || block.type === 'page');
+        });
+
+        if (selectedIds.size > 1 || hasNonEditableSelected || !isEditingBlock || (focusedBlockId && selectedIds.has(focusedBlockId))) {
           // Se houver texto selecionado DENTRO do bloco (seleção nativa), deixamos o comportamento padrão
           const selection = window.getSelection();
           if (selection && !selection.isCollapsed && isEditingBlock && selectedIds.size === 1) {
