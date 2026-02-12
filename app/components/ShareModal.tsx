@@ -37,7 +37,7 @@ export default function ShareModal({ onClose }: ShareModalProps) {
     <>
       <div 
         ref={modalRef}
-        className="absolute right-0 top-[calc(100%+8px)] z-50 w-[420px] rounded-2xl border border-[#2f2f2f] bg-[#1f1f1f] shadow-2xl text-sm text-[#d4d4d4] overflow-hidden"
+        className="absolute right-0 top-[calc(100%+8px)] z-50 w-114 rounded-2xl border border-[#2f2f2f] bg-[#1f1f1f] shadow-2xl text-sm text-[#d4d4d4] overflow-hidden"
       >
         {/* Tabs */}
         <div className="flex px-6 pt-4 border-b border-[#2a2a2a]">

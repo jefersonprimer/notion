@@ -17,6 +17,8 @@ interface SortableBlockProps {
   inputRef?: (el: HTMLDivElement | null) => void; // Changed from HTMLInputElement
   onPasteMultiLine?: (id: string, newLines: string[]) => void;
   listNumber?: number; // New prop for numbered lists
+  isSelected?: boolean;
+  onSelect?: (id: string, multi: boolean) => void;
 }
 
 const PREFIXES: Record<string, string> = {
@@ -31,7 +33,7 @@ const PREFIXES: Record<string, string> = {
   page: 'p: ',
 };
 
-export function SortableBlock({ id, type, content, childTitles = {}, onChange, onKeyDown, inputRef, onPasteMultiLine, listNumber }: SortableBlockProps) {
+export function SortableBlock({ id, type, content, childTitles = {}, onChange, onKeyDown, inputRef, onPasteMultiLine, listNumber, isSelected, onSelect }: SortableBlockProps) {
   const {
     attributes,
     listeners,
@@ -58,6 +60,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     zIndex: isDragging ? 100 : 'auto',
     position: 'relative' as 'relative',
     opacity: isDragging ? 0.5 : 1,
+    backgroundColor: isSelected ? '#2383e233' : 'transparent',
   };
 
   const setRefs = (el: HTMLDivElement | null) => { // Changed to HTMLDivElement
@@ -178,6 +181,14 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     <div
       ref={setNodeRef}
       style={style}
+      onClick={(e) => {
+        if (e.shiftKey && onSelect) {
+          e.preventDefault();
+          onSelect(id, true);
+        } else if (onSelect && (e.target as HTMLElement).classList.contains('group')) {
+          onSelect(id, false);
+        }
+      }}
       className={`group flex items-start -ml-12 pl-2 py-1 relative rounded transition-colors ${getContainerMargins()}`}
     >
       {/* Drag Handle & Add Button Container */}
@@ -223,6 +234,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
         ) : (
           <div
               ref={setRefs}
+              id={id}
               contentEditable="true"
               className={`w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-300 resize-none focus:outline-none ${getStyles()} ${isContentEmptyAndUnfocused ? 'py-0' : ''}`}
               onInput={handleInput}
@@ -241,7 +253,10 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
           <SlashMenu 
             position={{ top: type.startsWith('h') ? 40 : 32, left: 0 }} 
             onSelect={handleMenuSelect}
-            onClose={() => setShowMenu(false)}
+            onClose={() => {
+              setShowMenu(false);
+              localInputRef.current?.focus();
+            }}
           />
         )}
       </div>

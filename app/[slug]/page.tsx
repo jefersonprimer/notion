@@ -29,6 +29,7 @@ import {
 import { SortableBlock } from '../components/SortableBlock';
 import PageOptionsModal from '../components/PageOptionsModal';
 import ShareModal from '../components/ShareModal';
+import FloatingToolbar from '../components/FloatingToolbar';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -55,17 +56,58 @@ export default function NotePage() {
   const [parentNote, setParentNote] = useState<Note | null>(null);
   const [title, setTitle] = useState('');
   const [blocks, setBlocks] = useState<{ id: string; type: string; content: string }[]>([]);
+  const [history, setHistory] = useState<{ past: typeof blocks[], future: typeof blocks[] }>({ past: [], future: [] });
   const [childTitles, setChildTitles] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFloatingOpen, setIsFloatingOpen] = useState(false);
   const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectionBox, setSelectionBox] = useState<{ x1: number, y1: number, x2: number, y2: number } | null>(null);
   
   const titleDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const blocksDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const inputRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Helper to update blocks with history
+  const updateBlocks = (newBlocks: typeof blocks | ((prev: typeof blocks) => typeof blocks), saveToHistory = true) => {
+    if (saveToHistory) {
+      setHistory(prev => ({
+        past: [blocks, ...prev.past].slice(0, 50), // Limit to 50 steps
+        future: []
+      }));
+    }
+    if (typeof newBlocks === 'function') {
+      setBlocks(newBlocks);
+    } else {
+      setBlocks(newBlocks);
+    }
+  };
+
+  const undo = () => {
+    if (history.past.length === 0) return;
+    const previous = history.past[0];
+    const newPast = history.past.slice(1);
+    setHistory(prev => ({
+      past: newPast,
+      future: [blocks, ...prev.future]
+    }));
+    setBlocks(previous);
+  };
+
+  const redo = () => {
+    if (history.future.length === 0) return;
+    const next = history.future[0];
+    const newFuture = history.future.slice(1);
+    setHistory(prev => ({
+      past: [blocks, ...prev.past],
+      future: newFuture
+    }));
+    setBlocks(next);
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -73,6 +115,63 @@ export default function NotePage() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  useEffect(() => {
+    const handleMouseDown = (e: MouseEvent) => {
+      // Start selection only if clicking on the container or empty space, not on inputs/buttons
+      const target = e.target as HTMLElement;
+      if (target.closest('button') || target.closest('input') || target.closest('[contenteditable="true"]') || target.closest('a')) {
+        return;
+      }
+
+      setSelectionBox({ x1: e.clientX, y1: e.clientY, x2: e.clientX, y2: e.clientY });
+      if (!e.shiftKey) setSelectedIds(new Set());
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!selectionBox) return;
+
+      setSelectionBox(prev => prev ? { ...prev, x2: e.clientX, y2: e.clientY } : null);
+
+      // Collision detection
+      const xMin = Math.min(selectionBox.x1, e.clientX);
+      const xMax = Math.max(selectionBox.x1, e.clientX);
+      const yMin = Math.min(selectionBox.y1, e.clientY);
+      const yMax = Math.max(selectionBox.y1, e.clientY);
+
+      const newSelected = new Set(e.shiftKey ? selectedIds : []);
+      
+      blocks.forEach(block => {
+        const el = inputRefs.current.get(block.id)?.closest('.group');
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          const isIntersecting = !(rect.right < xMin || rect.left > xMax || rect.bottom < yMin || rect.top > yMax);
+          if (isIntersecting) {
+            newSelected.add(block.id);
+          }
+        }
+      });
+
+      setSelectedIds(newSelected);
+    };
+
+    const handleMouseUp = () => {
+      setSelectionBox(null);
+    };
+
+    if (selectionBox) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    } else {
+      containerRef.current?.addEventListener('mousedown', handleMouseDown);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      containerRef.current?.removeEventListener('mousedown', handleMouseDown);
+    };
+  }, [selectionBox, blocks, selectedIds]);
 
   useEffect(() => {
     async function fetchNote() {
@@ -248,13 +347,75 @@ export default function NotePage() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (active.id !== over?.id) {
-      setBlocks((items) => {
+      updateBlocks((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over?.id);
         return arrayMove(items, oldIndex, newIndex);
       });
     }
   };
+
+  const handleSelect = (id: string, multi: boolean) => {
+    setSelectedIds(prev => {
+      const newSet = new Set(multi ? prev : []);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Undo/Redo
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        if (e.shiftKey) {
+          e.preventDefault();
+          redo();
+        } else {
+          e.preventDefault();
+          undo();
+        }
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        e.preventDefault();
+        redo();
+      }
+
+      if ((e.key === 'Backspace' || e.key === 'Delete') && selectedIds.size > 0) {
+        const activeEl = document.activeElement;
+        const isEditingTitle = activeEl === titleInputRef.current;
+        
+        // Se estiver editando o título, não apaga os blocos selecionados
+        if (isEditingTitle) return;
+
+        // Se houver mais de um bloco selecionado, OU se o bloco focado for um dos selecionados
+        // e o cursor estiver no início (para Backspace) ou apenas se for Delete
+        const isEditingBlock = activeEl?.getAttribute('contenteditable') === 'true';
+        const focusedBlockId = activeEl?.id;
+        
+        if (selectedIds.size > 1 || !isEditingBlock || (focusedBlockId && selectedIds.has(focusedBlockId))) {
+          // Se houver texto selecionado DENTRO do bloco (seleção nativa), deixamos o comportamento padrão
+          const selection = window.getSelection();
+          if (selection && !selection.isCollapsed && isEditingBlock && selectedIds.size === 1) {
+            return;
+          }
+
+          e.preventDefault();
+          updateBlocks(prev => prev.filter(b => !selectedIds.has(b.id)));
+          setSelectedIds(new Set());
+        }
+      }
+      if (e.key === 'Escape') {
+        setSelectedIds(new Set());
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedIds]);
 
   const handleBlockChange = async (id: string, newContent: string, newType?: string) => {
     if (newType === 'page') {
@@ -292,17 +453,24 @@ export default function NotePage() {
       }
       return;
     }
-    setBlocks(prev => prev.map(b => 
+    updateBlocks(prev => prev.map(b => 
         b.id === id ? { ...b, content: newContent, type: newType ?? b.type } : b
-    ));
+    ), false); // Pass false for content changes as contentEditable has its own undo
   };
 
   const handleTitleKeyDown = (e: React.KeyboardEvent) => {
-      if (e.key === 'ArrowDown' || e.key === 'Enter') {
+      if (e.key === 'ArrowDown') {
           e.preventDefault();
           if (blocks.length > 0) {
               inputRefs.current.get(blocks[0].id)?.focus();
           }
+      } else if (e.key === 'Enter') {
+          e.preventDefault();
+          const newBlock = { id: generateId(), type: 'text', content: '' };
+          updateBlocks([newBlock, ...blocks]);
+          setTimeout(() => {
+              inputRefs.current.get(newBlock.id)?.focus();
+          }, 0);
       }
   };
 
@@ -340,6 +508,8 @@ export default function NotePage() {
           }
       } else if (e.key === 'Enter') {
           e.preventDefault();
+          const selection = window.getSelection();
+          const isAtStart = selection?.anchorOffset === 0;
           const currentBlock = blocks[index];
           
           let nextType = 'text';
@@ -349,12 +519,23 @@ export default function NotePage() {
 
           const newBlock = { id: generateId(), type: nextType, content: '' };
           const newBlocks = [...blocks];
-          newBlocks.splice(index + 1, 0, newBlock);
-          setBlocks(newBlocks);
           
-          setTimeout(() => {
-              inputRefs.current.get(newBlock.id)?.focus();
-          }, 0);
+          if (isAtStart && currentBlock.content.length > 0) {
+              // Insert above
+              newBlocks.splice(index, 0, newBlock);
+              updateBlocks(newBlocks);
+              // Focus remains same or we focus the new one above
+              setTimeout(() => {
+                  inputRefs.current.get(currentBlock.id)?.focus();
+              }, 0);
+          } else {
+              // Default: insert below
+              newBlocks.splice(index + 1, 0, newBlock);
+              updateBlocks(newBlocks);
+              setTimeout(() => {
+                  inputRefs.current.get(newBlock.id)?.focus();
+              }, 0);
+          }
 
       } else if (e.key === 'Backspace') {
           if (!el) return;
@@ -362,7 +543,6 @@ export default function NotePage() {
           if (!selection || !selection.anchorNode) return;
 
           const isAtStart = selection.isCollapsed && selection.anchorOffset === 0;
-
           const prefixedTypes = ['bullet', 'number', 'todo', 'toggle'];
           const isPrefixedType = prefixedTypes.includes(blocks[index].type);
 
@@ -370,12 +550,16 @@ export default function NotePage() {
               if (blocks[index].content.length === 0) {
                   e.preventDefault();
                   const newBlocks = blocks.filter(b => b.id !== id);
-                  setBlocks(newBlocks);
+                  updateBlocks(newBlocks);
 
                   setTimeout(() => {
                       if (index > 0) {
                           const prevBlock = blocks[index - 1];
-                          inputRefs.current.get(prevBlock.id)?.focus();
+                          const prevInput = inputRefs.current.get(prevBlock.id);
+                          if (prevInput) {
+                              prevInput.focus();
+                              setCursor(prevInput, prevBlock.content.length);
+                          }
                       } else {
                           titleInputRef.current?.focus();
                       }
@@ -656,7 +840,7 @@ export default function NotePage() {
 
         {/* Note Content Area */}
         <div className="flex-1 overflow-y-auto">
-            <div className="max-w-4xl mx-auto px-12 py-12">
+            <div ref={containerRef} className="max-w-4xl mx-auto px-12 py-12">
                 {/* Title Input */}
                 <input
                     ref={titleInputRef}
@@ -701,6 +885,8 @@ export default function NotePage() {
                                         childTitles={childTitles}
                                         onChange={handleBlockChange}
                                         onKeyDown={handleBlockKeyDown}
+                                        isSelected={selectedIds.has(block.id)}
+                                        onSelect={handleSelect}
                                         inputRef={(el) => {
                                             if (el) inputRefs.current.set(block.id, el);
                                             else inputRefs.current.delete(block.id);
@@ -717,6 +903,10 @@ export default function NotePage() {
                     <div 
                         className="h-20 cursor-text"
                         onClick={() => {
+                             if (selectedIds.size > 0) {
+                                 setSelectedIds(new Set());
+                                 return;
+                             }
                              const newBlock = { id: generateId(), type: 'text', content: '' };
                              setBlocks(prev => [...prev, newBlock]);
                              setTimeout(() => inputRefs.current.get(newBlock.id)?.focus(), 0);
@@ -726,6 +916,18 @@ export default function NotePage() {
             </div>
         </div>
       </main>
+      <FloatingToolbar />
+      {selectionBox && (
+          <div 
+              className="fixed border border-[#2383e2] bg-[#2383e233] pointer-events-none z-[100]"
+              style={{
+                  left: Math.min(selectionBox.x1, selectionBox.x2),
+                  top: Math.min(selectionBox.y1, selectionBox.y2),
+                  width: Math.abs(selectionBox.x2 - selectionBox.x1),
+                  height: Math.abs(selectionBox.y2 - selectionBox.y1),
+              }}
+          />
+      )}
     </div>
   );
 }
