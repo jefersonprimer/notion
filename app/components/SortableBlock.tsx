@@ -6,7 +6,7 @@ import { CSS } from '@dnd-kit/utilities';
 import Link from 'next/link';
 import { GripVertical, Plus, Square, CheckSquare, FileText, Image as ImageIcon } from 'lucide-react';
 import { SlashMenu } from './SlashMenu';
-import ImagePasteModal from './ImagePasteModal';
+import UrlPasteModal from './UrlPasteModal';
 
 interface SortableBlockProps {
   id: string;
@@ -33,6 +33,7 @@ const PREFIXES: Record<string, string> = {
   toggle: '> ',
   page: 'p: ',
   image: 'img: ',
+  video: 'vid: ',
 };
 
 export function SortableBlock({ id, type, content, childTitles = {}, onChange, onKeyDown, inputRef, onPasteMultiLine, listNumber, isSelected, onSelect }: SortableBlockProps) {
@@ -46,9 +47,10 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
   } = useSortable({ id });
 
   const [showMenu, setShowMenu] = useState(false);
-  const [showImageModal, setShowImageModal] = useState(false);
+  const [showUrlModal, setShowUrlModal] = useState(false);
   const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
   const [pastedUrl, setPastedUrl] = useState('');
+  const [isPastedVideo, setIsPastedVideo] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false); // New state for input focus
   const localInputRef = useRef<HTMLDivElement>(null); // Changed to HTMLDivElement
   const resizerRef = useRef<HTMLDivElement>(null);
@@ -116,16 +118,18 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     // Check if it's a URL
     const isUrl = /^(https?:\/\/[^\s]+)$/i.test(text.trim());
     const isImageUrl = /https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp|svg)(\?[^\s]*)?/i.test(text.trim());
+    const isVideoUrl = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|vimeo\.com|dailymotion\.com)\/.+$/i.test(text.trim());
 
-    if (isImageUrl || isUrl) {
+    if (isImageUrl || isVideoUrl || isUrl) {
       setPastedUrl(text.trim());
+      setIsPastedVideo(isVideoUrl);
       const rect = localInputRef.current?.getBoundingClientRect();
       if (rect) {
         setModalPosition({ 
           top: rect.bottom + window.scrollY, 
           left: rect.left + window.scrollX 
         });
-        setShowImageModal(true);
+        setShowUrlModal(true);
       }
       return;
     }
@@ -145,9 +149,46 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     }
   };
 
+  const getEmbedUrl = (url: string) => {
+    try {
+      const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
+      
+      // YouTube
+      if (urlObj.hostname.includes('youtube.com')) {
+        const videoId = urlObj.searchParams.get('v');
+        if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+      }
+      if (urlObj.hostname.includes('youtu.be')) {
+        const videoId = urlObj.pathname.slice(1);
+        if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+      }
+      
+      // Vimeo
+      if (urlObj.hostname.includes('vimeo.com')) {
+        const videoId = urlObj.pathname.split('/').pop();
+        if (videoId && /^\d+$/.test(videoId)) {
+          return `https://player.vimeo.com/video/${videoId}`;
+        }
+      }
+
+      // Dailymotion
+      if (urlObj.hostname.includes('dailymotion.com')) {
+        const videoId = urlObj.pathname.split('/').pop()?.split('_')[0];
+        if (videoId) return `https://www.dailymotion.com/embed/video/${videoId}`;
+      }
+    } catch (e) {
+      console.error('Error parsing video URL:', e);
+    }
+    return url;
+  };
+
   const handleModalSelect = (option: 'mention' | 'url' | 'bookmark' | 'embed') => {
     if (option === 'embed') {
-      onChange(id, `${pastedUrl}|100%|auto`, 'image');
+      if (isPastedVideo) {
+        onChange(id, `${getEmbedUrl(pastedUrl)}|100%|450px`, 'video');
+      } else {
+        onChange(id, `${pastedUrl}|100%|auto`, 'image');
+      }
     } else {
       // For other options, we just insert the URL for now or handle accordingly
       // Notion usually creates a link or a bookmark
@@ -159,7 +200,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
       }
       // Other options like mention and bookmark could be implemented later
     }
-    setShowImageModal(false);
+    setShowUrlModal(false);
   };
 
   const handleMenuSelect = (newType: string) => {
@@ -249,7 +290,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
         newHeight = `${calculatedHeight}px`;
       }
 
-      onChange(id, `${imgUrl}|${newWidthPercent}|${newHeight}`, 'image');
+      onChange(id, `${imgUrl}|${newWidthPercent}|${newHeight}`, type);
     };
 
     const onMouseUp = () => {
@@ -299,7 +340,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     );
   }
 
-  if (type === 'image') {
+  if (type === 'image' || type === 'video') {
     const [url, width = '100%', height = 'auto'] = content.split('|');
     return (
       <div
@@ -333,12 +374,21 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
             className="relative" 
             style={{ width: width, height: height }}
           >
-            <img 
-              src={url} 
-              alt="Embedded content" 
-              className={`w-full h-full rounded-sm select-none object-cover ${isSelected ? 'ring-2 ring-[#2383e2]' : ''}`}
-              draggable={false}
-            />
+            {type === 'image' ? (
+              <img 
+                src={url} 
+                alt="Embedded content" 
+                className={`w-full h-full rounded-sm select-none object-cover ${isSelected ? 'ring-2 ring-[#2383e2]' : ''}`}
+                draggable={false}
+              />
+            ) : (
+              <iframe
+                src={url}
+                className={`w-full h-full rounded-sm select-none ${isSelected ? 'ring-2 ring-[#2383e2]' : ''}`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            )}
             
             {/* Horizontal Resizers (Width) */}
             <div 
@@ -438,12 +488,13 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
           />
         )}
 
-        {/* Image Paste Modal */}
-        {showImageModal && (
-          <ImagePasteModal 
+        {/* URL Paste Modal */}
+        {showUrlModal && (
+          <UrlPasteModal 
             position={modalPosition}
-            onClose={() => setShowImageModal(false)}
+            onClose={() => setShowUrlModal(false)}
             onSelect={handleModalSelect}
+            isVideo={isPastedVideo}
           />
         )}
       </div>

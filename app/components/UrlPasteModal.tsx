@@ -3,13 +3,14 @@
 import React, { useEffect, useRef } from 'react';
 import { AtSign, Link as LinkIcon, Bookmark, Image as ImageIcon } from 'lucide-react';
 
-interface ImagePasteModalProps {
+interface UrlPasteModalProps {
   onClose: () => void;
   onSelect: (option: 'mention' | 'url' | 'bookmark' | 'embed') => void;
   position: { top: number; left: number };
+  isVideo?: boolean;
 }
 
-export default function ImagePasteModal({ onClose, onSelect, position }: ImagePasteModalProps) {
+export default function UrlPasteModal({ onClose, onSelect, position, isVideo }: UrlPasteModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -26,11 +27,11 @@ export default function ImagePasteModal({ onClose, onSelect, position }: ImagePa
   }, [onClose]);
 
   const options = [
-    { id: 'mention', label: 'Menção', icon: <AtSign size={16} /> },
-    { id: 'url', label: 'URL', icon: <LinkIcon size={16} /> },
-    { id: 'bookmark', label: 'Criar marcador', icon: <Bookmark size={16} /> },
-    { id: 'embed', label: 'Incorporar', icon: <ImageIcon size={16} /> },
-  ] as const;
+    { id: 'mention' as const, label: 'Menção', icon: <AtSign size={16} /> },
+    { id: 'embed' as const, label: isVideo ? 'Integrar vídeo' : 'Incorporar', icon: <ImageIcon size={16} /> },
+    { id: 'bookmark' as const, label: 'Criar marcador', icon: <Bookmark size={16} /> },
+    { id: 'url' as const, label: 'URL', icon: <LinkIcon size={16} /> },
+  ];
 
   return (
     <div

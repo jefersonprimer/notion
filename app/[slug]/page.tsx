@@ -44,6 +44,7 @@ const PREFIXES: Record<string, string> = {
   toggle: '> ',
   page: 'p: ',
   image: 'img: ',
+  video: 'vid: ',
 };
 
 export default function NotePage() {
