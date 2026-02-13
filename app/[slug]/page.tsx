@@ -821,47 +821,68 @@ export default function NotePage() {
                   <button className="text-sm text-[#f0efed] font-normal truncate max-w-[240px] hover:bg-[#fffff315] px-2 py-1 rounded-md">
                     {title.trim() || 'Sem título'}
                   </button>
-                  <button 
-                      className="flex items-center justify-center text-sm font-normal text-[#7d7a75] hover:text-[#f0efed] gap-2 hover:bg-[#202020] px-2 py-1 rounded-md"
-                      title="Somente voce tem acesso"
-                  >
-                      <LockKeyhole size={14}/>
-                      Particular
-                      <ChevronDown size={14}/>
-                  </button>
+                  <div className="relative group/particular">
+                    <button 
+                        className="flex items-center justify-center text-sm font-normal text-[#7d7a75] hover:text-[#f0efed] gap-2 hover:bg-[#202020] px-2 py-1 rounded-md"
+                    >
+                        <LockKeyhole size={14}/>
+                        Particular
+                        <ChevronDown size={14}/>
+                    </button>
+                    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 hidden group-hover/particular:block bg-[#2f2f2f] text-[#f0efed] text-xs p-1 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
+                        Somente você tem acesso <br/>
+                        <span className="text-gray-400">Clique para mover</span>
+                    </div>
+                  </div>
                 </div>
               </div>
              <div className="flex items-center gap-2">
-              <div className="relative">
+              <div className="relative group/share">
                 <button 
                   onClick={() => setIsShareModalOpen(!isShareModalOpen)}
                   className={`flex items-center justify-center gap-2 border border-[#383836] text-sm px-2 py-1 rounded-md transition-colors ${isShareModalOpen ? 'bg-[#fffff315]' : 'hover:bg-[#fffff315]'}`}
-                  title="Compartilhar"
                 >
                   <LockKeyhole size={14}/>
                   Compartilhar
                   <ChevronDown size={14}/>
                 </button>
+                
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/share:block bg-[#2f2f2f] text-[#f0efed] text-xs p-2 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
+                  Somente você pode acessar
+                </div>
 
                 {isShareModalOpen && <ShareModal onClose={() => setIsShareModalOpen(false)} />}
               </div>
 
-              <button 
-                onClick={handleToggleFavorite}
-                className={`p-1.5 hover:bg-gray-100 dark:hover:bg-[#fffff315] rounded-md transition-colors ${isFavorite ? 'text-[#ca984d]' : 'text-[#f0efed]'}`}
-                title={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
-              >
-                <Star size={18} fill={isFavorite ? "currentColor" : "none"} />
-              </button>
 
-              <div className="relative">
+             <div className="flex items-center gap-2"> 
+              <div className="relative group/favorite">
+                <button 
+                  onClick={handleToggleFavorite}
+                  className={`p-1.5 hover:bg-gray-100 dark:hover:bg-[#fffff315] rounded-md transition-colors ${isFavorite ? 'text-[#ca984d]' : 'text-[#f0efed]'}`}
+                >
+                  <Star size={18} fill={isFavorite ? "currentColor" : "none"} />
+                </button>
+
+                <div className="absolute top-full right-[-28] mt-2 hidden group-hover/favorite:block bg-[#2f2f2f] text-[#f0efed] text-xs p-2 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
+                  {isFavorite ? "Remover dos seus Favoritos" : "Adicionar aos seus favoritos"} 
+                </div>
+              </div>
+            </div>
+
+
+             <div className="flex items-center gap-2"> 
+              <div className="relative group/more">
                 <button 
                   onClick={() => setIsOptionsModalOpen(!isOptionsModalOpen)}
                   className={`p-1.5 text-[#f0efed] rounded-md transition-colors ${isOptionsModalOpen ? 'bg-[#fffff315]' : 'hover:bg-gray-100 dark:hover:bg-[#fffff315]'}`}
-                  title="Mais opções"
                 >
                   <MoreHorizontal size={20}/>
                 </button>
+
+                <div className="absolute top-full right-0 mt-2 hidden group-hover/more:block bg-[#2f2f2f] text-[#f0efed] text-xs p-2 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
+                  Defina estilos, exporte e faça muito mais...
+                </div>
 
                 <PageOptionsModal 
                   isOpen={isOptionsModalOpen} 
@@ -872,6 +893,7 @@ export default function NotePage() {
                 />
               </div>
              </div>
+          </div>
         </div>
 
         {/* Note Content Area */}

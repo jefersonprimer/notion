@@ -68,7 +68,7 @@ export default function FloatingToolbar() {
 
       setPosition({
         top: rect.top + window.scrollY - 50,
-        left: rect.left + window.scrollX + rect.width / 2 + 200,
+        left: rect.left + window.scrollX + 200
       })
 
       setVisible(true)
