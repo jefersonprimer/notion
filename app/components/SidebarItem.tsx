@@ -128,6 +128,7 @@ export default function SidebarItem({
   const handleDuplicate = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!session) return;
     try {
       await api.post(`/notes/${note.id}/duplicate`, {}, {
         headers: { Authorization: `Bearer ${session.accessToken}` }
@@ -143,6 +144,7 @@ export default function SidebarItem({
   const handleDeleteAction = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!session) return;
     
     try {
       await api.delete(`/notes/${note.id}`, {

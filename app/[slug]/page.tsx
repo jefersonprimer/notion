@@ -887,8 +887,8 @@ export default function NotePage() {
                 <PageOptionsModal 
                   isOpen={isOptionsModalOpen} 
                   onClose={() => setIsOptionsModalOpen(false)} 
-                  userName={session?.user?.displayName || session?.user?.name || session?.user?.email}
-                  updatedAt={note?.updatedAt || note?.updated_at}
+                  userName={session?.user?.displayName || session?.user?.displayName || session?.user?.email}
+                  updatedAt={note?.updated_at || note?.updated_at}
                   wordCount={wordCount}
                 />
               </div>

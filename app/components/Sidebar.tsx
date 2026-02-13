@@ -230,7 +230,6 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
                     session={session}
                     onAddChild={handleAddChild}
                     onDelete={handleDeleteRootNote} 
-                    onRemove={() => toggleFavorite(note)}
                     currentPathname={pathname}
                   />
                 ))}
