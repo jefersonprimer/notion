@@ -241,7 +241,7 @@ export default function Home() {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 p-8 overflow-y-auto flex-col items-center w-full max-w-5xl mx-auto">
+        <div className="flex-1 p-8 overflow-y-auto flex-col items-center w-full max-w-6xl mx-auto">
           <header className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center">
               {greeting}
