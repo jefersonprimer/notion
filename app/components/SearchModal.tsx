@@ -1,5 +1,5 @@
 'use client'
-import { Search, Settings, FileText, ListFilter } from 'lucide-react';
+import { Search, Settings, FileText, File, ListFilter } from 'lucide-react';
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
@@ -109,7 +109,7 @@ export default function SearchModal({ open, onClose }: Props) {
                 <div className="rounded-[14px] mr-[6px] inline-flex">
                   <div role="button" tabIndex={0} className="select-none transition-colors duration-20 px-2 h-6 flex items-center justify-center gap-[6px] whitespace-nowrap rounded-[32px] text-[14px] leading-6 cursor-pointer text-neutral-400 bg-neutral-800 hover:bg-neutral-700">
                     <svg aria-hidden="true" role="graphics-symbol" viewBox="0 0 20 20" className="w-5 h-5 block fill-current shrink-0 text-inherit">
-                      <path d="M14.075 3.45a.625.625 0 0 0-.884 0l-3.497 3.5a.625.625 0 0 0 .883.884l2.431-2.431v10.705a.625.625 0 0 0 1.25 0V5.402l2.431 2.43a.625.625 0 1 0 .884-.883zM2.427 12.167a.625.625 0 0 1 .884 0l2.43 2.431V3.893a.625.625 0 0 1 1.25 0v10.705l2.431-2.43a.625.625 0 0 1 .884.883L6.81 16.55a.625.625 0 0 1-.884 0l-3.498-3.498a.625.625 0 0 1 0-.884"></path>
+                      <path d="M14.075 3.45a.625.625 0 0 0-.884 0l-3.497 3.5a.625.625 0 0 0 .883.884l2.431-2.431v10.705a.625.625 0 0 0 1.25 0V5.402l2.431 2.43a.625.625 0 1 0 .884-.883zM2.427 12.167a.625.625 0 0 1 .884 0l2.43 2.431V3.893a.625.625 0 0 1 .125 0v10.705l2.431-2.43a.625.625 0 0 1 .884.883L6.81 16.55a.625.625 0 0 1-.884 0l-3.498-3.498a.625.625 0 0 1 0-.884"></path>
                     </svg>
                     Ordenar
                     <svg aria-hidden="true" role="graphics-symbol" viewBox="3.06 0 9.88 16" className="w-auto h-3.5 block fill-current shrink-0 text-inherit">
@@ -176,6 +176,7 @@ export default function SearchModal({ open, onClose }: Props) {
                             <Item 
                                 key={note.id} 
                                 title={note.title || 'Sem título'} 
+                                note={note}
                                 onClick={() => handleSelect(note)}
                             />
                         ))}
@@ -234,14 +235,20 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-function Item({ title, onClick }: { title: string; onClick: () => void }) {
+function Item({ title, note, onClick }: { title: string; note: Note; onClick: () => void }) {
   return (
     <div 
         onClick={onClick}
         className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-neutral-800 cursor-pointer"
     >
       <div className="flex items-center gap-3">
-        <span className="text-neutral-400"><FileText size={16} /></span>
+        <span className="text-neutral-400">
+          {note.description && note.description.trim() !== '' ? (
+            <FileText size={16} />
+          ) : (
+            <File size={16} />
+          )}
+        </span>
         <span className="text-sm">{title}</span>
       </div>
     </div>

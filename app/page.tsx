@@ -121,15 +121,19 @@ export default function Home() {
             {!isSidebarOpen && (
               <div
                 className="relative group mr-1"
-                onMouseEnter={() => setIsFloatingOpen(true)}
+                onMouseEnter={() => {
+                  if (window.innerWidth >= 768) {
+                    setIsFloatingOpen(true);
+                  }
+                }}
                 onMouseLeave={() => setIsFloatingOpen(false)}
               >
                 <button
                   onClick={() => setIsSidebarOpen(true)}
                   className="p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded transition-colors"
                 >
-                  <Menu size={20} className="group-hover:hidden text-white" />
-                  <ChevronsRight size={20} className="hidden group-hover:block text-white-500 hover:text-white" />
+                  <Menu size={20} className="md:group-hover:hidden text-white" />
+                  <ChevronsRight size={20} className="hidden md:group-hover:block text-white-500 hover:text-white" />
                 </button>
 
                 {/* Floating Sidebar */}
@@ -241,7 +245,7 @@ export default function Home() {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 p-8 overflow-y-auto flex-col items-center w-full max-w-6xl mx-auto">
+        <div className="flex-1 p-8 overflow-y-auto flex-col items-center w-full max-w-5xl mx-auto">
           <header className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center">
               {greeting}

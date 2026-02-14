@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FileText } from 'lucide-react';
+import { FileText, File } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { createNoteSlug, formatRelativeDate, formatFullDate } from '../../lib/utils';
 import { Note } from '../../types/note';
@@ -53,7 +53,11 @@ export default function NoteCard({ note }: NoteCardProps) {
               flex items-center justify-center
             "
           >
-            <FileText size={20} className="text-gray-600 dark:text-[#7d7a75]" />
+            {note.description && note.description.trim() !== '' ? (
+              <FileText size={20} className="text-gray-600 dark:text-[#7d7a75]" />
+            ) : (
+              <File size={20} className="text-gray-600 dark:text-[#7d7a75]" />
+            )}
           </div>
         </div>
 

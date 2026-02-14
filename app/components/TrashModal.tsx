@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Trash2, RotateCcw, X, FileText } from 'lucide-react';
+import { Trash2, RotateCcw, X, FileText, File } from 'lucide-react';
 import api from '@/lib/api';
 import { Note } from '@/types/note';
 
@@ -124,7 +124,11 @@ export default function TrashModal({ open, onClose }: Props) {
                 className="group flex items-center justify-between p-2 rounded hover:bg-[#2f2f2f] transition-colors"
               >
                 <div className="flex items-center gap-2 overflow-hidden">
-                  <FileText size={14} className="shrink-0" />
+                  {note.description && note.description.trim() !== '' ? (
+                    <FileText size={14} className="shrink-0" />
+                  ) : (
+                    <File size={14} className="shrink-0" />
+                  )}
                   <span className="text-sm truncate text-white">{note.title || "Sem título"}</span>
                 </div>
                 

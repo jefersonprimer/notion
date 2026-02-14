@@ -786,15 +786,19 @@ export default function NotePage() {
                  {!isSidebarOpen && (
                      <div 
                         className="relative group mr-1"
-                        onMouseEnter={() => setIsFloatingOpen(true)}
+                        onMouseEnter={() => {
+                          if (window.innerWidth >= 768) {
+                            setIsFloatingOpen(true);
+                          }
+                        }}
                         onMouseLeave={() => setIsFloatingOpen(false)}
                      >
                         <button 
                             onClick={() => setIsSidebarOpen(true)}
                             className="p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded text-gray-500 transition-colors"
                         >
-                            <Menu size={20} className="group-hover:hidden" />
-                            <ChevronsRight size={20} className="hidden group-hover:block" />
+                            <Menu size={20} className="md:group-hover:hidden" />
+                            <ChevronsRight size={20} className="hidden md:group-hover:block" />
                         </button>
 
                         {/* Floating Sidebar */}

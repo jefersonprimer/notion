@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import {
@@ -54,6 +54,20 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
   const [isMoreOptionsModalOpen, setIsMoreOptionsModalOpen] = useState(false);
   const [userModalPos, setUserModalPos] = useState({ top: 0, left: 0 });
   const [moreOptionsModalPos, setMoreOptionsModalPos] = useState({ top: 0, left: 0 });
+  const sidebarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (window.innerWidth < 768 && sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [setIsSidebarOpen]);
 
   useEffect(() => {
     async function fetchRootNotes() {
@@ -123,8 +137,19 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
   };
 
   return (
-    <div className={`group/sidebar w-68 bg-[#202020] text-[#ada9a3] flex flex-col text-sm border-r border-[#2f2f2f] select-none ${isFloating ? 'h-full max-h-[70vh] overflow-y-auto' : 'h-screen'}`}>
-      {/* Header */}
+    <>
+      {/* Mobile Backdrop */}
+      {!isFloating && (
+        <div 
+          className="fixed inset-0 bg-black/40 z-40 md:hidden" 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+      <div 
+        ref={sidebarRef}
+        className={`group/sidebar w-68 bg-[#202020] text-[#ada9a3] flex flex-col text-sm border-r border-[#2f2f2f] select-none ${isFloating ? 'h-full max-h-[70vh] overflow-y-auto' : 'h-screen'} ${!isFloating ? 'fixed inset-y-0 left-0 z-50 md:relative' : ''}`}
+      >
+        {/* Header */}
       <div
         className={`group relative flex items-center justify-between mt-2 mx-2 rounded-md transition-colors cursor-pointer hover:bg-[#252525] ${isUserModalOpen ? 'bg-[#252525]' : ''}`}
       >
@@ -340,7 +365,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
         position={moreOptionsModalPos}
       />
     </div>
-
+    </>
   );
 }
 

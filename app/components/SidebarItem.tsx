@@ -171,29 +171,44 @@ export default function SidebarItem({
         style={{ paddingLeft: `${depth * 12 + 8}px` }}
       >
         {/* Icon & Toggle */}
-        <div
-          role="button"
-          onClick={handleToggle}
-          className="relative flex items-center justify-center w-6 h-6 shrink-0 z-10 cursor-pointer rounded hover:bg-[#3f3f3f]"
-        >
-          {note.title && note.description ? (
-            <FileText size={20} className="transition-opacity duration-200 group-hover:opacity-0" />
-          ) : (
-            <File size={20} className="transition-opacity duration-200 group-hover:opacity-0" />
-          )}
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <div className="flex items-center shrink-0">
+          {/* Mobile Chevron (Always visible on mobile) */}
+          <div
+            role="button"
+            onClick={handleToggle}
+            className="flex md:hidden items-center justify-center w-5 h-6 cursor-pointer rounded hover:bg-[#3f3f3f]"
+          >
             <ChevronRight
-              size={16}
+              size={14}
               className={`transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
             />
+          </div>
+
+          {/* Desktop Icon (Switches on hover) / Mobile Icon (Always visible) */}
+          <div
+            role="button"
+            onClick={handleToggle}
+            className="relative flex items-center justify-center w-6 h-6 shrink-0 z-10 cursor-pointer rounded hover:bg-[#3f3f3f]"
+          >
+            {note.description && note.description.trim() !== '' ? (
+              <FileText size={20} className="transition-opacity duration-200 md:group-hover:opacity-0" />
+            ) : (
+              <File size={20} className="transition-opacity duration-200 md:group-hover:opacity-0" />
+            )}
+            <div className="hidden md:flex absolute inset-0 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <ChevronRight
+                size={16}
+                className={`transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
+              />
+            </div>
           </div>
         </div>
 
         {/* Title */}
         <span className="truncate text-base flex-1 pr-14">{note.title || "Sem título"}</span>
 
-        {/* Hover Actions */}
-        <div className="hidden group-hover:flex items-center absolute right-2 gap-1">
+        {/* Actions (Always visible on mobile, hover on desktop) */}
+        <div className="flex md:hidden md:group-hover:flex items-center absolute right-2 gap-1">
           <button
             className="p-1 hover:bg-[#3f3f3f] rounded text-[#ada9a3] hover:text-white relative"
             onClick={(e) => {
