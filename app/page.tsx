@@ -24,7 +24,7 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    document.title = 'Página inicial';
+    document.title = 'Página inicial | Cognition';
   }, []);
 
   useEffect(() => {
@@ -132,8 +132,8 @@ export default function Home() {
                   onClick={() => setIsSidebarOpen(true)}
                   className="p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded transition-colors"
                 >
-                  <Menu size={20} className="md:group-hover:hidden text-white" />
-                  <ChevronsRight size={20} className="hidden md:group-hover:block text-white-500 hover:text-white" />
+                  <Menu size={20} className="md:group-hover:hidden text-[#e6e5e3]" />
+                  <ChevronsRight size={20} className="hidden md:group-hover:block text-white-500 hover:text-[#e6e5e3s]" />
                 </button>
 
                 {/* Floating Sidebar */}
@@ -145,8 +145,7 @@ export default function Home() {
               </div>
             )}
             
-            <div className="flex items-center gap-2 px-2 py-1 rounded hover:bg-[#2f2f2f] cursor-pointer transition-colors group">
-              <HomeIcon size={16} className="text-gray-400 group-hover:text-white" />
+            <div className="flex md:hidden  items-center gap-2 py-1 rounded hover:bg-[#2f2f2f] cursor-pointer transition-colors group">
               <span className="text-white font-medium">Página inicial</span>
             </div>
           </div>
@@ -154,9 +153,9 @@ export default function Home() {
           <div className="flex items-center gap-2" ref={moreMenuRef}>
             <button 
               onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
-              className={`p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded text-white-500 transition-colors ${isMoreMenuOpen ? 'bg-[#2f2f2f]' : ''}`}
+              className={`p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded text-[#e6e5e3] transition-colors ${isMoreMenuOpen ? 'bg-[#2f2f2f]' : ''}`}
             >
-              <MoreHorizontal size={20} />
+              <MoreHorizontal size={22} />
             </button>
 
             {isMoreMenuOpen && (
@@ -247,7 +246,7 @@ export default function Home() {
         {/* Content Area */}
         <div className="flex-1 p-8 overflow-y-auto flex-col items-center w-full max-w-5xl mx-auto">
           <header className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 text-center">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-[#f0efed] text-center">
               {greeting}
             </h1>
           </header>

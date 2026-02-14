@@ -162,11 +162,11 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           className="flex items-center p-2 gap-2 transition-all duration-200 group-hover:opacity-100 flex-1 min-w-0"
         >
           <div className="w-5.5 h-6 bg-[#2f2f2f] rounded flex items-center justify-center text-sm font-medium text-white shrink-0">
-            <span className="leading-none select-none">P</span>
+            <span className="leading-none select-none">C</span>
           </div>
           <div className="flex items-center gap-1 min-w-0">
             <span className="text-white text-sm truncate font-medium leading-none">
-              Notion de {session?.user.displayName || 'Usuário'}
+              Cognition de {session?.user.displayName || 'Usuário'}
             </span>
             <div className="hidden group-hover:flex items-center text-[#ada9a3] hover:text-white">
               <ChevronDown size={14} />
@@ -226,7 +226,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
         />
         <NavItem 
           icon={<Sparkle size={20} />} 
-          label="IA do Notion" 
+          label="IA do Cognition" 
           title="Pergunte, busque, crie com a IA" 
           onHoverClick={() => {
             // Logica para ver histórico do chat
@@ -312,15 +312,15 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           </div>
         </div>
 
-        {/* Aplicativos do Notion */}
+        {/* Aplicativos do Cognition */}
         <div className="mt-4 px-2">
           <div className="px-2 py-1 text-xs font-medium text-[#9b9b9b]">
-            Aplicativos do Notion
+            Aplicativos do Cognition
           </div>
           <div className="py-1 text-base">
-            <NavItem icon={<Mail size={20} />} label="Notion Mail" />
-            <NavItem icon={<Calendar size={20} />} label="Notion Calendar" />
-            <NavItem icon={<Monitor size={20} />} label="Notion para desktop" />
+            <NavItem icon={<Mail size={20} />} label="Cognition Mail" />
+            <NavItem icon={<Calendar size={20} />} label="Cognition Calendar" />
+            <NavItem icon={<Monitor size={20} />} label="Cognition para desktop" />
 
           </div>
 

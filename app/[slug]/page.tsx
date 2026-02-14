@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useLayout } from '@/context/LayoutContext';
 import { useFavorite } from '@/context/FavoriteContext';
 import { extractIdFromSlug, createNoteSlug, isLikelyCode } from '@/lib/utils';
-import { MoreHorizontal, Menu, ChevronsRight, LockKeyhole, ChevronDown, Star, ChevronRight } from 'lucide-react';
+import { MoreHorizontal, Menu, ChevronsRight, LockKeyhole, ChevronDown, Star, ChevronRight, Share } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -844,11 +844,12 @@ export default function NotePage() {
               <div className="relative group/share">
                 <button 
                   onClick={() => setIsShareModalOpen(!isShareModalOpen)}
-                  className={`flex items-center justify-center gap-2 border border-[#383836] text-sm px-2 py-1 rounded-md transition-colors ${isShareModalOpen ? 'bg-[#fffff315]' : 'hover:bg-[#fffff315]'}`}
+                  className={`flex items-center justify-center md:gap-2 border border-[#383836] text-sm p-1.5 md:px-2 md:py-1 rounded-md transition-colors ${isShareModalOpen ? 'bg-[#fffff315]' : 'hover:bg-[#fffff315]'}`}
                 >
-                  <LockKeyhole size={14}/>
-                  Compartilhar
-                  <ChevronDown size={14}/>
+                  <Share size={18} className="md:hidden" />
+                  <LockKeyhole size={14} className="hidden md:inline" />
+                  <span className="hidden md:inline">Compartilhar</span>
+                  <ChevronDown size={14} className="hidden md:inline" />
                 </button>
                 
                 <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/share:block bg-[#2f2f2f] text-[#f0efed] text-xs p-2 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
