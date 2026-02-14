@@ -233,143 +233,163 @@ export default function SidebarItem({
               <MoreHorizontal size={16} />
             </button>
 
-            {showOptions && (
-              <>
-                {/* Mobile Overlay */}
-                {isMobile && (
-                  <div
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setShowOptions(false);
-                    }}
-                    className="fixed inset-0 bg-black/60 z-[9998] backdrop-blur-[2px]"
-                  />
-                )}
-                
-                <div
-                  ref={menuRef}
-                  className={`fixed z-[9999] bg-[#2b2b2b] border-[#3a3a3a] shadow-2xl text-sm text-[#cfcfcf] ${
-                    isMobile 
-                      ? 'inset-x-0 bottom-0 rounded-t-2xl border-t pb-8' 
-                      : 'w-70 border rounded-xl py-2'
-                  }`}
-                  style={!isMobile ? {
-                    bottom: '20px',
-                    left: '200px',
-                  } : {}}
-                >
-                  {/* Mobile Handle */}
-                  {isMobile && (
-                    <div className="flex justify-center pt-3 pb-1">
-                      <div className="w-10 h-1 rounded-full bg-[#3f3f3f]" />
-                    </div>
-                  )}
+            {typeof document !== 'undefined' && createPortal(
+              <AnimatePresence>
+                {showOptions && (
+                  <>
+                    {/* Mobile Overlay */}
+                    {isMobile && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setShowOptions(false);
+                        }}
+                        className="fixed inset-0 bg-black/60 z-[9998] backdrop-blur-[2px]"
+                      />
+                    )}
+                    
+                    <motion.div
+                      ref={menuRef}
+                      initial={isMobile ? { y: "100%" } : { opacity: 0, scale: 0.95 }}
+                      animate={isMobile ? { y: 0 } : { opacity: 1, scale: 1 }}
+                      exit={isMobile ? { y: "100%" } : { opacity: 0, scale: 0.95 }}
+                      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                      drag={isMobile ? "y" : false}
+                      dragConstraints={{ top: 0, bottom: 0 }}
+                      dragElastic={0.2}
+                      onDragEnd={(_, info) => {
+                        if (info.offset.y > 100 || info.velocity.y > 500) {
+                          setShowOptions(false);
+                        }
+                      }}
+                      className={`fixed z-[9999] bg-[#2b2b2b] border-[#3a3a3a] shadow-2xl text-sm text-[#cfcfcf] ${
+                        isMobile 
+                          ? 'inset-x-0 bottom-0 rounded-t-2xl border-t pb-8' 
+                          : 'w-70 border rounded-xl py-2'
+                      }`}
+                      style={!isMobile ? {
+                        bottom: '20px',
+                        left: '200px',
+                      } : {}}
+                    >
+                      {/* Mobile Handle */}
+                      {isMobile && (
+                        <div className="flex justify-center pt-3 pb-1">
+                          <div className="w-10 h-1 rounded-full bg-[#3f3f3f]" />
+                        </div>
+                      )}
 
-                  {/* Section Title */}
-                  <div className="px-3 pb-1 text-xs text-[#8f8f8f] pt-1">Página</div>
+                      {/* Section Title */}
+                      <div className="px-3 pb-1 text-xs text-[#8f8f8f] pt-1">Página</div>
 
-                  {/* Adicionar/Remover dos favoritos */}
-                  <button 
-                    className="w-full flex items-center justify-between px-3 py-2 text-[#f0efed] hover:text-white hover:bg-[#ffffff0e] transition-colors"
-                    onClick={handleToggleFavorite}
-                  >
-                    <div className="flex items-center gap-2 ">
-                      {isFavorite ? <StarOff size={20} /> : <Star size={20} />}
-                      <span className="text-base">{isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}</span>
-                    </div>
-                  </button>
+                      {/* Adicionar/Remover dos favoritos */}
+                      <button 
+                        className="w-full flex items-center justify-between px-3 py-2 text-[#f0efed] hover:text-white hover:bg-[#ffffff0e] transition-colors"
+                        onClick={handleToggleFavorite}
+                      >
+                        <div className="flex items-center gap-2 ">
+                          {isFavorite ? <StarOff size={20} /> : <Star size={20} />}
+                          <span className="text-base">{isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}</span>
+                        </div>
+                      </button>
 
-                  {/* Copiar link */}
-                  <button 
-                    className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors"
-                    onClick={handleCopyLink}
-                  >
-                    <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-                      <LinkIcon size={20}/>
-                      <span className="text-base">Copiar link</span>
-                    </div>
-                  </button>
+                      {/* Copiar link */}
+                      <button 
+                        className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors"
+                        onClick={handleCopyLink}
+                      >
+                        <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
+                          <LinkIcon size={20}/>
+                          <span className="text-base">Copiar link</span>
+                        </div>
+                      </button>
 
-                  {/* Duplicar */}
-                  <button 
-                    className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors"
-                    onClick={handleDuplicate}
-                  >
-                    <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-                      <Copy size={20}/>
-                      <span className="text-base">Duplicar</span>
-                    </div>
-                    {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+D</span>}
-                  </button>
+                      {/* Duplicar */}
+                      <button 
+                        className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors"
+                        onClick={handleDuplicate}
+                      >
+                        <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
+                          <Copy size={20}/>
+                          <span className="text-base">Duplicar</span>
+                        </div>
+                        {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+D</span>}
+                      </button>
 
-                  {/* Renomear */}
-                  <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
-                    <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-                      <SquarePen size={20} />
-                      <span className="text-base">Renomear</span>
-                    </div>
-                    {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+R</span>}
-                  </button>
+                      {/* Renomear */}
+                      <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
+                        <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
+                          <SquarePen size={20} />
+                          <span className="text-base">Renomear</span>
+                        </div>
+                        {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+R</span>}
+                      </button>
 
-                  {/* Mover para */}
-                  <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
-                    <div className="flex items-center gap-2 hover:text-[#f0efed] hover:text-white">
-                      <CornerRightUp size={20}/>
-                      <span className="text-base">Mover para</span>
-                    </div>
-                    {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+P</span>}
-                  </button>
+                      {/* Mover para */}
+                      <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
+                        <div className="flex items-center gap-2 hover:text-[#f0efed] hover:text-white">
+                          <CornerRightUp size={20}/>
+                          <span className="text-base">Mover para</span>
+                        </div>
+                        {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+P</span>}
+                      </button>
 
-                  {/* Divider */}
-                  <div className="my-2 border-t border-[#3a3a3a]" />
+                      {/* Divider */}
+                      <div className="my-2 border-t border-[#3a3a3a]" />
 
-                  {/* Mover para lixeira */}
-                  <button 
-                    className="w-full flex items-center justify-between px-3 py-2 text-[#f0efed] hover:text-red-400 hover:bg-[#3a3a3a] transition-colors"
-                    onClick={handleDeleteAction}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Trash2 size={20} />
-                      <span className="text-base">Mover para a lixeira</span>
-                    </div>
-                  </button>
+                      {/* Mover para lixeira */}
+                      <button 
+                        className="w-full flex items-center justify-between px-3 py-2 text-[#f0efed] hover:text-red-400 hover:bg-[#3a3a3a] transition-colors"
+                        onClick={handleDeleteAction}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Trash2 size={20} />
+                          <span className="text-base">Mover para a lixeira</span>
+                        </div>
+                      </button>
 
-                  {/* Transformar em wiki */}
-                  <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
-                    <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-                      <FileText size={20} />
-                      <span className="text-base">Transformar em wiki</span>
-                    </div>
-                  </button>
+                      {/* Transformar em wiki */}
+                      <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
+                        <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
+                          <FileText size={20} />
+                          <span className="text-base">Transformar em wiki</span>
+                        </div>
+                      </button>
 
-                  {/* Abrir em nova guia */}
-                  <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
-                    <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-                      <ExternalLink size={20}/>
-                      <span className="text-base">Abrir em nova guia</span>
-                    </div>
-                    {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+↵</span>}
-                  </button>
+                      {/* Abrir em nova guia */}
+                      <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
+                        <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
+                          <ExternalLink size={20}/>
+                          <span className="text-base">Abrir em nova guia</span>
+                        </div>
+                        {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+↵</span>}
+                      </button>
 
-                  {/* Abrir no modo lado a lado */}
-                  {!isMobile && (
-                    <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
-                      <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-                        <PanelRightOpen size={20} />
-                        <span className="text-base flex-1 truncate max-w-40">Abrir no modo lado a lado</span>
+                      {/* Abrir no modo lado a lado */}
+                      {!isMobile && (
+                        <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
+                          <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
+                            <PanelRightOpen size={20} />
+                            <span className="text-base flex-1 truncate max-w-40">Abrir no modo lado a lado</span>
+                          </div>
+                          <span className="text-xs text-[#8a8a8a]">Alt+Click</span>
+                        </button>
+                      )}
+
+                      {/* Footer */}
+                      <div className="mt-2 pt-2 border-t border-[#3a3a3a] px-3 text-xs text-[#7a7a7a]">
+                        Última edição por {session?.user?.displayName || 'Usuário'} <br />
+                        {formatRelativeDate(new Date(note.updated_at))}
                       </div>
-                      <span className="text-xs text-[#8a8a8a]">Alt+Click</span>
-                    </button>
-                  )}
-
-                  {/* Footer */}
-                  <div className="mt-2 pt-2 border-t border-[#3a3a3a] px-3 text-xs text-[#7a7a7a]">
-                    Última edição por {session?.user?.displayName || 'Usuário'} <br />
-                    {formatRelativeDate(new Date(note.updated_at))}
-                  </div>
-                </div>
-              </>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>,
+              document.body
             )}
           </div>
           
