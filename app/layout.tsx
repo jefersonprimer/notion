@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Cognition",
-  description: "Cognition is more than just a notepad.",
+  description: "Cognition is more than just a notepad - Developed by Primer",
 };
 
 export default function RootLayout({

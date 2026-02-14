@@ -256,6 +256,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
                     onAddChild={handleAddChild}
                     onDelete={handleDeleteRootNote} 
                     currentPathname={pathname}
+                    isFloating={isFloating}
                   />
                 ))}
               </div>
@@ -292,6 +293,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
                     onAddChild={handleAddChild}
                     onDelete={handleDeleteRootNote}
                     currentPathname={pathname}
+                    isFloating={isFloating}
                   />
                 ))
               )}

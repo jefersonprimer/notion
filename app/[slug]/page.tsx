@@ -785,7 +785,7 @@ export default function NotePage() {
                  {/* Menu / Floating Sidebar Trigger */}
                  {!isSidebarOpen && (
                      <div 
-                        className="relative group mr-1"
+                        className="relative group"
                         onMouseEnter={() => {
                           if (window.innerWidth >= 768) {
                             setIsFloatingOpen(true);
@@ -795,36 +795,40 @@ export default function NotePage() {
                      >
                         <button 
                             onClick={() => setIsSidebarOpen(true)}
-                            className="p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded text-gray-500 transition-colors"
+                            className="p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded text-[#e6e5e3] transition-colors"
                         >
-                            <Menu size={20} className="md:group-hover:hidden" />
+                            <Menu size={22} className="md:group-hover:hidden" />
                             <ChevronsRight size={20} className="hidden md:group-hover:block" />
                         </button>
 
                         {/* Floating Sidebar */}
                         {isFloatingOpen && (
-                            <div className="absolute top-full left-0 mt-2 w-60 max-h-[70vh] shadow-xl rounded-lg overflow-hidden border border-[#2f2f2f] bg-[#202020] animate-in fade-in zoom-in-95 duration-100 origin-top-left">
+                            <div className="absolute top-full left-0 mt-2 w-68 max-h-[80vh] shadow-xl rounded-lg overflow-hidden border border-[#2f2f2f] bg-[#202020] animate-in fade-in zoom-in-95 duration-100 origin-top-left">
                                 <Sidebar isFloating={true} />
                             </div>
                         )}
                      </div>
                  )}
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   {parentNote && (
                     <>
                       <Link 
                         href={`/${createNoteSlug(parentNote.title, parentNote.id)}`}
-                        className="text-sm text-[#ada9a3] hover:text-[#f0efed] truncate max-w-[150px] hover:bg-[#fffff315] px-2 py-1 rounded-md transition-colors"
+                        className="text-sm text-[#ada9a3] hover:text-[#f0efed] truncate max-w-37.5 hover:bg-[#fffff315] px-2 py-1 rounded-md transition-colors"
                       >
                         {parentNote.title || 'Sem título'}
                       </Link>
                       <ChevronRight size={14} className="text-[#7d7a75]" />
                     </>
                   )}
-                  <button className="text-sm text-[#f0efed] font-normal truncate max-w-[240px] hover:bg-[#fffff315] px-2 py-1 rounded-md">
+                  
+                  <button 
+                    className="text-base text-[#f0efed] font-normal truncate max-w-60 hover:bg-[#fffff315] px-2 py-1 rounded-md"
+                  >
                     {title.trim() || 'Sem título'}
                   </button>
+
                   <div className="relative group/particular">
                     <button 
                         className="flex items-center justify-center text-sm font-normal text-[#7d7a75] hover:text-[#f0efed] gap-2 hover:bg-[#202020] px-2 py-1 rounded-md"
@@ -840,6 +844,7 @@ export default function NotePage() {
                   </div>
                 </div>
               </div>
+
              <div className="flex items-center gap-2">
               <div className="relative group/share">
                 <button 
@@ -874,7 +879,6 @@ export default function NotePage() {
                 </div>
               </div>
             </div>
-
 
              <div className="flex items-center gap-2"> 
               <div className="relative group/more">
@@ -982,7 +986,7 @@ export default function NotePage() {
       <FloatingToolbar />
       {selectionBox && (
           <div 
-              className="fixed border border-[#2383e2] bg-[#2383e233] pointer-events-none z-[100]"
+              className="fixed border border-[#2383e2] bg-[#2383e233] pointer-events-none z-100"
               style={{
                   left: Math.min(selectionBox.x1, selectionBox.x2),
                   top: Math.min(selectionBox.y1, selectionBox.y2),

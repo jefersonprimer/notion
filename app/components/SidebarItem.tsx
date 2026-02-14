@@ -34,6 +34,7 @@ interface SidebarItemProps {
   onAddChild: (parentId: string, e: React.MouseEvent) => void;
   onDelete: (noteId: string) => void;
   currentPathname: string | null;
+  isFloating?: boolean;
 }
 
 export function SidebarItemSkeleton({ depth = 0 }: { depth?: number }) {
@@ -54,7 +55,8 @@ export default function SidebarItem({
   session,
   onAddChild,
   onDelete,
-  currentPathname
+  currentPathname,
+  isFloating = false
 }: SidebarItemProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [children, setChildren] = useState<Note[]>([]);
@@ -184,11 +186,11 @@ export default function SidebarItem({
       >
         {/* Icon & Toggle */}
         <div className="flex items-center shrink-0">
-          {/* Mobile Chevron (Always visible on mobile) */}
+          {/* Mobile Chevron (Always visible on mobile or floating) */}
           <div
             role="button"
             onClick={handleToggle}
-            className="flex md:hidden items-center justify-center w-5 h-6 cursor-pointer rounded hover:bg-[#3f3f3f]"
+            className={`flex ${isFloating ? '' : 'md:hidden'} items-center justify-center w-5 h-6 cursor-pointer rounded hover:bg-[#3f3f3f]`}
           >
             <ChevronRight
               size={14}
@@ -203,16 +205,18 @@ export default function SidebarItem({
             className="relative flex items-center justify-center w-6 h-6 shrink-0 z-10 cursor-pointer rounded hover:bg-[#3f3f3f]"
           >
             {note.description && note.description.trim() !== '' ? (
-              <FileText size={20} className="transition-opacity duration-200 md:group-hover:opacity-0" />
+              <FileText size={20} className={`transition-opacity duration-200 ${!isFloating ? 'md:group-hover:opacity-0' : ''}`} />
             ) : (
-              <File size={20} className="transition-opacity duration-200 md:group-hover:opacity-0" />
+              <File size={20} className={`transition-opacity duration-200 ${!isFloating ? 'md:group-hover:opacity-0' : ''}`} />
             )}
-            <div className="hidden md:flex absolute inset-0 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <ChevronRight
-                size={16}
-                className={`transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
-              />
-            </div>
+            {!isFloating && (
+              <div className="hidden md:flex absolute inset-0 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <ChevronRight
+                  size={16}
+                  className={`transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -437,6 +441,7 @@ export default function SidebarItem({
               onAddChild={onAddChild}
               onDelete={handleDeleteChild}
               currentPathname={currentPathname}
+              isFloating={isFloating}
             />
           ))}
         </div>
