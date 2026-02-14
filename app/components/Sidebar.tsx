@@ -35,7 +35,7 @@ import MoreOptionsModal from  './MoreOptionsModal';
 export default function Sidebar({ isFloating = false }: { isFloating?: boolean }) {
   const { session } = useAuth();
   const { setIsSidebarOpen } = useLayout();
-  const { favoriteNotes, toggleFavorite } = useFavorite();
+  const { favoriteNotes } = useFavorite();
   const router = useRouter();
   const pathname = usePathname();
   const [rootNotes, setRootNotes] = useState<Note[]>([]);
@@ -166,7 +166,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           </div>
           <div className="flex items-center gap-1 min-w-0">
             <span className="text-white text-sm truncate font-medium leading-none">
-              Cognition de {session?.user.displayName || 'Usuário'}
+              {session?.user.displayName || 'Usuário'}
             </span>
             <div className="hidden group-hover:flex items-center text-[#ada9a3] hover:text-white">
               <ChevronDown size={14} />

@@ -22,6 +22,8 @@ import {
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { formatRelativeDate } from '@/lib/utils'
+import { motion, AnimatePresence } from 'framer-motion'
+import { createPortal } from 'react-dom'
 
 interface PageOptionsModalProps {
   isOpen: boolean;
@@ -36,6 +38,14 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
   const [fullWidth, setFullWidth] = useState(false)
   const [lockPage, setLockPage] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const formattedDate = updatedAt 
     ? formatRelativeDate(new Date(updatedAt))
@@ -43,7 +53,7 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node) && !isMobile) {
         onClose();
       }
     }
@@ -54,90 +64,131 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, isMobile]);
 
-  if (!isOpen) return null;
+  if (typeof document === 'undefined') return null;
 
-  return (
-    <div 
-      ref={modalRef}
-      className="fixed right-[20px] top-[50px] z-[100] w-80 rounded-xl border border-[#2f2f2f] bg-[#1f1f1f] shadow-2xl text-base text-[#d4d4d4] overflow-hidden"
-    >
-      {/* Search */}
-      <div className="p-3 border-b border-[#2a2a2a]">
-        <input
-          placeholder="Search actions..."
-          className="w-full rounded-md bg-[#2a2a2a] px-3 py-2 text-base placeholder:text-[#8a8a8a] outline-none focus:ring-1 focus:ring-[#3a3a3a]"
-        />
-      </div>
+  return createPortal(
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Mobile Overlay */}
+          {isMobile && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onClose}
+              className="fixed inset-0 bg-black/60 z-[9998] backdrop-blur-[2px]"
+            />
+          )}
 
-      <div className="max-h-[500px] overflow-y-auto">
+          <motion.div 
+            ref={modalRef}
+            initial={isMobile ? { y: "100%" } : { opacity: 0, scale: 0.95 }}
+            animate={isMobile ? { y: 0 } : { opacity: 1, scale: 1 }}
+            exit={isMobile ? { y: "100%" } : { opacity: 0, scale: 0.95 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            drag={isMobile ? "y" : false}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(_, info) => {
+              if (info.offset.y > 100 || info.velocity.y > 500) {
+                onClose();
+              }
+            }}
+            className={`fixed z-[9999] bg-[#1f1f1f] border-[#2f2f2f] shadow-2xl text-base text-[#d4d4d4] overflow-hidden ${
+              isMobile 
+                ? 'inset-x-0 bottom-0 rounded-t-2xl border-t' 
+                : 'right-[20px] top-[50px] w-80 rounded-xl border'
+            }`}
+          >
+            {/* Mobile Handle */}
+            {isMobile && (
+              <div className="flex justify-center pt-3 pb-1">
+                <div className="w-10 h-1 rounded-full bg-[#3f3f3f]" />
+              </div>
+            )}
 
-        {/* Font Options */}
-        <div className="flex justify-between px-4 py-3 border-b border-[#2a2a2a]">
-          <FontOption label="Default" active />
-          <FontOption label="Serif" />
-          <FontOption label="Mono" />
-        </div>
+            {/* Search */}
+            <div className="p-3 border-b border-[#2a2a2a]">
+              <input
+                placeholder="Search actions..."
+                className="w-full rounded-md bg-[#2a2a2a] px-3 py-2 text-base placeholder:text-[#8a8a8a] outline-none focus:ring-1 focus:ring-[#3a3a3a]"
+              />
+            </div>
 
-        <MenuItem icon={<Link size={20} />} label="Copy link" shortcut="Ctrl+Alt+L" />
-        <MenuItem icon={<Clipboard size={20} />} label="Copy page contents" />
-        <MenuItem icon={<Copy size={20} />} label="Duplicate" shortcut="Ctrl+D" />
-        <MenuItem icon={<ArrowRight size={20} />} label="Move to" shortcut="Ctrl+Shift+P" />
-        <MenuItem icon={<Trash2 size={20} />} label="Move to Trash" />
+            <div className={`${isMobile ? 'max-h-[70vh]' : 'max-h-[500px]'} overflow-y-auto`}>
 
-        <Divider />
+              {/* Font Options */}
+              <div className="flex justify-between px-4 py-3 border-b border-[#2a2a2a]">
+                <FontOption label="Default" active />
+                <FontOption label="Serif" />
+                <FontOption label="Mono" />
+              </div>
 
-        <ToggleItem
-          icon={<Text size={20} />}
-          label="Small text"
-          checked={smallText}
-          onChange={() => setSmallText(!smallText)}
-        />
+              <MenuItem icon={<Link size={20} />} label="Copy link" shortcut={!isMobile ? "Ctrl+Alt+L" : undefined} />
+              <MenuItem icon={<Clipboard size={20} />} label="Copy page contents" />
+              <MenuItem icon={<Copy size={20} />} label="Duplicate" shortcut={!isMobile ? "Ctrl+D" : undefined} />
+              <MenuItem icon={<ArrowRight size={20} />} label="Move to" shortcut={!isMobile ? "Ctrl+Shift+P" : undefined} />
+              <MenuItem icon={<Trash2 size={20} />} label="Move to Trash" />
 
-        <ToggleItem
-          icon={<Maximize2 size={20} />}
-          label="Full width"
-          checked={fullWidth}
-          onChange={() => setFullWidth(!fullWidth)}
-        />
+              <Divider />
 
-        <MenuItem icon={<SlidersHorizontal size={20} />} label="Customize page" />
+              <ToggleItem
+                icon={<Text size={20} />}
+                label="Small text"
+                checked={smallText}
+                onChange={() => setSmallText(!smallText)}
+              />
 
-        <ToggleItem
-          icon={<Lock size={20} />}
-          label="Lock page"
-          checked={lockPage}
-          onChange={() => setLockPage(!lockPage)}
-        />
+              <ToggleItem
+                icon={<Maximize2 size={20} />}
+                label="Full width"
+                checked={fullWidth}
+                onChange={() => setFullWidth(!fullWidth)}
+              />
 
-        <MenuItem icon={<Pencil size={20} />} label="Suggest edits" />
-        <MenuItem icon={<Languages size={20} />} label="Translate" hasArrow />
-        <MenuItem icon={<Undo2 size={20} />} label="Undo" shortcut="Ctrl+Z" />
+              <MenuItem icon={<SlidersHorizontal size={20} />} label="Customize page" />
 
-        <Divider />
+              <ToggleItem
+                icon={<Lock size={20} />}
+                label="Lock page"
+                checked={lockPage}
+                onChange={() => setLockPage(!lockPage)}
+              />
 
-        <MenuItem icon={<Download size={20} />} label="Import" />
-        <MenuItem icon={<Upload size={20} />} label="Export" />
-        <MenuItem icon={<Repeat size={20} />} label="Turn into wiki" />
+              <MenuItem icon={<Pencil size={20} />} label="Suggest edits" />
+              <MenuItem icon={<Languages size={20} />} label="Translate" hasArrow />
+              <MenuItem icon={<Undo2 size={20} />} label="Undo" shortcut={!isMobile ? "Ctrl+Z" : undefined} />
 
-        <Divider />
+              <Divider />
 
-        <MenuItem icon={<Clock size={20} />} label="Updates & analytics" />
-        <MenuItem icon={<Clock size={20} />} label="Version history" />
-        <MenuItem icon={<Bell size={20} />} label="Notify me" shortcut="Mentions" hasArrow />
-        <MenuItem icon={<GitBranch size={20} />} label="Connections" shortcut="None" hasArrow />
+              <MenuItem icon={<Download size={20} />} label="Import" />
+              <MenuItem icon={<Upload size={20} />} label="Export" />
+              <MenuItem icon={<Repeat size={20} />} label="Turn into wiki" />
 
-        <div className="px-4 py-3 text-xs text-[#7a7a7a] border-t border-[#2a2a2a] space-y-1">
-          <p>Contagem de palavras: {wordCount}</p>
-          <div className="mt-1">
-            Última edição por {userName || 'Usuário'} <br />
-            {formattedDate}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+              <Divider />
+
+              <MenuItem icon={<Clock size={20} />} label="Updates & analytics" />
+              <MenuItem icon={<Clock size={20} />} label="Version history" />
+              <MenuItem icon={<Bell size={20} />} label="Notify me" shortcut={!isMobile ? "Mentions" : undefined} hasArrow />
+              <MenuItem icon={<GitBranch size={20} />} label="Connections" shortcut={!isMobile ? "None" : undefined} hasArrow />
+
+              <div className="px-4 py-3 text-xs text-[#7a7a7a] border-t border-[#2a2a2a] space-y-1 pb-8">
+                <p>Contagem de palavras: {wordCount}</p>
+                <div className="mt-1">
+                  Última edição por {userName || 'Usuário'} <br />
+                  {formattedDate}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>,
+    document.body
+  );
 }
 
 /* ---------------- Components ---------------- */
@@ -222,3 +273,4 @@ function FontOption({ label, active }: { label: string; active?: boolean }) {
     </div>
   )
 }
+
