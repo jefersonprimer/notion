@@ -35,7 +35,7 @@ import MoreOptionsModal from  './MoreOptionsModal';
 export default function Sidebar({ isFloating = false }: { isFloating?: boolean }) {
   const { session } = useAuth();
   const { setIsSidebarOpen } = useLayout();
-  const { favoriteNotes } = useFavorite();
+  const { favoriteNotes, isLoading: isLoadingFavorites } = useFavorite();
   const router = useRouter();
   const pathname = usePathname();
   const [rootNotes, setRootNotes] = useState<Note[]>([]);
@@ -241,24 +241,32 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto">
         {/* Favorites Section */}
-        {favoriteNotes.length > 0 && (
+        {(isLoadingFavorites || favoriteNotes.length > 0) && (
           <div className="mt-4 px-2">
             <div className="px-2 py-1 text-xs font-medium text-[#9b9b9b]">
               Favoritos
             </div>
             {expandedSections.favoritos && (
               <div className="py-1">
-                {favoriteNotes.map(note => (
-                  <SidebarItem
-                    key={`fav-${note.id}`}
-                    note={note}
-                    session={session}
-                    onAddChild={handleAddChild}
-                    onDelete={handleDeleteRootNote} 
-                    currentPathname={pathname}
-                    isFloating={isFloating}
-                  />
-                ))}
+                {isLoadingFavorites ? (
+                  <div className="flex flex-col gap-0.5">
+                    {[...Array(3)].map((_, i) => (
+                      <SidebarItemSkeleton key={`fav-skeleton-${i}`} />
+                    ))}
+                  </div>
+                ) : (
+                  favoriteNotes.map(note => (
+                    <SidebarItem
+                      key={`fav-${note.id}`}
+                      note={note}
+                      session={session}
+                      onAddChild={handleAddChild}
+                      onDelete={handleDeleteRootNote} 
+                      currentPathname={pathname}
+                      isFloating={isFloating}
+                    />
+                  ))
+                )}
               </div>
             )}
           </div>
