@@ -23,6 +23,8 @@ interface SortableBlockProps {
   listNumber?: number; // New prop for numbered lists
   isSelected?: boolean;
   onSelect?: (id: string, multi: boolean) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 const PREFIXES: Record<string, string> = {
@@ -40,7 +42,7 @@ const PREFIXES: Record<string, string> = {
   code: '``` ',
 };
 
-export function SortableBlock({ id, type, content, childTitles = {}, onChange, onKeyDown, inputRef, onPasteMultiLine, listNumber, isSelected, onSelect }: SortableBlockProps) {
+export function SortableBlock({ id, type, content, childTitles = {}, onChange, onKeyDown, inputRef, onPasteMultiLine, listNumber, isSelected, onSelect, onFocus, onBlur }: SortableBlockProps) {
   const {
     attributes,
     listeners,
@@ -107,9 +109,13 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     onChange(id, val);
   };
 
-  const handleFocus = () => setIsInputFocused(true);
+  const handleFocus = () => {
+    setIsInputFocused(true);
+    if (onFocus) onFocus();
+  };
   const handleBlur = () => {
     setIsInputFocused(false);
+    if (onBlur) onBlur();
     // When blurring, ensure content is clean (e.g., no extra newlines from contentEditable)
     if (localInputRef.current && type !== 'image' && type !== 'code') {
         onChange(id, localInputRef.current.innerText.trim());

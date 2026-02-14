@@ -2,9 +2,10 @@
 
 import React, { useEffect, useState, useRef } from 'react'
 import {
-  MessageSquare,
+  CircleQuestionMark,
   Sparkles,
-  MessageCircle,
+  MessageSquareText,
+  SmilePlus,
   Edit3,
   Bold,
   Italic,
@@ -15,6 +16,7 @@ import {
   Link2,
   Palette,
   MoreHorizontal,
+  ChevronDown,
 } from 'lucide-react'
 
 type Position = {
@@ -23,12 +25,14 @@ type Position = {
 }
 
 const TOOLBAR_ITEMS = [
-  { id: 'explain', icon: <MessageSquare size={16} />, label: 'Explicar' },
+  { id: 'explain', icon: <CircleQuestionMark size={16} />, label: 'Explicar' },
   { id: 'ai', icon: <Sparkles size={16} />, label: 'Pedir à IA' },
   { type: 'divider' },
-  { id: 'comment', icon: <MessageCircle size={16} />, label: 'Comentário' },
+  { id: 'comment', icon: <MessageSquareText size={16} />, label: 'Comentário' },
+  { id: 'reaction', icon: <SmilePlus size={16} /> },
   { id: 'edit', icon: <Edit3 size={16} /> },
   { type: 'divider' },
+  { id: 'text', icon: <ChevronDown size={16} />, label: 'Text' },
   { id: 'bold', icon: <Bold size={16} /> },
   { id: 'italic', icon: <Italic size={16} /> },
   { id: 'underline', icon: <Underline size={16} /> },
@@ -38,6 +42,7 @@ const TOOLBAR_ITEMS = [
   { id: 'sigma', icon: <Sigma size={16} /> },
   { id: 'link', icon: <Link2 size={16} /> },
   { id: 'palette', icon: <Palette size={16} /> },
+  { type: 'divider' },
   { id: 'more', icon: <MoreHorizontal size={16} /> },
 ]
 
@@ -115,7 +120,7 @@ export default function FloatingToolbar() {
         left: position.left,
         transform: 'translateX(-50%)',
       }}
-      className="absolute z-50 flex items-center gap-1 rounded-xl border border-[#2f2f2f] bg-[#1f1f1f] px-2 py-1.5 shadow-2xl text-sm text-[#d4d4d4] outline-none"
+      className="absolute z-50 flex items-center rounded-xl border border-[#2f2f2f] bg-[#1f1f1f] px-3 py-2 shadow-2xl text-sm text-[#d4d4d4] outline-none whitespace-nowrap"
     >
       {TOOLBAR_ITEMS.map((item, index) => {
         if (item.type === 'divider') {
@@ -130,6 +135,7 @@ export default function FloatingToolbar() {
             icon={item.icon}
             label={item.label}
             isSelected={isSelected}
+            iconPosition={item.id === 'text' ? 'right' : 'left'}
             onClick={() => {
               console.log('Clicked:', item.id)
             }}
@@ -152,27 +158,30 @@ function ToolbarButton({
   isSelected,
   onClick,
   onMouseEnter,
+  iconPosition = 'left',
 }: {
   icon: React.ReactNode
   label?: string
   isSelected?: boolean
   onClick?: () => void
   onMouseEnter?: () => void
+  iconPosition?: 'left' | 'right'
 }) {
   return (
     <button
       onClick={onClick}
       onMouseEnter={onMouseEnter}
-      className={`flex items-center gap-2 rounded-md px-2 py-1 transition-colors ${
+      className={`flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors whitespace-nowrap ${
         isSelected ? 'bg-[#2a2a2a] text-white' : 'hover:bg-[#2a2a2a]'
       }`}
     >
-      {icon}
-      {label && <span className="text-sm">{label}</span>}
+      {iconPosition === 'left' && icon}
+      {label && <span className="text-sm whitespace-nowrap">{label}</span>}
+      {iconPosition === 'right' && icon}
     </button>
   )
 }
 
 function Divider() {
-  return <div className="mx-1 h-5 w-px bg-[#2a2a2a]" />
+  return <div className="mx-2 h-5 w-px bg-[#2a2a2a]" />
 }

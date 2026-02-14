@@ -30,6 +30,7 @@ import { SortableBlock } from '../components/SortableBlock';
 import PageOptionsModal from '../components/PageOptionsModal';
 import ShareModal from '../components/ShareModal';
 import FloatingToolbar from '../components/FloatingToolbar';
+import FloatingMobileToolbar from '../components/FloatingMobileToolbar';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -67,12 +68,53 @@ export default function NotePage() {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [selectionBox, setSelectionBox] = useState<{ x1: number, y1: number, x2: number, y2: number } | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [focusedBlockId, setFocusedBlockId] = useState<string | null>(null);
+  const [toolbarPosition, setToolbarPosition] = useState<{ top: number, left: number } | undefined>(undefined);
+  const [isToolbarVisible, setIsToolbarVisible] = useState(false);
   
   const titleDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const blocksDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const inputRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const handleBlockFocus = (id: string) => {
+    setFocusedBlockId(id);
+    if (window.innerWidth < 768) {
+      setIsToolbarVisible(true);
+      const el = id === 'title' ? titleInputRef.current : inputRefs.current.get(id);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        setToolbarPosition({
+          top: rect.bottom + 10,
+          left: rect.left
+        });
+      }
+    }
+  };
+
+  const handleBlockBlur = () => {
+    setTimeout(() => {
+      const activeEl = document.activeElement;
+      const isInput = activeEl?.getAttribute('contenteditable') === 'true' || 
+                     activeEl?.tagName === 'INPUT' || 
+                     activeEl?.tagName === 'TEXTAREA';
+      const isToolbarButton = activeEl?.closest('.floating-mobile-toolbar');
+      
+      if (!isInput && !isToolbarButton) {
+        setIsToolbarVisible(false);
+        setFocusedBlockId(null);
+      }
+    }, 150);
+  };
 
   // Helper to update blocks with history
   const updateBlocks = (newBlocks: typeof blocks | ((prev: typeof blocks) => typeof blocks), saveToHistory = true) => {
@@ -829,7 +871,7 @@ export default function NotePage() {
                     {title.trim() || 'Sem título'}
                   </button>
 
-                  <div className="relative group/particular">
+                  <div className="hidden md:flex relative group/particular">
                     <button 
                         className="flex items-center justify-center text-sm font-normal text-[#7d7a75] hover:text-[#f0efed] gap-2 hover:bg-[#202020] px-2 py-1 rounded-md"
                     >
@@ -931,6 +973,8 @@ export default function NotePage() {
                         onChange={handleTitleChange}
                         onKeyDown={handleTitleKeyDown}
                         onPaste={handleTitlePaste} // Add onPaste handler here
+                        onFocus={() => handleBlockFocus('title')}
+                        onBlur={handleBlockBlur}
                         placeholder="Sem título"
                         className="w-full text-4xl font-bold text-gray-900 dark:text-gray-100 mb-6 bg-transparent border-none outline-none placeholder:text-gray-300 dark:placeholder:text-gray-600"
                     />
@@ -976,6 +1020,8 @@ export default function NotePage() {
                                         }}
                                         onPasteMultiLine={handlePasteMultiLine}
                                         listNumber={listNumber}
+                                        onFocus={() => handleBlockFocus(block.id)}
+                                        onBlur={handleBlockBlur}
                                     />
                                 );
                             })}
@@ -999,7 +1045,13 @@ export default function NotePage() {
             </div>
         </div>
       </main>
-      <FloatingToolbar />
+      {!isMobile && <FloatingToolbar />}
+      {isMobile && (
+        <FloatingMobileToolbar 
+          isVisible={isToolbarVisible} 
+          position={toolbarPosition}
+        />
+      )}
       {selectionBox && (
           <div 
               className="fixed border border-[#2383e2] bg-[#2383e233] pointer-events-none z-100"
