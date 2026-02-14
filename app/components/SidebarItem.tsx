@@ -121,14 +121,14 @@ export default function SidebarItem({
     if (!isOpen) setIsOpen(true);
   };
 
-  const handleToggleFavorite = (e: React.MouseEvent) => {
+  const handleToggleFavorite = (e: React.MouseEvent | React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
     toggleFavorite(note);
     setShowOptions(false);
   };
 
-  const handleCopyLink = (e: React.MouseEvent) => {
+  const handleCopyLink = (e: React.MouseEvent | React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
     const url = `${window.location.origin}${noteHref}`;
@@ -137,7 +137,7 @@ export default function SidebarItem({
     setShowToast(true);
   };
 
-  const handleDuplicate = async (e: React.MouseEvent) => {
+  const handleDuplicate = async (e: React.MouseEvent | React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!session) return;
@@ -153,7 +153,7 @@ export default function SidebarItem({
     setShowOptions(false);
   };
 
-  const handleDeleteAction = async (e: React.MouseEvent) => {
+  const handleDeleteAction = async (e: React.MouseEvent | React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!session) return;
@@ -289,7 +289,7 @@ export default function SidebarItem({
                       {/* Adicionar/Remover dos favoritos */}
                       <button 
                         className="w-full flex items-center justify-between px-3 py-2 text-[#f0efed] hover:text-white hover:bg-[#ffffff0e] transition-colors"
-                        onClick={handleToggleFavorite}
+                        onPointerUp={handleToggleFavorite}
                       >
                         <div className="flex items-center gap-2 ">
                           {isFavorite ? <StarOff size={20} /> : <Star size={20} />}
@@ -300,7 +300,7 @@ export default function SidebarItem({
                       {/* Copiar link */}
                       <button 
                         className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors"
-                        onClick={handleCopyLink}
+                        onPointerUp={handleCopyLink}
                       >
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                           <LinkIcon size={20}/>
@@ -311,7 +311,7 @@ export default function SidebarItem({
                       {/* Duplicar */}
                       <button 
                         className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors"
-                        onClick={handleDuplicate}
+                        onPointerUp={handleDuplicate}
                       >
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                           <Copy size={20}/>
@@ -344,7 +344,7 @@ export default function SidebarItem({
                       {/* Mover para lixeira */}
                       <button 
                         className="w-full flex items-center justify-between px-3 py-2 text-[#f0efed] hover:text-red-400 hover:bg-[#3a3a3a] transition-colors"
-                        onClick={handleDeleteAction}
+                        onPointerUp={handleDeleteAction}
                       >
                         <div className="flex items-center gap-2">
                           <Trash2 size={20} />
