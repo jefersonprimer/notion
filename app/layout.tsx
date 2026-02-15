@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { LayoutProvider } from "@/context/LayoutContext";
 import { FavoriteProvider } from "@/context/FavoriteContext";
+import { NoteProvider } from "@/context/NoteContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,11 +32,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <FavoriteProvider>
-            <LayoutProvider>
-              {children}
-            </LayoutProvider>
-          </FavoriteProvider>
+          <NoteProvider>
+            <FavoriteProvider>
+              <LayoutProvider>
+                {children}
+              </LayoutProvider>
+            </FavoriteProvider>
+          </NoteProvider>
         </AuthProvider>
       </body>
     </html>

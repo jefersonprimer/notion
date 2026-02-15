@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import api from '@/lib/api'
 import { Note } from '@/types/note'
 import { createNoteSlug } from '@/lib/utils'
+import { useNote } from '@/context/NoteContext';
 
 type Props = {
   open: boolean
@@ -13,6 +14,7 @@ type Props = {
 
 export default function SearchModal({ open, onClose }: Props) {
   const router = useRouter()
+  const { updatedTitles } = useNote()
   const [query, setQuery] = useState('')
   const [notes, setNotes] = useState<Note[]>([])
   const [loading, setLoading] = useState(false)
@@ -66,7 +68,8 @@ export default function SearchModal({ open, onClose }: Props) {
 
   const handleSelect = (note: Note) => {
     onClose()
-    const slug = createNoteSlug(note.title, note.id)
+    const displayTitle = updatedTitles[note.id] || note.title || 'Nova página'
+    const slug = createNoteSlug(displayTitle, note.id)
     router.push(`/${slug}`)
   }
 
@@ -175,7 +178,7 @@ export default function SearchModal({ open, onClose }: Props) {
                         {groupNotes.map(note => (
                             <Item 
                                 key={note.id} 
-                                title={note.title || 'Sem título'} 
+                                title={(updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || 'Nova página'} 
                                 note={note}
                                 onClick={() => handleSelect(note)}
                             />
@@ -236,6 +239,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 function Item({ title, note, onClick }: { title: string; note: Note; onClick: () => void }) {
+  const { updatedHasContent } = useNote()
+  const hasContent = updatedHasContent[note.id] !== undefined 
+    ? updatedHasContent[note.id] 
+    : (note.title && note.title !== 'Nova página' && note.title.trim() !== '' && note.description && note.description.trim() !== '')
+
   return (
     <div 
         onClick={onClick}
@@ -243,7 +251,7 @@ function Item({ title, note, onClick }: { title: string; note: Note; onClick: ()
     >
       <div className="flex items-center gap-3">
         <span className="text-neutral-400">
-          {note.description && note.description.trim() !== '' ? (
+          {hasContent ? (
             <FileText size={16} />
           ) : (
             <File size={16} />

@@ -1,8 +1,11 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { Trash2, RotateCcw, X, FileText, File } from 'lucide-react';
+import Link from 'next/link';
 import api from '@/lib/api';
 import { Note } from '@/types/note';
+import { useNote } from '@/context/NoteContext';
+import { createNoteSlug } from '@/lib/utils';
 
 type Props = {
   open: boolean;
@@ -10,6 +13,7 @@ type Props = {
 };
 
 export default function TrashModal({ open, onClose }: Props) {
+  const { updatedTitles, updatedHasContent } = useNote();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -119,31 +123,39 @@ export default function TrashModal({ open, onClose }: Props) {
             notes.map(note => (
               <div 
                 key={note.id} 
-                className="group flex items-center justify-between p-2 rounded hover:bg-[#2f2f2f] transition-colors"
+                className="group flex items-center justify-between p-2 rounded-md hover:bg-[#2f2f2f] text-[#f0efed] transition-colors"
               >
-                <div className="flex items-center gap-2 overflow-hidden">
-                  {note.description && note.description.trim() !== '' ? (
-                    <FileText size={14} className="shrink-0" />
+                <Link 
+                  href={`/${createNoteSlug((updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || "Nova página", note.id)}`}
+                  onClick={onClose}
+                  className="flex items-center gap-2 overflow-hidden flex-1"
+                >
+                  { (updatedHasContent[note.id] !== undefined 
+                      ? updatedHasContent[note.id] 
+                      : (note.title && note.title !== 'Nova página' && note.title.trim() !== '' && note.description && note.description.trim() !== '')) ? (
+                    <FileText size={18} className="shrink-0" />
                   ) : (
-                    <File size={14} className="shrink-0" />
+                    <File size={18} className="shrink-0" />
                   )}
-                  <span className="text-sm truncate text-white">{note.title || "Sem título"}</span>
-                </div>
+                  <span className="text-base truncate">
+                    {(updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || "Nova página"}
+                  </span>
+                </Link>
                 
-                <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-1 shrink-0">
                   <button 
                     onClick={() => handleRestore(note.id)}
-                    className="p-1 hover:bg-[#3f3f3f] rounded text-[#9b9b9b] hover:text-white"
+                    className="p-1 hover:bg-[#3f3f3f] rounded text-[#ada9a3] hover:text-white"
                     title="Restaurar"
                   >
-                    <RotateCcw size={14} />
+                    <RotateCcw size={16} />
                   </button>
                   <button 
                     onClick={() => handlePermanentDelete(note.id)}
-                    className="p-1 hover:bg-[#3f3f3f] rounded text-[#ff5f5f] hover:text-[#ff8f8f]"
+                    className="p-1 hover:bg-[#3f3f3f] rounded text-[#ada9a3] hover:text-[#ff8f8f]"
                     title="Excluir permanentemente"
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </div>

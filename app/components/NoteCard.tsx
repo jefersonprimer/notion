@@ -65,7 +65,7 @@ export default function NoteCard({ note }: NoteCardProps) {
         <div className="flex flex-col justify-between flex-1 px-4 pt-6 pb-3">
           {/* Título */}
           <div className="text-sm font-medium text-gray-900 dark:text-[#f0efed] line-clamp-2">
-            {note.title || 'Sem título'}
+            {note.title || 'Nova página'}
           </div>
 
           {/* Meta */}

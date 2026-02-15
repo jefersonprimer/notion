@@ -7,4 +7,6 @@ export interface Note {
   is_favorite: boolean;
   user_id: string;
   parent_id: string | null;
+  is_deleted?: boolean;
+  deleted_at?: string | null;
 }

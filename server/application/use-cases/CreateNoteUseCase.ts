@@ -10,7 +10,7 @@ export class CreateNoteUseCase {
     description?: string | null;
     parentId?: string | null;
   }): Promise<Note> {
-    const title = input.title && input.title.trim() !== "" ? input.title : "Sem título";
+    const title = input.title && input.title.trim() !== "" ? input.title : "Nova página";
 
     const note = await this.noteRepository.create({
       userId: input.userId,

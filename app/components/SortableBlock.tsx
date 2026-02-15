@@ -10,6 +10,7 @@ import UrlPasteModal from './UrlPasteModal';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { isLikelyCode } from '@/lib/utils';
+import { useNote } from '@/context/NoteContext';
 
 interface SortableBlockProps {
   id: string;
@@ -43,6 +44,7 @@ const PREFIXES: Record<string, string> = {
 };
 
 export function SortableBlock({ id, type, content, childTitles = {}, onChange, onKeyDown, inputRef, onPasteMultiLine, listNumber, isSelected, onSelect, onFocus, onBlur }: SortableBlockProps) {
+  const { updatedTitles } = useNote();
   const {
     attributes,
     listeners,
@@ -451,7 +453,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
   if (type === 'page') {
     const [pageId, ...titleParts] = content.split('|');
     const storedTitle = titleParts.join('|');
-    const liveTitle = childTitles[pageId] || storedTitle || "Sem título";
+    const liveTitle = updatedTitles[pageId] || childTitles[pageId] || storedTitle || "Nova página";
 
     return (
       <div

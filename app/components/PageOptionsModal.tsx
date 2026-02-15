@@ -31,9 +31,10 @@ interface PageOptionsModalProps {
   userName?: string;
   updatedAt?: string;
   wordCount: number;
+  onDelete?: () => void;
 }
 
-export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt, wordCount }: PageOptionsModalProps) {
+export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt, wordCount, onDelete }: PageOptionsModalProps) {
   const [smallText, setSmallText] = useState(false)
   const [fullWidth, setFullWidth] = useState(false)
   const [lockPage, setLockPage] = useState(false)
@@ -131,7 +132,7 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
               <MenuItem icon={<Clipboard size={20} />} label="Copy page contents" />
               <MenuItem icon={<Copy size={20} />} label="Duplicate" shortcut={!isMobile ? "Ctrl+D" : undefined} />
               <MenuItem icon={<ArrowRight size={20} />} label="Move to" shortcut={!isMobile ? "Ctrl+Shift+P" : undefined} />
-              <MenuItem icon={<Trash2 size={20} />} label="Move to Trash" />
+              <MenuItem icon={<Trash2 size={20} />} label="Move to Trash" onClick={onDelete} />
 
               <Divider />
 
@@ -198,14 +199,19 @@ function MenuItem({
   label,
   shortcut,
   hasArrow,
+  onClick,
 }: {
   icon: React.ReactNode
   label: string
   shortcut?: string
   hasArrow?: boolean
+  onClick?: () => void
 }) {
   return (
-    <div className="flex items-center justify-between px-4 py-2 hover:bg-[#2a2a2a] cursor-pointer transition-colors">
+    <div 
+      className="flex items-center justify-between px-4 py-2 hover:bg-[#2a2a2a] cursor-pointer transition-colors"
+      onClick={onClick}
+    >
       <div className="flex items-center gap-3">
         <span className="text-[#bdbdbd] flex items-center justify-center w-5 h-5">{icon}</span>
         <span className="leading-none">{label}</span>

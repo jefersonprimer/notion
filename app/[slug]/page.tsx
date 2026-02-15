@@ -9,6 +9,7 @@ import { Note } from '@/types/note';
 import { useAuth } from '@/context/AuthContext';
 import { useLayout } from '@/context/LayoutContext';
 import { useFavorite } from '@/context/FavoriteContext';
+import { useNote } from '@/context/NoteContext';
 import { extractIdFromSlug, createNoteSlug, isLikelyCode } from '@/lib/utils';
 import 
 { 
@@ -22,7 +23,9 @@ import
   Share, 
   Smile, 
   Image as ImageIcon, 
-  MessageSquareText
+  MessageSquareText,
+  Trash2,
+  RotateCcw
 } from 'lucide-react';
 import {
   DndContext,
@@ -67,7 +70,8 @@ export default function NotePage() {
   const searchParams = useSearchParams();
   const { session } = useAuth();
   const { isSidebarOpen, setIsSidebarOpen } = useLayout();
-  const { favoriteNotes, toggleFavorite } = useFavorite();
+  const { favoriteNotes, toggleFavorite, removeNoteFromFavorites } = useFavorite();
+  const { updatedTitles, updateNoteTitle, updateNoteHasContent } = useNote();
   const [note, setNote] = useState<Note | null>(null);
   const [parentNote, setParentNote] = useState<Note | null>(null);
   const [title, setTitle] = useState('');
@@ -256,7 +260,10 @@ export default function NotePage() {
         const childrenData = childrenResponse.data;
 
         setNote(noteData);
-        setTitle(noteData.title === 'Sem título' ? '' : noteData.title);
+        setTitle(noteData.title === 'Nova página' ? '' : noteData.title);
+        
+        const hasInitialContent = (noteData.title && noteData.title !== 'Nova página' && noteData.title.trim() !== '') && (noteData.description && noteData.description.trim() !== '');
+        updateNoteHasContent(noteData.id, !!hasInitialContent);
 
         // Fetch parent note if exists
         if (noteData.parentId) {
@@ -364,6 +371,12 @@ export default function NotePage() {
     setTitle(newTitle);
 
     if (note) {
+        updateNoteTitle(note.id, newTitle);
+        
+        const currentDescription = blocks.map(b => (PREFIXES[b.type] || '') + b.content).join('\n');
+        const hasContent = (newTitle.trim() !== '' && newTitle !== 'Nova página') && currentDescription.trim() !== '';
+        updateNoteHasContent(note.id, hasContent);
+
         const cleanId = note.id.replace(/-/g, '');
         let newSlug;
         if (!newTitle.trim()) {
@@ -401,6 +414,9 @@ export default function NotePage() {
               const prefix = PREFIXES[b.type] || '';
               return prefix + b.content;
           }).join('\n');
+
+          const hasContent = (title.trim() !== '' && title !== 'Nova página') && description.trim() !== '';
+          updateNoteHasContent(note.id, hasContent);
 
           try {
               await api.put(`/notes/${note.id}`, { description }, {
@@ -495,7 +511,7 @@ export default function NotePage() {
     if (newType === 'page') {
       if (!session || !note) return;
       try {
-        const response = await api.post('/notes', { title: "Sem título", parentId: note.id }, {
+        const response = await api.post('/notes', { title: "Nova página", parentId: note.id }, {
           headers: { Authorization: `Bearer ${session.accessToken}` }
         });
         const newNote = response.data;
@@ -505,7 +521,7 @@ export default function NotePage() {
         const newBlock = { 
             id: generateId(), 
             type: 'page', 
-            content: `${cleanId}|${newNote.title || "Sem título"}` 
+            content: `${cleanId}|${newNote.title || "Nova página"}` 
         };
         
         const updatedBlocks = blocks.map(b => b.id === id ? newBlock : b);
@@ -766,11 +782,40 @@ export default function NotePage() {
 
   const wordCount = calculateWordCount();
 
+  const handleRestore = async () => {
+    if (!note || !session) return;
+    try {
+      await api.patch(`/notes/trash/${note.id}`);
+      setNote(prev => prev ? { ...prev, is_deleted: false, deleted_at: null } : null);
+    } catch (error) {
+      console.error('Failed to restore note:', error);
+    }
+  };
+
+  const handlePermanentDelete = async () => {
+    if (!note || !session) return;
+    try {
+      await api.delete(`/notes/trash/${note.id}`);
+      router.push('/');
+    } catch (error) {
+      console.error('Failed to permanently delete note:', error);
+    }
+  };
+
+  const getMinutesSinceDeletion = () => {
+    if (!note?.deleted_at) return 0;
+    const deletedAt = new Date(note.deleted_at);
+    const now = new Date();
+    const diff = now.getTime() - deletedAt.getTime();
+    const minutes = Math.floor(diff / 60000);
+    return minutes > 0 ? minutes : 0;
+  };
+
   useEffect(() => {
     if (title) {
       document.title = `${title}`;
     } else if (note) {
-      document.title = `Sem título`;
+      document.title = `Nova página`;
     }
   }, [title, note]);
 
@@ -779,6 +824,22 @@ export default function NotePage() {
     toggleFavorite(note);
     // Optimistically update local note state as well so the UI reflects it immediately if it depends on note state
     setNote(prev => prev ? { ...prev, is_favorite: !prev.is_favorite } : null);
+  };
+
+  const handleDeleteNote = async () => {
+    if (!note || !session) return;
+    
+    try {
+      await api.delete(`/notes/${note.id}`, {
+        headers: { Authorization: `Bearer ${session.accessToken}` }
+      });
+      removeNoteFromFavorites(note.id);
+      setIsOptionsModalOpen(false);
+      router.push('/');
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      alert('Erro ao excluir nota');
+    }
   };
 
   // Helper for Sidebar logic in Loading/Error states
@@ -869,10 +930,10 @@ export default function NotePage() {
                   {parentNote && (
                     <>
                       <Link 
-                        href={`/${createNoteSlug(parentNote.title, parentNote.id)}`}
+                        href={`/${createNoteSlug(updatedTitles[parentNote.id] || parentNote.title, parentNote.id)}`}
                         className="text-sm text-[#ada9a3] hover:text-[#f0efed] truncate max-w-37.5 hover:bg-[#fffff315] px-2 py-1 rounded-md transition-colors"
                       >
-                        {parentNote.title || 'Sem título'}
+                        {updatedTitles[parentNote.id] || parentNote.title || 'Nova página'}
                       </Link>
                       <ChevronRight size={14} className="text-[#7d7a75]" />
                     </>
@@ -881,7 +942,7 @@ export default function NotePage() {
                   <button 
                     className="text-base text-[#f0efed] font-normal truncate max-w-60 hover:bg-[#fffff315] px-2 py-1 rounded-md"
                   >
-                    {title.trim() || 'Sem título'}
+                    {title.trim() || 'Nova página'}
                   </button>
 
                   <div className="hidden md:flex relative group/particular">
@@ -954,11 +1015,39 @@ export default function NotePage() {
                   userName={session?.user?.displayName || session?.user?.displayName || session?.user?.email}
                   updatedAt={note?.updated_at || note?.updated_at}
                   wordCount={wordCount}
+                  onDelete={handleDeleteNote}
                 />
               </div>
              </div>
           </div>
         </div>
+
+        {/* Flash Message for Deleted Note */}
+        {note?.is_deleted && (
+          <div className="bg-[#eb5757] text-[#f0efed] hover:text-white px-4 py-2 flex items-center justify-between text-sm">
+            <div className="flex items-center gap-2">
+              <span>
+                {session?.user?.displayName || session?.user?.email} moveu esta página para a lixeira em {getMinutesSinceDeletion()} minutos atrás. Ela será excluída automaticamente em 30 dias.
+              </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={handleRestore}
+                className="flex items-center border border-[#f0efed] hover:border-white px-2 py-1 rounded-md gap-2 font-medium"
+              >
+                <RotateCcw size={16}/>
+                Restaurar página
+              </button>
+              <button 
+                onClick={handlePermanentDelete}
+                className="flex items-center border border-[#f0efed] hover:border-white px-2 py-1 rounded-md gap-2 font-medium"
+              >
+                <Trash2 size={16} />
+                Excluir da lixeira
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Note Content Area */}
         <div className="flex-1 overflow-y-auto">

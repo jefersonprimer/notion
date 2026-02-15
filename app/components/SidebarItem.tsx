@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   File,
   FileText, 
@@ -24,6 +25,7 @@ import api from '@/lib/api';
 import { Note } from '@/types/note';
 import { createNoteSlug, formatRelativeDate } from '@/lib/utils';
 import { useFavorite } from '@/context/FavoriteContext';
+import { useNote } from '@/context/NoteContext';
 import { Session } from '@/context/AuthContext';
 import Toast from './Toast';
 
@@ -58,6 +60,7 @@ export default function SidebarItem({
   currentPathname,
   isFloating = false
 }: SidebarItemProps) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [children, setChildren] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -68,9 +71,15 @@ export default function SidebarItem({
   const menuRef = useRef<HTMLDivElement>(null);
   
   const { favoriteNotes, toggleFavorite, removeNoteFromFavorites } = useFavorite();
+  const { updatedTitles, updatedHasContent } = useNote();
   const isFavorite = favoriteNotes.some(n => n.id === note.id);
 
-  const noteHref = `/${createNoteSlug(note.title || "Sem título", note.id)}`;
+  const displayTitle = (updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || "Nova página";
+  const hasContent = updatedHasContent[note.id] !== undefined 
+    ? updatedHasContent[note.id] 
+    : (note.title && note.title !== 'Nova página' && note.title.trim() !== '' && note.description && note.description.trim() !== '');
+  
+  const noteHref = `/${createNoteSlug(displayTitle, note.id)}`;
   const isActive = currentPathname === noteHref;
 
   // Detect mobile
@@ -167,6 +176,10 @@ export default function SidebarItem({
       removeNoteFromFavorites(note.id);
       onDelete(note.id);
       setShowOptions(false);
+      
+      if (isActive) {
+        router.push('/');
+      }
     } catch (error) {
       console.error('Error deleting note:', error);
       alert('Erro ao excluir nota');
@@ -204,7 +217,7 @@ export default function SidebarItem({
             onClick={handleToggle}
             className="relative flex items-center justify-center w-6 h-6 shrink-0 z-10 cursor-pointer rounded hover:bg-[#3f3f3f]"
           >
-            {note.description && note.description.trim() !== '' ? (
+            {hasContent ? (
               <FileText size={20} className={`transition-opacity duration-200 ${!isFloating ? 'md:group-hover:opacity-0' : ''}`} />
             ) : (
               <File size={20} className={`transition-opacity duration-200 ${!isFloating ? 'md:group-hover:opacity-0' : ''}`} />
@@ -221,7 +234,7 @@ export default function SidebarItem({
         </div>
 
         {/* Title */}
-        <span className="truncate text-base flex-1 pr-14">{note.title || "Nova página"}</span>
+        <span className="truncate text-base flex-1 pr-14">{displayTitle}</span>
 
         {/* Actions (Always visible on mobile, hover on desktop) */}
         <div className="flex md:hidden md:group-hover:flex items-center absolute right-2 gap-1">
