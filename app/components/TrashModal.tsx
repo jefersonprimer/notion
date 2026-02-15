@@ -55,7 +55,6 @@ export default function TrashModal({ open, onClose }: Props) {
   };
 
   const handlePermanentDelete = async (id: string) => {
-    if (!confirm("Tem certeza? Essa ação não pode ser desfeita.")) return;
     try {
       await api.delete(`/notes/trash/${id}`);
       setNotes(prev => prev.filter(n => n.id !== id));
@@ -65,7 +64,6 @@ export default function TrashModal({ open, onClose }: Props) {
   };
 
   const handleEmptyTrash = async () => {
-    if (!confirm("Tem certeza que deseja esvaziar a lixeira? Essa ação não pode ser desfeita.")) return;
     try {
       await api.delete('/notes/trash');
       setNotes([]);
