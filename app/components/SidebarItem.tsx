@@ -221,7 +221,7 @@ export default function SidebarItem({
         </div>
 
         {/* Title */}
-        <span className="truncate text-base flex-1 pr-14">{note.title || "Sem título"}</span>
+        <span className="truncate text-base flex-1 pr-14">{note.title || "Nova página"}</span>
 
         {/* Actions (Always visible on mobile, hover on desktop) */}
         <div className="flex md:hidden md:group-hover:flex items-center absolute right-2 gap-1">

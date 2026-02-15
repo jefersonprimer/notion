@@ -10,7 +10,20 @@ import { useAuth } from '@/context/AuthContext';
 import { useLayout } from '@/context/LayoutContext';
 import { useFavorite } from '@/context/FavoriteContext';
 import { extractIdFromSlug, createNoteSlug, isLikelyCode } from '@/lib/utils';
-import { MoreHorizontal, Menu, ChevronsRight, LockKeyhole, ChevronDown, Star, ChevronRight, Share, Smile, Image as ImageIcon, MessageSquare } from 'lucide-react';
+import 
+{ 
+  MoreHorizontal,
+  Menu,
+  ChevronsRight,
+  LockKeyhole, 
+  ChevronDown, 
+  Star, 
+  ChevronRight, 
+  Share, 
+  Smile, 
+  Image as ImageIcon, 
+  MessageSquareText
+} from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -949,7 +962,7 @@ export default function NotePage() {
 
         {/* Note Content Area */}
         <div className="flex-1 overflow-y-auto">
-            <div ref={containerRef} className="max-w-4xl mx-auto px-12 py-12">
+            <div ref={containerRef} className="max-w-4xl mx-auto px-6 md:px-12 py-6 md:py-12">
                 {/* Title Input */}
                 <div className="group relative">
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity mb-2 h-10">
@@ -962,7 +975,7 @@ export default function NotePage() {
                             Adicionar capa
                         </button>
                         <button className="flex items-center gap-2 p-2 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-base leading-none font-normal">
-                            <MessageSquare size={16} />
+                            <MessageSquareText size={16} />
                             Adicionar comentário
                         </button>
                     </div>
@@ -975,8 +988,8 @@ export default function NotePage() {
                         onPaste={handleTitlePaste} // Add onPaste handler here
                         onFocus={() => handleBlockFocus('title')}
                         onBlur={handleBlockBlur}
-                        placeholder="Sem título"
-                        className="w-full text-4xl font-bold text-gray-900 dark:text-gray-100 mb-6 bg-transparent border-none outline-none placeholder:text-gray-300 dark:placeholder:text-gray-600"
+                        placeholder="Nova página"
+                        className="w-full text-4xl font-bold text-gray-900 dark:text-gray-100 mb-6 bg-transparent border-none outline-none placeholder:text-gray-300 dark:placeholder:text-[#373737]"
                     />
                 </div>
                 
@@ -1054,7 +1067,7 @@ export default function NotePage() {
       )}
       {selectionBox && (
           <div 
-              className="fixed border border-[#2383e2] bg-[#2383e233] pointer-events-none z-100"
+              className="fixed border border-transparent bg-[#2383e233] pointer-events-none z-100"
               style={{
                   left: Math.min(selectionBox.x1, selectionBox.x2),
                   top: Math.min(selectionBox.y1, selectionBox.y2),

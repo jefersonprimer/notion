@@ -4,7 +4,7 @@ import {
   Plus,
   ChevronDown,
   AtSign,
-  MessageSquare,
+  MessageSquareText,
   ImageIcon,
   Trash,
   ArrowLeftToLine,
@@ -24,30 +24,30 @@ export default function FloatingMobileToolbar({
 }) {
   if (!isVisible) return null;
 
-  const style = position 
-    ? { top: position.top, left: '50%', transform: 'translateX(-50%)' } 
+  const style: React.CSSProperties = position 
+    ? { top: position.top } 
     : {};
 
   return (
     <div 
-      className={`fixed ${position ? '' : 'bottom-20'} left-1/2 -translate-x-1/2 z-50 w-[95vw] max-w-[720px] transition-all duration-200 floating-mobile-toolbar`}
+      className={`fixed ${position ? '' : 'bottom-20'} inset-x-0 mx-auto z-50 w-[95vw] max-w-180 transition-all duration-200 floating-mobile-toolbar`}
       style={style}
     >
       <div className="bg-[#2f2f2f] border border-[#444] rounded-xl shadow-xl flex overflow-hidden">
 
         {/* Scroll container */}
-        <div className="flex overflow-x-auto overflow-y-hidden scrollbar-none">
+        <div className="flex overflow-x-auto overflow-y-hidden mobile-toolbar-scrollbar">
 
           {/* + button */}
           <ToolbarButton>
             <Plus size={20} />
-            <ChevronDown size={16} className="text-neutral-400" />
+            <ChevronDown size={16}/>
           </ToolbarButton>
 
           {/* Transformar em */}
           <ToolbarButton text>
             Transformar em
-            <ChevronDown size={16} className="text-neutral-400" />
+            <ChevronDown size={16}/>
           </ToolbarButton>
 
           {/* @ */}
@@ -57,7 +57,7 @@ export default function FloatingMobileToolbar({
 
           {/* Comment */}
           <ToolbarButton>
-            <MessageSquare size={20} />
+            <MessageSquareText size={20} />
           </ToolbarButton>
 
           {/* Image */}
@@ -103,13 +103,13 @@ export default function FloatingMobileToolbar({
           {/* Cor */}
           <ToolbarButton text>
             Cor
-            <ChevronDown size={16} className="text-neutral-400" />
+            <ChevronDown size={16}/>
           </ToolbarButton>
 
           {/* Mais */}
           <ToolbarButton text>
             Mais
-            <ChevronDown size={16} className="text-neutral-400" />
+            <ChevronDown size={16}/>
           </ToolbarButton>
 
         </div>
@@ -132,13 +132,13 @@ function ToolbarButton({
       className={`
       flex items-center justify-center
       gap-1
-      h-[42px]
-      min-w-[44px]
+      h-10.5
+      min-w-11
       px-3
       border-r border-[#444]
-      text-neutral-200
+      text-[#f0efed]
       whitespace-nowrap
-      flex-shrink-0
+      shrink-0
       transition-colors
       hover:bg-[#3a3a3a]
       active:bg-[#444]
@@ -163,7 +163,7 @@ function IconButton({
     <button
       disabled={disabled}
       className={`
-      w-[34px] h-[42px]
+      w-8.5 h-10.5
       flex items-center justify-center
       transition-colors
       ${disabled ? "opacity-40 cursor-default" : "hover:bg-[#3a3a3a] active:bg-[#444]"}
@@ -178,7 +178,7 @@ function IconButton({
 
 function ToolbarGroup({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex border-r border-[#444] px-1 flex-shrink-0">
+    <div className="flex border-r border-[#444] px-1 shrink-0">
       {children}
     </div>
   );
