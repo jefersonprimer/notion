@@ -1024,8 +1024,8 @@ export default function NotePage() {
 
         {/* Flash Message for Deleted Note */}
         {note?.is_deleted && (
-          <div className="bg-[#eb5757] text-[#f0efed] hover:text-white px-4 py-2 flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2">
+          <div className="bg-[#eb5757] text-[#f0efed] hover:text-white px-4 py-2 flex items-center justify-center md:justify-between text-sm">
+            <div className="hidden md:flex items-center gap-2">
               <span>
                 {session?.user?.displayName || session?.user?.email} moveu esta página para a lixeira em {getMinutesSinceDeletion()} minutos atrás. Ela será excluída automaticamente em 30 dias.
               </span>
