@@ -12,6 +12,7 @@ interface UserModalProps {
 export default function UserModal({ isOpen, onClose, position, onOpenSettings }: UserModalProps) {
   const { session, signOut } = useAuth();
   const modalRef = useRef<HTMLDivElement>(null);
+  const userInitial = 'C';
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -38,8 +39,8 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
     >
       <div className='border-b border-[#3f3f3f] bg-[#252525]'>
         <div className="flex items-center p-3 gap-2 ">
-          <div className="w-9 h-9 bg-[#2f2f2f] rounded flex items-center justify-center text-lg font-medium text-white shrink-0">
-            P
+          <div className="w-9 h-9 bg-[#2f2f2f] rounded flex items-center justify-center text-lg font-medium text-white shrink-0 leading-none">
+            {userInitial}
           </div>
 
           <div className='flex flex-col min-w-0'>
@@ -79,8 +80,8 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
         </div>
 
         <div className='flex items-center px-2 mx-1 py-2 hover:bg-[#3f3f3f] rounded-md transition-colors'>
-          <div className="w-6 h-6 bg-[#2f2f2f] rounded flex items-center justify-center text-base font-medium text-neutral-400 shrink-0">
-            P
+          <div className="w-6 h-6 bg-[#2f2f2f] rounded flex items-center justify-center text-base font-medium text-neutral-400 shrink-0 leading-none">
+            {userInitial}
           </div>
 
           <div className='flex items-center justify-between flex-1 px-2 text-white min-w-0'>

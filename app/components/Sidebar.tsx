@@ -38,6 +38,8 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
   const { favoriteNotes, isLoading: isLoadingFavorites } = useFavorite();
   const router = useRouter();
   const pathname = usePathname();
+  const userName = session?.user.displayName || 'Usuário';
+  const userInitial = userName[0]?.toUpperCase() || 'U';
   const [rootNotes, setRootNotes] = useState<Note[]>([]);
   const [loadingRootNotes, setLoadingRootNotes] = useState(true);
   const [expandedSections, setExpandedSections] = useState({
@@ -162,7 +164,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           className="flex items-center p-2 gap-2 transition-all duration-200 group-hover:opacity-100 flex-1 min-w-0"
         >
           <div className="w-5.5 h-6 bg-[#2f2f2f] rounded flex items-center justify-center text-sm font-medium text-white shrink-0">
-            <span className="leading-none select-none">C</span>
+            <span className="leading-none select-none">{userInitial}</span>
           </div>
           <div className="flex items-center gap-1 min-w-0">
             <span className="text-white text-sm truncate font-medium leading-none">

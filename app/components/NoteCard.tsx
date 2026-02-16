@@ -75,7 +75,7 @@ export default function NoteCard({ note }: NoteCardProps) {
                 w-4 h-4 rounded-full
                 border border-gray-300 dark:border-[#7d7a75]
                 flex items-center justify-center
-                text-xs text-[#7d7a75] font-medium
+                text-[10px] text-[#7d7a75] font-medium leading-none
               "
             >
               {userInitial}

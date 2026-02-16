@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  Search,
   Link,
   Copy,
   Clipboard,
@@ -98,10 +99,10 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
                 onClose();
               }
             }}
-            className={`fixed z-[9999] bg-[#1f1f1f] border-[#2f2f2f] shadow-2xl text-base text-[#d4d4d4] overflow-hidden ${
+            className={`fixed z-[9999] bg-[#252525] border-[#2f2f2f] shadow-2xl text-base text-[#d4d4d4] overflow-hidden ${
               isMobile 
                 ? 'inset-x-0 bottom-0 rounded-t-2xl border-t' 
-                : 'right-[20px] top-[50px] w-80 rounded-xl border'
+                : 'right-[20px] top-[50px] w-70 rounded-xl border'
             }`}
           >
             {/* Mobile Handle */}
@@ -112,17 +113,20 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
             )}
 
             {/* Search */}
-            <div className="p-3 border-b border-[#2a2a2a]">
+            <div className="flex items-center p-2 border-b border-[#2a2a2a]">
+              <div className="flex items-center w-full rounded-full px-3 py-2 gap-2 bg-[#ffffff0e]">
+              <Search size={20}/>
               <input
                 placeholder="Search actions..."
-                className="w-full rounded-md bg-[#2a2a2a] px-3 py-2 text-base placeholder:text-[#8a8a8a] outline-none focus:ring-1 focus:ring-[#3a3a3a]"
+                className="text-base placeholder:text-[#8a8a8a] outline-none focus:none focus:none"
               />
+              </div>
             </div>
 
             <div className={`${isMobile ? 'max-h-[70vh]' : 'max-h-[500px]'} overflow-y-auto`}>
 
               {/* Font Options */}
-              <div className="flex justify-between px-4 py-3 border-b border-[#2a2a2a]">
+              <div className="flex justify-center px-4 py-3 border-b border-[#2a2a2a]">
                 <FontOption label="Default" active />
                 <FontOption label="Serif" />
                 <FontOption label="Mono" />
@@ -152,31 +156,39 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
 
               <MenuItem icon={<SlidersHorizontal size={20} />} label="Customize page" />
 
+
+              <Divider />
               <ToggleItem
                 icon={<Lock size={20} />}
                 label="Lock page"
                 checked={lockPage}
                 onChange={() => setLockPage(!lockPage)}
               />
+              <Divider />
 
               <MenuItem icon={<Pencil size={20} />} label="Suggest edits" />
               <MenuItem icon={<Languages size={20} />} label="Translate" hasArrow />
-              <MenuItem icon={<Undo2 size={20} />} label="Undo" shortcut={!isMobile ? "Ctrl+Z" : undefined} />
-
               <Divider />
 
               <MenuItem icon={<Download size={20} />} label="Import" />
               <MenuItem icon={<Upload size={20} />} label="Export" />
+              <Divider />
+
               <MenuItem icon={<Repeat size={20} />} label="Turn into wiki" />
 
               <Divider />
 
               <MenuItem icon={<Clock size={20} />} label="Updates & analytics" />
               <MenuItem icon={<Clock size={20} />} label="Version history" />
-              <MenuItem icon={<Bell size={20} />} label="Notify me" shortcut={!isMobile ? "Mentions" : undefined} hasArrow />
+
+
+              <Divider />
+              <MenuItem icon={<Bell size={20} />} label="Notify me" shortcut={!isMobile ? "Comments" : undefined} hasArrow />
+              <Divider />
+
               <MenuItem icon={<GitBranch size={20} />} label="Connections" shortcut={!isMobile ? "None" : undefined} hasArrow />
 
-              <div className="px-4 py-3 text-xs text-[#7a7a7a] border-t border-[#2a2a2a] space-y-1 pb-8">
+              <div className="px-4 py-2 text-xs text-[#7a7a7a] border-t border-[#2a2a2a] space-y-1">
                 <p>Contagem de palavras: {wordCount}</p>
                 <div className="mt-1">
                   Última edição por {userName || 'Usuário'} <br />
@@ -265,15 +277,15 @@ function Divider() {
 
 function FontOption({ label, active }: { label: string; active?: boolean }) {
   return (
-    <div className="flex flex-col items-center cursor-pointer group">
+    <div className="flex flex-col items-center cursor-pointer group px-4 py-3 rounded hover:bg-[#ffffff0e]">
       <span
-        className={`text-lg ${
+        className={`text-2xl ${
           active ? 'text-blue-400' : 'text-[#d4d4d4]'
         }`}
       >
         Ag
       </span>
-      <span className="text-xs text-[#8a8a8a] group-hover:text-[#d4d4d4]">
+      <span className="text-sm text-[#8a8a8a] group-hover:text-[#d4d4d4]">
         {label}
       </span>
     </div>

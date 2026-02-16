@@ -1,7 +1,8 @@
-import { X, ChevronDown, Bell, User, Settings, Users, Globe, Link2, Download, Sparkles } from "lucide-react";
+import { X, ChevronDown, Bell, Settings, Settings2, Users, Globe, Smile, Link2, Download, Building2, Sparkles, CircleArrowUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import { useEffect, useState } from "react";
+import { useAuth } from '@/context/AuthContext';
 
 interface SettingsModalProps {
   open: boolean;
@@ -10,6 +11,9 @@ interface SettingsModalProps {
 
 export default function SettingsModal({ open, onClose }: SettingsModalProps) {
   const [mounted, setMounted] = useState(false);
+  const { session } = useAuth();
+  const userName = session?.user.displayName || 'Usuário';
+  const userInitial = userName[0]?.toUpperCase() || 'U';
 
   useEffect(() => {
     setMounted(true);
@@ -21,7 +25,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60"
+          className="fixed inset-0 z-9999 flex items-center justify-center bg-black/60"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -30,45 +34,93 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
           <div className="absolute inset-0" onClick={onClose} />
 
           <motion.div
-            className="relative flex h-[80vh] w-[900px] overflow-hidden rounded-2xl bg-zinc-900 text-zinc-100 shadow-2xl"
+            className="relative flex h-full w-full md:h-150 md:w-287.5 overflow-hidden md:rounded-2xl bg-[#202020] md:bg-zinc-900 text-zinc-100 shadow-2xl"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            {/* Sidebar */}
-            <aside className="w-64 border-r border-zinc-800 p-3 text-sm">
-              <div className="mb-4 px-2 text-xs text-zinc-400">Conta</div>
+            {/* Sidebar - Hidden on mobile */}
+            <aside className="hidden md:block w-64 border-r border-zinc-800 overflow-y-auto p-3 text-sm bg-[#272727]">
+              <div className="mb-4 px-2 text-sm text-[#7d7a75] font-medium">Conta</div>
               <div className="mb-2 flex items-center gap-2 rounded-lg bg-zinc-800 px-2 py-1.5">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-700 text-xs">J</div>
-                Jeferson Primer
+                <div
+                  className="
+                    w-5 h-5 rounded-full
+                    border border-gray-300 dark:border-[#7d7a75]
+                    flex items-center justify-center
+                    text-sm text-[#7d7a75] font-medium leading-none
+                  "
+                >
+                  {userInitial}
+                </div>
+                <span className="text-base text-[#bcbab6]">
+                  {session?.user.displayName || 'Usuário'}
+                </span>
               </div>
 
               <nav className="space-y-1">
-                <SidebarItem icon={Settings} label="Preferências" active />
+                <SidebarItem icon={Settings2} label="Preferências" active />
                 <SidebarItem icon={Bell} label="Notificações" />
                 <SidebarItem icon={Link2} label="Conexões" />
 
-                <div className="mt-4 px-2 text-xs text-zinc-400">Espaço de trabalho</div>
+                <div className="mt-4 px-2 text-sm text-[#7d7a75] font-medium">Espaço de trabalho</div>
                 <SidebarItem icon={Settings} label="Geral" />
                 <SidebarItem icon={Users} label="Pessoas" />
-                <SidebarItem icon={Globe} label="Páginas públicas" />
                 <SidebarItem icon={Download} label="Importações" />
+                
+                <div className="mt-4 px-2 text-sm text-[#7d7a75] font-medium">Features</div>
                 <SidebarItem icon={Sparkles} label="IA do Notion" />
+                <SidebarItem icon={Globe} label="Páginas públicas" />
+                <SidebarItem icon={Smile} label="Emoji" />
+                
+                <div className="mt-4 px-2 text-sm text-[#7d7a75] font-medium">Integrations</div>
+                <SidebarItem icon={Link2} label="Conexões" />
+                
+                <div className="mt-4 px-2 text-sm text-[#7d7a75] font-medium">Admin</div>
+                <SidebarItem icon={Building2} label="Espaços de equipe" />
+
+                <div className="mt-4 px-2 text-sm text-[#7d7a75] font-medium">Acess e billing</div>
+                <SidebarItem icon={CircleArrowUp} label="Fazer upgrade do plano" />
               </nav>
             </aside>
 
             {/* Content */}
-            <main className="flex-1 overflow-y-auto p-6">
+            <main className="flex-1 overflow-y-auto bg-[#202020] p-4 md:p-6">
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Preferências</h2>
+                <h2 className="text-xl font-semibold">Configurações</h2>
                 <button onClick={onClose} className="rounded-lg p-1 hover:bg-zinc-800">
                   <X size={18} />
                 </button>
               </div>
 
+              {/* Account Section - Visible on mobile only since it's in the sidebar on desktop */}
+              <div className="md:hidden mb-8">
+                <div className="mb-4 text-sm text-[#7d7a75] font-medium uppercase tracking-wider">Conta</div>
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-800/50 border border-zinc-800">
+                  <div
+                    className="
+                      w-10 h-10 rounded-full
+                      border border-gray-300 dark:border-[#7d7a75]
+                      flex items-center justify-center
+                      text-lg text-[#7d7a75] font-medium leading-none
+                    "
+                  >
+                    {userInitial}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-base font-medium text-[#f0efed]">
+                      {session?.user.displayName || 'Usuário'}
+                    </span>
+                    <span className="text-xs text-[#7d7a75]">
+                      {session?.user.email}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               <Section title="Aparência">
-                <Row label="Personalize a aparência do Notion no seu dispositivo.">
+                <Row label="Aparência" description="Personalize a aparência do Notion no seu dispositivo.">
                   <Select value="Usar configuração do sistema" />
                 </Row>
               </Section>
@@ -86,6 +138,23 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
                   <Select value="(GMT-3:00) São Paulo" />
                 </Row>
               </Section>
+
+              {/* Placeholder for other sections that would normally be in the sidebar */}
+              <div className="md:hidden space-y-8">
+                <Section title="Notificações">
+                   <Toggle label="Notificações no desktop" checked />
+                   <Toggle label="Notificações por e-mail" />
+                </Section>
+
+                <Section title="Segurança">
+                  <button className="w-full text-left px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition text-sm">
+                    Alterar senha
+                  </button>
+                  <button className="w-full text-left px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition text-sm text-red-400">
+                    Sair de todas as sessões
+                  </button>
+                </Section>
+              </div>
             </main>
           </motion.div>
         </motion.div>
@@ -98,11 +167,11 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
 function SidebarItem({ icon: Icon, label, active }: any) {
   return (
     <div
-      className={`flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-zinc-800 ${
+      className={`flex cursor-pointer items-center text-base text-[#bcbab6] hover:text-[#f0efed] font-medium gap-2 rounded-lg px-2 py-1.5 hover:bg-[#ffffff0e] ${
         active ? "bg-zinc-800" : ""
       }`}
     >
-      <Icon size={16} className="text-zinc-400" />
+      <Icon size={20} />
       {label}
     </div>
   );
@@ -124,7 +193,7 @@ function Row({ label, description, children }: any) {
     <div className="flex items-center justify-between gap-4">
       <div>
         <div className="text-sm">{label}</div>
-        {description && <div className="text-xs text-zinc-400">{description}</div>}
+        {description && <div className="text-sm text-zinc-400">{description}</div>}
       </div>
       {children}
     </div>
