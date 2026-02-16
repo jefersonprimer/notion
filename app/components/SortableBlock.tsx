@@ -64,10 +64,10 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
   const localInputRef = useRef<HTMLDivElement>(null); // Changed to HTMLDivElement
   const resizerRef = useRef<HTMLDivElement>(null);
 
-  // Effect to update the contentEditable div's innerText when content prop changes
+  // Effect to update the contentEditable div's innerHTML when content prop changes
   useEffect(() => {
-    if (localInputRef.current && localInputRef.current.innerText !== content && type !== 'image' && type !== 'code') {
-      localInputRef.current.innerText = content;
+    if (localInputRef.current && localInputRef.current.innerHTML !== content && type !== 'image' && type !== 'code') {
+      localInputRef.current.innerHTML = content;
     }
   }, [content, type]);
 
@@ -86,15 +86,16 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
   };
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
-    const val = (e.target as HTMLDivElement).innerText;
+    const textVal = (e.target as HTMLDivElement).innerText;
+    const htmlVal = (e.target as HTMLDivElement).innerHTML;
     
-    // Check for auto-formatting
-    if (type === 'text' && val.endsWith(' ')) {
+    // Check for auto-formatting using textVal
+    if (type === 'text' && textVal.endsWith(' ')) {
         for (const [key, prefix] of Object.entries(PREFIXES)) {
-            if (key !== 'todo_checked' && val.startsWith(prefix)) { // Exclude todo_checked from auto-format trigger
+            if (key !== 'todo_checked' && textVal.startsWith(prefix)) { // Exclude todo_checked from auto-format trigger
                 // Instead of clearing content, we update content to remove the prefix
                 // and then trigger a type change
-                onChange(id, val.slice(prefix.length), key); 
+                onChange(id, textVal.slice(prefix.length), key); 
                 // Manual focus is needed after type change if content is modified
                 // setTimeout(() => localInputRef.current?.focus(), 0);
                 return; // Stop after first match
@@ -102,13 +103,13 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
         }
     }
 
-    if (val === '/') {
+    if (textVal === '/') {
       setShowMenu(true);
-    } else if (showMenu && !val.includes('/')) {
+    } else if (showMenu && !textVal.includes('/')) {
       setShowMenu(false); 
     }
     
-    onChange(id, val);
+    onChange(id, htmlVal);
   };
 
   const handleFocus = () => {
@@ -120,7 +121,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     if (onBlur) onBlur();
     // When blurring, ensure content is clean (e.g., no extra newlines from contentEditable)
     if (localInputRef.current && type !== 'image' && type !== 'code') {
-        onChange(id, localInputRef.current.innerText.trim());
+        onChange(id, localInputRef.current.innerHTML.trim());
     }
   };
 
@@ -168,7 +169,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
         document.execCommand('insertText', false, text);
         // And then call onChange to update the block content
         if (localInputRef.current) {
-            onChange(id, localInputRef.current.innerText);
+            onChange(id, localInputRef.current.innerHTML);
         }
     }
   };
@@ -219,7 +220,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
       if (option === 'url') {
         document.execCommand('insertText', false, pastedUrl);
         if (localInputRef.current) {
-          onChange(id, localInputRef.current.innerText);
+          onChange(id, localInputRef.current.innerHTML);
         }
       }
       // Other options like mention and bookmark could be implemented later

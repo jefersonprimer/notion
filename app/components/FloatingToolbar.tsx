@@ -50,21 +50,34 @@ export default function FloatingToolbar() {
   const [visible, setVisible] = useState(false)
   const [position, setPosition] = useState<Position>({ top: 0, left: 0 })
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const [activeStates, setActiveStates] = useState<Record<string, boolean>>({})
+  const [showColorModal, setShowColorModal] = useState(false)
+  const [colorModalPosition, setColorModalPosition] = useState<Position>({ top: 0, left: 0 })
   const toolbarRef = useRef<HTMLDivElement>(null)
+
+  const updateActiveStates = () => {
+    setActiveStates({
+      bold: document.queryCommandState('bold'),
+      italic: document.queryCommandState('italic'),
+      underline: document.queryCommandState('underline'),
+      strikethrough: document.queryCommandState('strikeThrough'),
+      code: document.queryCommandValue('formatBlock') === 'pre',
+    })
+  }
 
   useEffect(() => {
     const handleSelection = () => {
       const selection = window.getSelection()
 
       if (!selection || selection.rangeCount === 0) {
-        setVisible(false)
+        if (!showColorModal) setVisible(false)
         return
       }
 
       const text = selection.toString().trim()
 
       if (text.length === 0) {
-        setVisible(false)
+        if (!showColorModal) setVisible(false)
         return
       }
 
@@ -72,23 +85,59 @@ export default function FloatingToolbar() {
       const rect = range.getBoundingClientRect()
 
       setPosition({
-        top: rect.top + window.scrollY - 50,
-        left: rect.left + window.scrollX + 200
+        top: rect.top + window.scrollY - 60,
+        left: rect.left + window.scrollX + rect.width / 2
       })
 
+      updateActiveStates()
       setVisible(true)
+    }
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (toolbarRef.current && !toolbarRef.current.contains(e.target as Node)) {
+        // Only close if not clicking inside a modal that might be appended elsewhere
+        // but since we render it inside the same container it should be fine
+      }
     }
 
     document.addEventListener('mouseup', handleSelection)
     document.addEventListener('keyup', handleSelection)
+    document.addEventListener('mousedown', handleClickOutside)
 
     return () => {
       document.removeEventListener('mouseup', handleSelection)
       document.removeEventListener('keyup', handleSelection)
+      document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [])
+  }, [showColorModal])
 
   const clickableItems = TOOLBAR_ITEMS.filter(item => item.type !== 'divider')
+
+  const handleAction = (id: string, e?: React.MouseEvent) => {
+    switch (id) {
+      case 'bold':
+        document.execCommand('bold', false)
+        break
+      case 'italic':
+        document.execCommand('italic', false)
+        break
+      case 'underline':
+        document.execCommand('underline', false)
+        break
+      case 'strikethrough':
+        document.execCommand('strikeThrough', false)
+        break
+      case 'code':
+        document.execCommand('formatBlock', false, 'pre')
+        break
+      case 'palette':
+        setShowColorModal(!showColorModal)
+        return // Don't update active states yet
+      default:
+        console.log('Action not implemented:', id)
+    }
+    updateActiveStates()
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!visible) return
@@ -101,10 +150,10 @@ export default function FloatingToolbar() {
       setSelectedIndex((prev) => (prev - 1 + clickableItems.length) % clickableItems.length)
     } else if (e.key === 'Enter') {
       e.preventDefault()
-      console.log('Selected:', clickableItems[selectedIndex].id)
-      // Here you would call the actual action
+      handleAction(clickableItems[selectedIndex].id)
     } else if (e.key === 'Escape') {
       setVisible(false)
+      setShowColorModal(false)
     }
   }
 
@@ -128,6 +177,7 @@ export default function FloatingToolbar() {
         }
 
         const isSelected = clickableItems[selectedIndex]?.id === item.id
+        const isActive = activeStates[item.id]
 
         return (
           <ToolbarButton
@@ -135,9 +185,11 @@ export default function FloatingToolbar() {
             icon={item.icon}
             label={item.label}
             isSelected={isSelected}
+            isActive={isActive}
             iconPosition={item.id === 'text' ? 'right' : 'left'}
-            onClick={() => {
-              console.log('Clicked:', item.id)
+            onMouseDown={(e) => {
+              e.preventDefault()
+              handleAction(item.id, e)
             }}
             onMouseEnter={() => {
               const clickIndex = clickableItems.findIndex(ci => ci.id === item.id)
@@ -146,6 +198,86 @@ export default function FloatingToolbar() {
           />
         )
       })}
+
+      {showColorModal && (
+        <ColorModal 
+          onClose={() => setShowColorModal(false)}
+          onApplyColor={(type, color) => {
+            if (type === 'text') {
+              document.execCommand('foreColor', false, color)
+            } else {
+              document.execCommand('backColor', false, color)
+            }
+            updateActiveStates()
+          }}
+        />
+      )}
+    </div>
+  )
+}
+
+/* ---------------- Color Modal ---------------- */
+
+const TEXT_COLORS = [
+  '#37352f', '#787774', '#976d57', '#d9730d', '#cb912f',
+  '#448361', '#337ea9', '#7858cc', '#d15796', '#df5452'
+]
+
+const BACK_COLORS = [
+  '#37352f', '#787774', '#976d57', '#d9730d', '#cb912f',
+  '#448361', '#337ea9', '#7858cc', '#d15796', '#df5452'
+]
+
+function ColorModal({ 
+  onClose,
+  onApplyColor 
+}: { 
+  onClose: () => void,
+  onApplyColor: (type: 'text' | 'bg', color: string) => void
+}) {
+  return (
+    <div 
+      className="absolute top-full left-[calc(50%+400px)] -translate-x-1/2 mt-3 z-60 w-64 bg-[#1f1f1f] border border-[#2f2f2f] rounded-lg shadow-2xl p-3 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-100"
+      onMouseDown={(e) => e.preventDefault()} // Prevent losing selection
+    >
+
+      <div>
+        <div className="text-[10px] text-gray-500 font-semibold uppercase mb-2 px-1">Recentemente usado</div>
+        <div className="flex gap-2 px-1">
+           <div className="w-6 h-6 rounded border border-[#2f2f2f] bg-[#df5452]" />
+           <div className="w-6 h-6 rounded border border-[#2f2f2f] bg-[#337ea9]" />
+        </div>
+      </div>
+
+      <div>
+        <div className="text-[10px] text-gray-500 font-semibold uppercase mb-2 px-1">Cor do texto</div>
+        <div className="grid grid-cols-5 gap-1">
+          {TEXT_COLORS.map((color, i) => (
+            <button
+              key={`text-${i}`}
+              onClick={() => onApplyColor('text', color)}
+              className="flex items-center justify-center w-10 h-10 rounded hover:bg-[#2a2a2a] transition-colors border border-transparent hover:border-[#3f3f3f]"
+            >
+              <span className="text-lg font-medium border px-1.5 rounded" style={{ color: color, borderColor: color }}>A</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <div className="text-[10px] text-gray-500 font-semibold uppercase mb-2 px-1">Cor de fundo</div>
+        <div className="grid grid-cols-5 gap-1">
+          {BACK_COLORS.map((color, i) => (
+            <button
+              key={`bg-${i}`}
+              onClick={() => onApplyColor('bg', color)}
+              className="flex items-center justify-center w-10 h-10 rounded hover:bg-[#2a2a2a] transition-colors border border-transparent hover:border-[#3f3f3f]"
+            >
+              <div className="w-6 h-6 rounded border border-[#333]" style={{ backgroundColor: color }} />
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
@@ -156,25 +288,28 @@ function ToolbarButton({
   icon,
   label,
   isSelected,
-  onClick,
+  isActive,
+  onMouseDown,
   onMouseEnter,
   iconPosition = 'left',
 }: {
   icon: React.ReactNode
   label?: string
   isSelected?: boolean
-  onClick?: () => void
+  isActive?: boolean
+  onMouseDown?: (e: React.MouseEvent) => void
   onMouseEnter?: () => void
   iconPosition?: 'left' | 'right'
 }) {
   return (
     <button
-      onClick={onClick}
+      onMouseDown={onMouseDown}
       onMouseEnter={onMouseEnter}
       className={`flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors whitespace-nowrap ${
-        isSelected ? 'bg-[#2a2a2a] text-white' : 'hover:bg-[#2a2a2a]'
+        isActive ? 'text-[#2383e2] bg-[#2383e21a]' : isSelected ? 'bg-[#2a2a2a] text-white' : 'hover:bg-[#2a2a2a]'
       }`}
     >
+
       {iconPosition === 'left' && icon}
       {label && <span className="text-sm whitespace-nowrap">{label}</span>}
       {iconPosition === 'right' && icon}
