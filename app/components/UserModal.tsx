@@ -45,27 +45,27 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
 
           <div className='flex flex-col min-w-0'>
             <div className="flex items-center text-base text-white font-medium truncate">
-              Notion de {session?.user.displayName || 'Usuário'}
+              Cognition de {session?.user.displayName || 'Usuário'}
             </div>
             <div className="text-sm text-neutral-400">Conta Gratuita</div>
           </div>
         </div>
 
-        <div className='flex items-center justify-center gap-2 px-3 mb-2'>
+        <div className='flex items-center justify-center gap-2 px-2 mb-2'>
           <button
             onClick={() => {
               onOpenSettings?.();
               onClose();
             }}
-            className="rounded-md border border-[#3f3f3f] px-2 py-1.5  hover:bg-[#2f2f2f] flex items-center gap-2 text-base transition-colors"
+            className="rounded-md border border-[#3f3f3f] px-2 py-1.5  hover:bg-[#2f2f2f] flex items-center gap-2 text-sm transition-colors"
           >
-            <Settings size={20} />
+            <Settings size={16} />
             <span>Configurações</span>
           </button>
 
-          <button className="rounded-md border border-[#3f3f3f] px-2 py-1.5 hover:bg-[#2f2f2f] flex items-center gap-2 text-base transition-colors">
-            <Users size={20} />
-            <span>Membros</span>
+          <button className="rounded-md border border-[#3f3f3f] px-2 py-1.5 hover:bg-[#2f2f2f] flex items-center gap-2 text-sm transition-colors">
+            <Users size={16} />
+            <span>Convidar Membros</span>
           </button>
         </div>
       </div>
@@ -125,6 +125,10 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
 
       <div className="my-1">
         <div className="px-2 mx-1 py-1.5 hover:bg-[#2f2f2f] rounded-md flex items-center gap-2 text-base transition-colors">Obter App Mac</div>
+      </div>
+
+      <div className="my-1">
+        <div className="px-2 mx-1 py-1.5 hover:bg-[#2f2f2f] rounded-md flex items-center gap-2 text-base transition-colors">Obter App IOS e Android</div>
       </div>
     </div>
   );
