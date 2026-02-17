@@ -18,6 +18,7 @@ import {
   MoreHorizontal,
   ChevronDown,
 } from 'lucide-react'
+import { SlashMenu } from './SlashMenu'
 
 type Position = {
   top: number
@@ -32,7 +33,7 @@ const TOOLBAR_ITEMS = [
   { id: 'reaction', icon: <SmilePlus size={16} /> },
   { id: 'edit', icon: <Edit3 size={16} /> },
   { type: 'divider' },
-  { id: 'text', icon: <ChevronDown size={16} />, label: 'Text' },
+  { id: 'text', icon: <ChevronDown size={16} /> },
   { id: 'bold', icon: <Bold size={16} /> },
   { id: 'italic', icon: <Italic size={16} /> },
   { id: 'underline', icon: <Underline size={16} /> },
@@ -52,6 +53,10 @@ export default function FloatingToolbar() {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [activeStates, setActiveStates] = useState<Record<string, boolean>>({})
   const [showColorModal, setShowColorModal] = useState(false)
+  const [showSlashMenu, setShowSlashMenu] = useState(false)
+  const [slashMenuLeft, setSlashMenuLeft] = useState(0)
+  const [selectedBlockLabel, setSelectedBlockLabel] = useState('Texto')
+  const [savedSelection, setSavedSelection] = useState<Range | null>(null) // New state to save selection
   const toolbarRef = useRef<HTMLDivElement>(null)
 
   const updateActiveStates = () => {
@@ -69,23 +74,42 @@ export default function FloatingToolbar() {
       const selection = window.getSelection()
 
       if (!selection || selection.rangeCount === 0) {
-        if (!showColorModal) setVisible(false)
+        if (!showColorModal && !showSlashMenu) setVisible(false)
         return
       }
 
       const text = selection.toString().trim()
 
       if (text.length === 0) {
-        if (!showColorModal) setVisible(false)
+        if (!showColorModal && !showSlashMenu) setVisible(false)
         return
       }
 
       const range = selection.getRangeAt(0)
       const rect = range.getBoundingClientRect()
 
+      let calculatedLeft = rect.left + window.scrollX + rect.width / 2 + 300
+
+      // Clamp so toolbar doesn't overflow the viewport horizontally
+      if (toolbarRef.current) {
+        const toolbarWidth = toolbarRef.current.offsetWidth
+        const halfWidth = toolbarWidth / 2
+        const viewportWidth = window.innerWidth
+        const padding = 8 // small padding from edges
+
+        // Right edge overflow
+        if (calculatedLeft + halfWidth > viewportWidth - padding) {
+          calculatedLeft = viewportWidth - halfWidth - padding
+        }
+        // Left edge overflow
+        if (calculatedLeft - halfWidth < padding) {
+          calculatedLeft = halfWidth + padding
+        }
+      }
+
       setPosition({
         top: rect.top + window.scrollY - 60,
-        left: rect.left + window.scrollX + rect.width / 2 + 300
+        left: calculatedLeft,
       })
 
       updateActiveStates()
@@ -108,12 +132,79 @@ export default function FloatingToolbar() {
       document.removeEventListener('keyup', handleSelection)
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [showColorModal])
+  }, [showColorModal, showSlashMenu])
 
-  const clickableItems = TOOLBAR_ITEMS.filter(item => item.type !== 'divider')
+  const clickableItems = TOOLBAR_ITEMS.map((item) => {
+    if (item.id === 'text') {
+      return { ...item, label: selectedBlockLabel };
+    }
+    return item;
+  }).filter(item => item.type !== 'divider');
+
+  const handleSlashMenuSelect = (type: string) => {
+    // Find the contentEditable block element from the saved selection
+    let blockEl: HTMLElement | null = null
+    if (savedSelection) {
+      const node = savedSelection.startContainer
+      blockEl = node instanceof HTMLElement
+        ? node.closest('[contenteditable]')
+        : node.parentElement?.closest('[contenteditable]') || null
+    }
+
+    // Dispatch a custom event so that page.tsx can change the block type
+    // via the same onChange mechanism used by SortableBlock
+    if (blockEl && blockEl.id) {
+      const event = new CustomEvent('changeBlockType', {
+        bubbles: true,
+        detail: { blockId: blockEl.id, newType: type }
+      })
+      blockEl.dispatchEvent(event)
+    }
+
+    let label = 'Texto'
+    switch (type) {
+      case 'text': label = 'Texto'; break
+      case 'h1': label = 'Título 1'; break
+      case 'h2': label = 'Título 2'; break
+      case 'h3': label = 'Título 3'; break
+      case 'bullet': label = 'Lista com marcadores'; break
+      case 'number': label = 'Lista numerada'; break
+      case 'todo': label = 'Lista de tarefas'; break
+      case 'toggle': label = 'Lista de alternantes'; break
+      case 'code': label = 'Bloco de código'; break
+      case 'page': label = 'Página'; break
+      default: break
+    }
+    setSelectedBlockLabel(label)
+    setShowSlashMenu(false)
+    setSavedSelection(null)
+  }
 
   const handleAction = (id: string, e?: React.MouseEvent) => {
     switch (id) {
+      case 'explain':
+        console.log('Explain action')
+        break
+      case 'ai':
+        console.log('AI action')
+        break
+      case 'comment':
+        console.log('Comment action')
+        break
+      case 'reaction':
+        console.log('Reaction action')
+        break
+      case 'edit':
+        console.log('Edit action')
+        break
+      case 'text':
+        e?.preventDefault()
+        const selection = window.getSelection()
+        if (selection && selection.rangeCount > 0) {
+          setSavedSelection(selection.getRangeAt(0))
+        }
+        setShowSlashMenu((prev) => !prev)
+        break
       case 'bold':
         document.execCommand('bold', false)
         break
@@ -129,9 +220,18 @@ export default function FloatingToolbar() {
       case 'code':
         document.execCommand('formatBlock', false, 'pre')
         break
+      case 'sigma':
+        console.log('Sigma action')
+        break
+      case 'link':
+        console.log('Link action')
+        break
       case 'palette':
-        setShowColorModal(!showColorModal)
-        return // Don't update active states yet
+        setShowColorModal((prev) => !prev)
+        break
+      case 'more':
+        console.log('More action')
+        break
       default:
         console.log('Action not implemented:', id)
     }
@@ -156,6 +256,7 @@ export default function FloatingToolbar() {
     } else if (e.key === 'Escape') {
       setVisible(false)
       setShowColorModal(false)
+      setShowSlashMenu(false)
     }
   }
 
@@ -185,13 +286,20 @@ export default function FloatingToolbar() {
           <ToolbarButton
             key={item.id}
             icon={item.icon}
-            label={item.label}
+            label={item.id === 'text' ? selectedBlockLabel : item.label}
             isSelected={isSelected}
             isActive={isActive}
             iconPosition={item.id === 'text' ? 'right' : 'left'}
             onMouseDown={(e) => {
               e.preventDefault()
-              if (item.id) handleAction(item.id, e)
+              if (item.id === 'text') {
+                // Capture button position relative to toolbar
+                const btn = (e.currentTarget as HTMLElement)
+                setSlashMenuLeft(btn.offsetLeft)
+                handleAction('text', e)
+              } else if (item.id) {
+                handleAction(item.id, e)
+              }
             }}
             onMouseEnter={() => {
               if (item.id) {
@@ -204,7 +312,7 @@ export default function FloatingToolbar() {
       })}
 
       {showColorModal && (
-        <ColorModal 
+        <ColorModal
           onClose={() => setShowColorModal(false)}
           onApplyColor={(type, color) => {
             if (type === 'text') {
@@ -214,6 +322,32 @@ export default function FloatingToolbar() {
             }
             updateActiveStates()
           }}
+          onResetColor={(type) => {
+            if (type === 'text') {
+              // Save formatting states before removeFormat
+              const wasBold = document.queryCommandState('bold')
+              const wasItalic = document.queryCommandState('italic')
+              const wasUnderline = document.queryCommandState('underline')
+              const wasStrike = document.queryCommandState('strikeThrough')
+              document.execCommand('removeFormat', false)
+              // Re-apply saved formatting
+              if (wasBold) document.execCommand('bold', false)
+              if (wasItalic) document.execCommand('italic', false)
+              if (wasUnderline) document.execCommand('underline', false)
+              if (wasStrike) document.execCommand('strikeThrough', false)
+            } else {
+              document.execCommand('hiliteColor', false, 'transparent')
+            }
+            updateActiveStates()
+          }}
+        />
+      )}
+
+      {showSlashMenu && (
+        <SlashMenu
+          leftOffset={slashMenuLeft}
+          onSelect={handleSlashMenuSelect}
+          onClose={() => setShowSlashMenu(false)}
         />
       )}
     </div>
@@ -232,30 +366,75 @@ const BACK_COLORS = [
   '#448361', '#337ea9', '#7858cc', '#d15796', '#df5452'
 ]
 
-function ColorModal({ 
+function ColorModal({
   onClose,
-  onApplyColor 
-}: { 
+  onApplyColor,
+  onResetColor
+}: {
   onClose: () => void,
-  onApplyColor: (type: 'text' | 'bg', color: string) => void
+  onApplyColor: (type: 'text' | 'bg', color: string) => void,
+  onResetColor: (type: 'text' | 'bg') => void
 }) {
-  return (
-    <div 
-      className="absolute top-full left-[calc(50%+400px)] -translate-x-1/2 mt-3 z-60 w-64 bg-[#1f1f1f] border border-[#2f2f2f] rounded-lg shadow-2xl p-3 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-100"
-      onMouseDown={(e) => e.preventDefault()} // Prevent losing selection
-    >
+  const modalRef = useRef<HTMLDivElement>(null)
+  const [flipAbove, setFlipAbove] = useState(false)
+  const [adjustedLeft, setAdjustedLeft] = useState<number | null>(null)
 
+  useEffect(() => {
+    if (modalRef.current) {
+      const rect = modalRef.current.getBoundingClientRect()
+      const padding = 8
+
+      // Vertical flip
+      if (rect.bottom > window.innerHeight) {
+        setFlipAbove(true)
+      }
+
+      // Horizontal clamp
+      if (rect.right > window.innerWidth - padding) {
+        const overflow = rect.right - window.innerWidth + padding
+        setAdjustedLeft(-overflow)
+      } else if (rect.left < padding) {
+        const overflow = padding - rect.left
+        setAdjustedLeft(overflow)
+      }
+    }
+
+    // Close when clicking outside
+    function handleClickOutside(event: MouseEvent) {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        onClose()
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [onClose])
+
+  return (
+    <div
+      ref={modalRef}
+      style={adjustedLeft !== null ? { marginLeft: adjustedLeft } : undefined}
+      className={`absolute left-[calc(50%+400px)] -translate-x-1/2 z-60 w-64 bg-[#1f1f1f] border border-[#2f2f2f] rounded-lg shadow-2xl p-3 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-100 ${flipAbove ? 'bottom-full mb-3' : 'top-full mt-3'
+        }`}
+      onMouseDown={(e) => e.preventDefault()}
+    >
       <div>
         <div className="text-[10px] text-gray-500 font-semibold uppercase mb-2 px-1">Recentemente usado</div>
         <div className="flex gap-2 px-1">
-           <div className="w-6 h-6 rounded border border-[#2f2f2f] bg-[#df5452]" />
-           <div className="w-6 h-6 rounded border border-[#2f2f2f] bg-[#337ea9]" />
+          <div className="w-6 h-6 rounded border border-[#2f2f2f] bg-[#df5452]" />
+          <div className="w-6 h-6 rounded border border-[#2f2f2f] bg-[#337ea9]" />
         </div>
       </div>
 
       <div>
         <div className="text-[10px] text-gray-500 font-semibold uppercase mb-2 px-1">Cor do texto</div>
         <div className="grid grid-cols-5 gap-1">
+          <button
+            onClick={() => onResetColor('text')}
+            className="flex items-center justify-center w-10 h-10 rounded hover:bg-[#2a2a2a] transition-colors border border-transparent hover:border-[#3f3f3f]"
+            title="Padrão"
+          >
+            <span className="text-lg font-medium border px-1.5 rounded text-gray-300 border-gray-500">A</span>
+          </button>
           {TEXT_COLORS.map((color, i) => (
             <button
               key={`text-${i}`}
@@ -271,6 +450,15 @@ function ColorModal({
       <div>
         <div className="text-[10px] text-gray-500 font-semibold uppercase mb-2 px-1">Cor de fundo</div>
         <div className="grid grid-cols-5 gap-1">
+          <button
+            onClick={() => onResetColor('bg')}
+            className="flex items-center justify-center w-10 h-10 rounded hover:bg-[#2a2a2a] transition-colors border border-transparent hover:border-[#3f3f3f]"
+            title="Padrão"
+          >
+            <div className="w-6 h-6 rounded border border-dashed border-gray-500 flex items-center justify-center">
+              <span className="text-[10px] text-gray-500">⊘</span>
+            </div>
+          </button>
           {BACK_COLORS.map((color, i) => (
             <button
               key={`bg-${i}`}
@@ -309,9 +497,8 @@ function ToolbarButton({
     <button
       onMouseDown={onMouseDown}
       onMouseEnter={onMouseEnter}
-      className={`flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors whitespace-nowrap ${
-        isActive ? 'text-[#2383e2] bg-[#2383e21a]' : isSelected ? 'bg-[#2a2a2a] text-white' : 'hover:bg-[#2a2a2a]'
-      }`}
+      className={`flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors whitespace-nowrap ${isActive ? 'text-[#2383e2] bg-[#2383e21a]' : isSelected ? 'bg-[#2a2a2a] text-white' : 'hover:bg-[#2a2a2a]'
+        }`}
     >
 
       {iconPosition === 'left' && icon}
