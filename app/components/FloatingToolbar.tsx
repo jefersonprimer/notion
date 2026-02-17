@@ -150,7 +150,10 @@ export default function FloatingToolbar() {
       setSelectedIndex((prev) => (prev - 1 + clickableItems.length) % clickableItems.length)
     } else if (e.key === 'Enter') {
       e.preventDefault()
-      handleAction(clickableItems[selectedIndex].id)
+      const selectedItem = clickableItems[selectedIndex]
+      if (selectedItem && selectedItem.id) {
+        handleAction(selectedItem.id)
+      }
     } else if (e.key === 'Escape') {
       setVisible(false)
       setShowColorModal(false)
@@ -172,7 +175,7 @@ export default function FloatingToolbar() {
       className="absolute z-50 flex items-center rounded-xl border border-[#2f2f2f] bg-[#1f1f1f] px-3 py-2 shadow-2xl text-sm text-[#d4d4d4] outline-none whitespace-nowrap"
     >
       {TOOLBAR_ITEMS.map((item, index) => {
-        if (item.type === 'divider') {
+        if (item.type === 'divider' || !item.id) {
           return <Divider key={`divider-${index}`} />
         }
 
@@ -189,11 +192,13 @@ export default function FloatingToolbar() {
             iconPosition={item.id === 'text' ? 'right' : 'left'}
             onMouseDown={(e) => {
               e.preventDefault()
-              handleAction(item.id, e)
+              if (item.id) handleAction(item.id, e)
             }}
             onMouseEnter={() => {
-              const clickIndex = clickableItems.findIndex(ci => ci.id === item.id)
-              if (clickIndex !== -1) setSelectedIndex(clickIndex)
+              if (item.id) {
+                const clickIndex = clickableItems.findIndex(ci => ci.id === item.id)
+                if (clickIndex !== -1) setSelectedIndex(clickIndex)
+              }
             }}
           />
         )
