@@ -16,6 +16,7 @@ import {
 
 interface SlashMenuProps {
   leftOffset?: number;
+  position?: { top: number; left: number };
   onSelect: (type: string) => void;
   onClose: () => void;
 }
@@ -33,7 +34,7 @@ const MENU_ITEMS = [
   { id: 'page', label: 'Página', icon: <FileText size={18} /> }
 ];
 
-export function SlashMenu({ leftOffset, onSelect, onClose }: SlashMenuProps) {
+export function SlashMenu({ leftOffset, position, onSelect, onClose }: SlashMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [flipAbove, setFlipAbove] = React.useState(false);
@@ -43,9 +44,12 @@ export function SlashMenu({ leftOffset, onSelect, onClose }: SlashMenuProps) {
 
     // Check if there's enough space below; if not, flip above
     if (menuRef.current) {
-      const rect = menuRef.current.getBoundingClientRect();
-      if (rect.bottom > window.innerHeight) {
-        setFlipAbove(true);
+      // Only flip if position is not explicitly set, as explicit position should take precedence
+      if (!position) {
+        const rect = menuRef.current.getBoundingClientRect();
+        if (rect.bottom > window.innerHeight) {
+          setFlipAbove(true);
+        }
       }
     }
 
@@ -82,9 +86,13 @@ export function SlashMenu({ leftOffset, onSelect, onClose }: SlashMenuProps) {
       tabIndex={0}
       onKeyDown={handleKeyDown}
       onMouseDown={(e) => e.preventDefault()}
-      style={leftOffset !== undefined ? { left: leftOffset } : undefined}
-      className={`absolute z-60 w-64 bg-white dark:bg-[#252525] border border-gray-200 dark:border-[#3f3f3f] rounded-lg shadow-xl overflow-hidden py-2 animate-in fade-in zoom-in-95 duration-100 outline-none ${leftOffset === undefined ? 'left-0 ' : ''
-        }${flipAbove ? 'bottom-full mb-3' : 'top-full mt-3'
+      style={
+        position
+          ? { top: position.top, left: position.left }
+          : (leftOffset !== undefined ? { left: leftOffset } : undefined)
+      }
+      className={`absolute z-60 w-64 bg-white dark:bg-[#252525] border border-gray-200 dark:border-[#3f3f3f] rounded-lg shadow-xl overflow-hidden py-2 animate-in fade-in zoom-in-95 duration-100 outline-none ${position ? '' : (leftOffset === undefined ? 'left-0 ' : '')
+        }${flipAbove && !position ? 'bottom-full mb-3' : (position ? '' : 'top-full mt-3')
         }`}
     >
 
