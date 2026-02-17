@@ -52,7 +52,6 @@ export default function FloatingToolbar() {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [activeStates, setActiveStates] = useState<Record<string, boolean>>({})
   const [showColorModal, setShowColorModal] = useState(false)
-  const [colorModalPosition, setColorModalPosition] = useState<Position>({ top: 0, left: 0 })
   const toolbarRef = useRef<HTMLDivElement>(null)
 
   const updateActiveStates = () => {
@@ -86,7 +85,7 @@ export default function FloatingToolbar() {
 
       setPosition({
         top: rect.top + window.scrollY - 60,
-        left: rect.left + window.scrollX + rect.width / 2
+        left: rect.left + window.scrollX + rect.width / 2 + 300
       })
 
       updateActiveStates()
@@ -172,7 +171,7 @@ export default function FloatingToolbar() {
         left: position.left,
         transform: 'translateX(-50%)',
       }}
-      className="absolute z-50 flex items-center rounded-xl border border-[#2f2f2f] bg-[#1f1f1f] px-3 py-2 shadow-2xl text-sm text-[#d4d4d4] outline-none whitespace-nowrap"
+      className="absolute z-50 flex items-center rounded-xl border border-[#2f2f2f] bg-[#1f1f1f] p-1 shadow-2xl text-sm text-[#d4d4d4] outline-none whitespace-nowrap"
     >
       {TOOLBAR_ITEMS.map((item, index) => {
         if (item.type === 'divider' || !item.id) {
