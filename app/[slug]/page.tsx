@@ -61,6 +61,7 @@ const PREFIXES: Record<string, string> = {
   page: 'p: ',
   image: 'img: ',
   video: 'vid: ',
+  code: '``` ',
 };
 
 export default function NotePage() {
@@ -296,6 +297,10 @@ export default function NotePage() {
             if (line.startsWith(prefix)) {
               type = key;
               content = line.slice(prefix.length);
+              // Decode escaped newlines for code blocks
+              if (key === 'code') {
+                content = content.replace(/\\n/g, '\n');
+              }
               break;
             }
           }
@@ -373,7 +378,11 @@ export default function NotePage() {
     if (note) {
       updateNoteTitle(note.id, newTitle);
 
-      const currentDescription = blocks.map(b => (PREFIXES[b.type] || '') + b.content).join('\n');
+      const currentDescription = blocks.map(b => {
+        const prefix = PREFIXES[b.type] || '';
+        const content = b.type === 'code' ? b.content.replace(/\n/g, '\\n') : b.content;
+        return prefix + content;
+      }).join('\n');
       const hasContent = (newTitle.trim() !== '' && newTitle !== 'Nova página') && currentDescription.trim() !== '';
       updateNoteHasContent(note.id, hasContent);
 
@@ -412,7 +421,9 @@ export default function NotePage() {
       // Join blocks back with prefixes
       const description = blocks.map(b => {
         const prefix = PREFIXES[b.type] || '';
-        return prefix + b.content;
+        // Encode newlines in code blocks so they stay as a single line in storage
+        const content = b.type === 'code' ? b.content.replace(/\n/g, '\\n') : b.content;
+        return prefix + content;
       }).join('\n');
 
       const hasContent = (title.trim() !== '' && title !== 'Nova página') && description.trim() !== '';
@@ -483,7 +494,7 @@ export default function NotePage() {
         // Check if any selected block is an image or other non-contenteditable block
         const hasNonEditableSelected = Array.from(selectedIds).some(id => {
           const block = blocks.find(b => b.id === id);
-          return block && (block.type === 'image' || block.type === 'page');
+          return block && (block.type === 'image' || block.type === 'page' || block.type === 'code');
         });
 
         if (selectedIds.size > 1 || hasNonEditableSelected || !isEditingBlock || (focusedBlockId && selectedIds.has(focusedBlockId))) {
@@ -545,7 +556,8 @@ export default function NotePage() {
         // Save explicitly before navigating
         const description = updatedBlocks.map(b => {
           const prefix = PREFIXES[b.type] || '';
-          return prefix + b.content;
+          const content = b.type === 'code' ? b.content.replace(/\n/g, '\\n') : b.content;
+          return prefix + content;
         }).join('\n');
 
         await api.put(`/notes/${note.id}`, { description }, {

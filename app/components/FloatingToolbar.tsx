@@ -20,6 +20,7 @@ import {
 import { SlashMenu } from './SlashMenu'
 import SquareRootSmallIcon from './ui/SquareRootSmallIcon';
 import CommentPencilIcon from './ui/CommentPencilIcon';
+import LinkModal from './LinkModal';
 
 type Position = {
   top: number
@@ -32,7 +33,7 @@ const TOOLBAR_ITEMS = [
   { type: 'divider' },
   { id: 'comment', icon: <MessageSquareText size={16} />, label: 'Comentário' },
   { id: 'reaction', icon: <SmilePlus size={16} /> },
-  { id: 'edit', icon: <CommentPencilIcon size={20}/> },
+  { id: 'edit', icon: <CommentPencilIcon size={20} /> },
   { type: 'divider' },
   { id: 'text', icon: <ChevronDown size={16} /> },
   { id: 'bold', icon: <Bold size={16} /> },
@@ -41,8 +42,8 @@ const TOOLBAR_ITEMS = [
   { id: 'strikethrough', icon: <Strikethrough size={16} /> },
   { type: 'divider' },
   { id: 'code', icon: <Code size={16} /> },
-  { id: 'sigma', icon: <SquareRootSmallIcon size={16}/> },
-  { id: 'link', icon: <Link2 size={16} /> },
+  { id: 'sigma', icon: <SquareRootSmallIcon size={16} /> },
+  { id: 'link', icon: <Link2 size={16} />, hasChevron: true },
   { id: 'palette', icon: <Palette size={16} /> },
   { type: 'divider' },
   { id: 'more', icon: <MoreHorizontal size={16} /> },
@@ -55,6 +56,7 @@ export default function FloatingToolbar() {
   const [activeStates, setActiveStates] = useState<Record<string, boolean>>({})
   const [showColorModal, setShowColorModal] = useState(false)
   const [showSlashMenu, setShowSlashMenu] = useState(false)
+  const [showLinkModal, setShowLinkModal] = useState(false)
   const [slashMenuLeft, setSlashMenuLeft] = useState(0)
   const [selectedBlockLabel, setSelectedBlockLabel] = useState('Texto')
   const [savedSelection, setSavedSelection] = useState<Range | null>(null) // New state to save selection
@@ -75,14 +77,14 @@ export default function FloatingToolbar() {
       const selection = window.getSelection()
 
       if (!selection || selection.rangeCount === 0) {
-        if (!showColorModal && !showSlashMenu) setVisible(false)
+        if (!showColorModal && !showSlashMenu && !showLinkModal) setVisible(false)
         return
       }
 
       const text = selection.toString().trim()
 
       if (text.length === 0) {
-        if (!showColorModal && !showSlashMenu) setVisible(false)
+        if (!showColorModal && !showSlashMenu && !showLinkModal) setVisible(false)
         return
       }
 
@@ -133,7 +135,7 @@ export default function FloatingToolbar() {
       document.removeEventListener('keyup', handleSelection)
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [showColorModal, showSlashMenu])
+  }, [showColorModal, showSlashMenu, showLinkModal])
 
   const clickableItems = TOOLBAR_ITEMS.map((item) => {
     if (item.id === 'text') {
@@ -225,7 +227,12 @@ export default function FloatingToolbar() {
         console.log('Sigma action')
         break
       case 'link':
-        console.log('Link action')
+        e?.preventDefault()
+        const sel = window.getSelection()
+        if (sel && sel.rangeCount > 0) {
+          setSavedSelection(sel.getRangeAt(0))
+        }
+        setShowLinkModal((prev) => !prev)
         break
       case 'palette':
         setShowColorModal((prev) => !prev)
@@ -257,6 +264,7 @@ export default function FloatingToolbar() {
     } else if (e.key === 'Escape') {
       setVisible(false)
       setShowColorModal(false)
+      setShowLinkModal(false)
       setShowSlashMenu(false)
     }
   }
@@ -283,6 +291,69 @@ export default function FloatingToolbar() {
         const isSelected = clickableItems[selectedIndex]?.id === item.id
         const isActive = activeStates[item.id]
 
+        if (item.id === 'link' && (item as any).hasChevron) {
+          return (
+            <div key={item.id} className="relative flex items-center">
+              <ToolbarButton
+                icon={item.icon}
+                isSelected={isSelected}
+                isActive={isActive || showLinkModal}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  handleAction('link', e)
+                }}
+                onMouseEnter={() => {
+                  const clickIndex = clickableItems.findIndex(ci => ci.id === item.id)
+                  if (clickIndex !== -1) setSelectedIndex(clickIndex)
+                }}
+              />
+              <ChevronDown size={12} className="-ml-1.5 text-gray-500" />
+              {showLinkModal && (
+                <LinkModal
+                  onApplyLink={(url) => {
+                    // Restore saved selection
+                    if (savedSelection) {
+                      const sel = window.getSelection()
+                      sel?.removeAllRanges()
+                      sel?.addRange(savedSelection)
+                    }
+                    document.execCommand('createLink', false, url)
+                    // Style the created link
+                    const sel = window.getSelection()
+                    if (sel && sel.rangeCount > 0) {
+                      const range = sel.getRangeAt(0)
+                      const container = range.commonAncestorContainer
+                      const parentEl = container instanceof HTMLElement ? container : container.parentElement
+                      const link = parentEl?.closest('a') || parentEl?.querySelector('a')
+                      if (link) {
+                        link.style.color = '#2383e2'
+                        link.style.textDecoration = 'underline'
+                        link.style.cursor = 'pointer'
+                        link.setAttribute('target', '_blank')
+                        link.setAttribute('rel', 'noopener noreferrer')
+                      }
+                    }
+                    setShowLinkModal(false)
+                    setSavedSelection(null)
+
+                    // Trigger input event so block content updates
+                    const blockEl = savedSelection?.startContainer instanceof HTMLElement
+                      ? savedSelection.startContainer.closest('[contenteditable]')
+                      : savedSelection?.startContainer.parentElement?.closest('[contenteditable]')
+                    if (blockEl) {
+                      blockEl.dispatchEvent(new Event('input', { bubbles: true }))
+                    }
+                  }}
+                  onClose={() => {
+                    setShowLinkModal(false)
+                    setSavedSelection(null)
+                  }}
+                />
+              )}
+            </div>
+          )
+        }
+
         return (
           <ToolbarButton
             key={item.id}
@@ -294,7 +365,6 @@ export default function FloatingToolbar() {
             onMouseDown={(e) => {
               e.preventDefault()
               if (item.id === 'text') {
-                // Capture button position relative to toolbar
                 const btn = (e.currentTarget as HTMLElement)
                 setSlashMenuLeft(btn.offsetLeft)
                 handleAction('text', e)

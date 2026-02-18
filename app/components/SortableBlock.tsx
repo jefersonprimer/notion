@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Link from 'next/link';
-import { GripVertical, Plus, Square, CheckSquare, FileText, Image as ImageIcon, Copy, Check } from 'lucide-react';
+import { GripVertical, Plus, Square, CheckSquare, FileText, Image as ImageIcon, Copy, Check, Pencil, Link2 } from 'lucide-react';
 import { SlashMenu } from './SlashMenu';
 import UrlPasteModal from './UrlPasteModal';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -59,10 +59,15 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
   const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
   const [pastedUrl, setPastedUrl] = useState('');
   const [isPastedVideo, setIsPastedVideo] = useState(false);
-  const [isInputFocused, setIsInputFocused] = useState(false); // New state for input focus
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const [copied, setCopied] = useState(false);
-  const localInputRef = useRef<HTMLDivElement>(null); // Changed to HTMLDivElement
+  const [hoveredLink, setHoveredLink] = useState<{ el: HTMLAnchorElement; url: string; rect: DOMRect } | null>(null);
+  const [editingLink, setEditingLink] = useState<HTMLAnchorElement | null>(null);
+  const [editLinkValue, setEditLinkValue] = useState('');
+  const [linkCopied, setLinkCopied] = useState(false);
+  const localInputRef = useRef<HTMLDivElement>(null);
   const resizerRef = useRef<HTMLDivElement>(null);
+  const linkPreviewRef = useRef<HTMLDivElement>(null);
 
   // Effect to update the contentEditable div's innerHTML when content prop changes
   useEffect(() => {
@@ -70,6 +75,37 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
       localInputRef.current.innerHTML = content;
     }
   }, [content, type]);
+
+  // Link hover detection
+  useEffect(() => {
+    const el = localInputRef.current;
+    if (!el) return;
+
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement).closest('a') as HTMLAnchorElement | null;
+      if (target && el.contains(target)) {
+        const rect = target.getBoundingClientRect();
+        setHoveredLink({ el: target, url: target.href, rect });
+      }
+    };
+
+    const handleMouseOut = (e: MouseEvent) => {
+      const related = e.relatedTarget as HTMLElement | null;
+      // Don't close if moving to the preview tooltip
+      if (linkPreviewRef.current?.contains(related)) return;
+      const target = (e.target as HTMLElement).closest('a');
+      if (target) {
+        setHoveredLink(null);
+      }
+    };
+
+    el.addEventListener('mouseover', handleMouseOver);
+    el.addEventListener('mouseout', handleMouseOut);
+    return () => {
+      el.removeEventListener('mouseover', handleMouseOver);
+      el.removeEventListener('mouseout', handleMouseOut);
+    };
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -81,34 +117,34 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
   };
 
   const setRefs = (el: HTMLDivElement | null) => { // Changed to HTMLDivElement
-      localInputRef.current = el;
-      if (inputRef) inputRef(el);
+    localInputRef.current = el;
+    if (inputRef) inputRef(el);
   };
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
     const textVal = (e.target as HTMLDivElement).innerText;
     const htmlVal = (e.target as HTMLDivElement).innerHTML;
-    
+
     // Check for auto-formatting using textVal
     if (type === 'text' && textVal.endsWith(' ')) {
-        for (const [key, prefix] of Object.entries(PREFIXES)) {
-            if (key !== 'todo_checked' && textVal.startsWith(prefix)) { // Exclude todo_checked from auto-format trigger
-                // Instead of clearing content, we update content to remove the prefix
-                // and then trigger a type change
-                onChange(id, textVal.slice(prefix.length), key); 
-                // Manual focus is needed after type change if content is modified
-                // setTimeout(() => localInputRef.current?.focus(), 0);
-                return; // Stop after first match
-            }
+      for (const [key, prefix] of Object.entries(PREFIXES)) {
+        if (key !== 'todo_checked' && textVal.startsWith(prefix)) { // Exclude todo_checked from auto-format trigger
+          // Instead of clearing content, we update content to remove the prefix
+          // and then trigger a type change
+          onChange(id, textVal.slice(prefix.length), key);
+          // Manual focus is needed after type change if content is modified
+          // setTimeout(() => localInputRef.current?.focus(), 0);
+          return; // Stop after first match
         }
+      }
     }
 
     if (textVal === '/') {
       setShowMenu(true);
     } else if (showMenu && !textVal.includes('/')) {
-      setShowMenu(false); 
+      setShowMenu(false);
     }
-    
+
     onChange(id, htmlVal);
   };
 
@@ -121,7 +157,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     if (onBlur) onBlur();
     // When blurring, ensure content is clean (e.g., no extra newlines from contentEditable)
     if (localInputRef.current && type !== 'image' && type !== 'code') {
-        onChange(id, localInputRef.current.innerHTML.trim());
+      onChange(id, localInputRef.current.innerHTML.trim());
     }
   };
 
@@ -145,9 +181,9 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
       setIsPastedVideo(isVideoUrl);
       const rect = localInputRef.current?.getBoundingClientRect();
       if (rect) {
-        setModalPosition({ 
-          top: rect.bottom + window.scrollY, 
-          left: rect.left + window.scrollX 
+        setModalPosition({
+          top: rect.bottom + window.scrollY,
+          left: rect.left + window.scrollX
         });
         setShowUrlModal(true);
       }
@@ -162,22 +198,22 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     const lines = text.split('\n');
 
     if (lines.length > 1 && onPasteMultiLine) {
-        // If multi-line, use the multi-line handler
-        onPasteMultiLine(id, lines, isLikelyCode(text));
+      // If multi-line, use the multi-line handler
+      onPasteMultiLine(id, lines, isLikelyCode(text));
     } else {
-        // If single line, insert text at cursor position
-        document.execCommand('insertText', false, text);
-        // And then call onChange to update the block content
-        if (localInputRef.current) {
-            onChange(id, localInputRef.current.innerHTML);
-        }
+      // If single line, insert text at cursor position
+      document.execCommand('insertText', false, text);
+      // And then call onChange to update the block content
+      if (localInputRef.current) {
+        onChange(id, localInputRef.current.innerHTML);
+      }
     }
   };
 
   const getEmbedUrl = (url: string) => {
     try {
       const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
-      
+
       // YouTube
       if (urlObj.hostname.includes('youtube.com')) {
         const videoId = urlObj.searchParams.get('v');
@@ -187,7 +223,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
         const videoId = urlObj.pathname.slice(1);
         if (videoId) return `https://www.youtube.com/embed/${videoId}`;
       }
-      
+
       // Vimeo
       if (urlObj.hostname.includes('vimeo.com')) {
         const videoId = urlObj.pathname.split('/').pop();
@@ -286,10 +322,10 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     e.stopPropagation();
     const startX = e.clientX;
     const startY = e.clientY;
-    
+
     const element = resizerRef.current?.parentElement;
     if (!element) return;
-    
+
     const rect = element.getBoundingClientRect();
     const startWidth = rect.width;
     const startHeight = rect.height;
@@ -332,21 +368,29 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
       <div
         ref={setNodeRef}
         style={style}
+        onClick={(e) => {
+          if (e.shiftKey && onSelect) {
+            e.preventDefault();
+            onSelect(id, true);
+          } else if (onSelect) {
+            onSelect(id, false);
+          }
+        }}
         className={`group/block flex items-start -ml-12 pl-2 py-1 relative rounded transition-colors my-2 ${isSelected ? 'bg-[#2383e233]' : ''}`}
       >
         <div className={`absolute left-0 top-1 flex items-center gap-1 opacity-0 group-hover/block:opacity-100 transition-opacity px-1 select-none z-10 h-8`}>
           <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
-              <Plus size={16} />
+            <Plus size={16} />
           </button>
-          <button 
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
-              {...attributes}
-              {...listeners}
+          <button
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
+            {...attributes}
+            {...listeners}
           >
-              <GripVertical size={16} />
+            <GripVertical size={16} />
           </button>
         </div>
-        
+
         <div className="flex-1 ml-10 relative group/code overflow-hidden rounded-md bg-[#202020] border border-[#333]">
           {/* Language badge or selector could go here */}
           <div className="absolute right-2 top-2 z-20 opacity-0 group-hover/code:opacity-100 transition-opacity flex items-center gap-2">
@@ -361,7 +405,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
               {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
             </button>
           </div>
-          
+
           <div className="relative">
             {isInputFocused ? (
               <textarea
@@ -418,7 +462,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
                 style={{ height: content.split('\n').length * 20 + 32 + 'px' }}
               />
             ) : (
-              <div 
+              <div
                 onClick={() => {
                   setIsInputFocused(true);
                 }}
@@ -464,14 +508,14 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
       >
         <div className={`absolute left-0 top-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 select-none z-10 ${lineHeight}`}>
           <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
-              <Plus size={16} />
+            <Plus size={16} />
           </button>
-          <button 
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
-              {...attributes}
-              {...listeners}
+          <button
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
+            {...attributes}
+            {...listeners}
           >
-              <GripVertical size={16} />
+            <GripVertical size={16} />
           </button>
         </div>
         <div className="flex-1 ml-10">
@@ -507,26 +551,26 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
       >
         <div className={`absolute left-0 top-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 select-none z-10 h-8`}>
           <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
-              <Plus size={16} />
+            <Plus size={16} />
           </button>
-          <button 
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
-              {...attributes}
-              {...listeners}
+          <button
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
+            {...attributes}
+            {...listeners}
           >
-              <GripVertical size={16} />
+            <GripVertical size={16} />
           </button>
         </div>
         <div className="flex-1 ml-10 flex flex-col items-center group/image relative">
-          <div 
+          <div
             ref={resizerRef}
-            className="relative" 
+            className="relative"
             style={{ width: width, height: height }}
           >
             {type === 'image' ? (
-              <img 
-                src={url} 
-                alt="Embedded content" 
+              <img
+                src={url}
+                alt="Embedded content"
                 className={`w-full h-full rounded-sm select-none object-cover ${isSelected ? 'ring-2 ring-[#2383e2]' : ''}`}
                 draggable={false}
               />
@@ -538,25 +582,25 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
                 allowFullScreen
               />
             )}
-            
+
             {/* Horizontal Resizers (Width) */}
-            <div 
+            <div
               onMouseDown={(e) => handleResize(e, 'horizontal')}
               className="absolute top-0 -right-1.5 w-1.5 h-full hover:bg-[#2383e2] cursor-ew-resize opacity-0 group-hover/image:opacity-100 transition-all"
             />
-            <div 
+            <div
               onMouseDown={(e) => handleResize(e, 'horizontal')}
               className="absolute top-0 -left-1.5 w-1.5 h-full hover:bg-[#2383e2] cursor-ew-resize opacity-0 group-hover/image:opacity-100 transition-all"
             />
 
             {/* Vertical Resizer (Height) */}
-            <div 
+            <div
               onMouseDown={(e) => handleResize(e, 'vertical')}
               className="absolute -bottom-1.5 left-0 w-full h-1.5 hover:bg-[#2383e2] cursor-ns-resize opacity-0 group-hover/image:opacity-100 transition-all"
             />
 
             {/* Corner Resizer (Both) */}
-            <div 
+            <div
               onMouseDown={(e) => handleResize(e, 'both')}
               className="absolute -bottom-1.5 -right-1.5 w-4 h-4 hover:bg-[#2383e2] cursor-nwse-resize opacity-0 group-hover/image:opacity-100 transition-all z-20 rounded-full border-2 border-white dark:border-[#191919]"
             />
@@ -582,22 +626,22 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     >
       {/* Drag Handle & Add Button Container */}
       <div className={`absolute left-0 top-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 select-none z-10 ${lineHeight}`}>
-         <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
-            <Plus size={16} />
-         </button>
-         <button 
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
-            {...attributes}
-            {...listeners}
-         >
-            <GripVertical size={16} />
-         </button>
+        <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
+          <Plus size={16} />
+        </button>
+        <button
+          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical size={16} />
+        </button>
       </div>
 
       {/* Prefix Indicators */}
       <div className={`flex items-center ml-10 shrink-0 select-none ${lineHeight}`}>
         {isTodo && (
-          <button 
+          <button
             onClick={toggleTodo}
             className="mr-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
@@ -610,25 +654,124 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
 
       {/* Content Editable Div */}
       <div className="flex-1 relative">
+        <div
+          ref={setRefs}
+          id={id}
+          contentEditable="true"
+          className={`w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-300 resize-none focus:outline-none ${getStyles()} ${isContentEmptyAndUnfocused ? 'py-0' : ''}`}
+          onInput={handleInput}
+          onKeyDown={(e) => onKeyDown(e, id)}
+          onClick={(e) => {
+            const target = (e.target as HTMLElement).closest('a') as HTMLAnchorElement | null;
+            if (target) {
+              e.preventDefault();
+              const url = target.getAttribute('href');
+              if (url) {
+                if (url.startsWith('/')) {
+                  window.location.href = url;
+                } else {
+                  window.open(url, '_blank', 'noopener,noreferrer');
+                }
+              }
+            }
+          }}
+          onPaste={handlePaste}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          data-placeholder={currentPlaceholder}
+          suppressContentEditableWarning={true} // To suppress React warning
+        />
+
+        {/* Link Hover Preview */}
+        {hoveredLink && !editingLink && (
           <div
-              ref={setRefs}
-              id={id}
-              contentEditable="true"
-              className={`w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-300 resize-none focus:outline-none ${getStyles()} ${isContentEmptyAndUnfocused ? 'py-0' : ''}`}
-              onInput={handleInput}
-              onKeyDown={(e) => onKeyDown(e, id)}
-              onPaste={handlePaste}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              // Placeholder for contentEditable can be handled with CSS or by inserting a span
-              data-placeholder={currentPlaceholder} 
-              suppressContentEditableWarning={true} // To suppress React warning
-          />
-        
+            ref={linkPreviewRef}
+            className="fixed z-[100] flex items-center gap-1.5 px-2.5 py-1.5 bg-[#252525] border border-[#3a3a3a] rounded-lg shadow-2xl text-sm animate-in fade-in duration-100"
+            style={{
+              top: hoveredLink.rect.bottom + 6,
+              left: hoveredLink.rect.left,
+            }}
+            onMouseLeave={() => setHoveredLink(null)}
+          >
+            <Link2 size={13} className="text-gray-500 shrink-0" />
+            <a
+              href={hoveredLink.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#2383e2] text-xs max-w-[200px] truncate hover:underline"
+            >
+              {hoveredLink.url}
+            </a>
+            <div className="w-px h-3.5 bg-[#3a3a3a] mx-0.5" />
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(hoveredLink.url);
+                setLinkCopied(true);
+                setTimeout(() => setLinkCopied(false), 1500);
+              }}
+              className="p-0.5 rounded hover:bg-[#3a3a3a] text-gray-400 hover:text-white transition-colors"
+              title="Copiar link"
+            >
+              {linkCopied ? <Check size={13} className="text-green-500" /> : <Copy size={13} />}
+            </button>
+            <button
+              onClick={() => {
+                setEditingLink(hoveredLink.el);
+                setEditLinkValue(hoveredLink.url);
+                setHoveredLink(null);
+              }}
+              className="p-0.5 rounded hover:bg-[#3a3a3a] text-gray-400 hover:text-white transition-colors"
+              title="Editar link"
+            >
+              <Pencil size={13} />
+            </button>
+          </div>
+        )}
+
+        {/* Link Edit Inline */}
+        {editingLink && (
+          <div
+            className="fixed z-[100] flex items-center gap-1.5 px-2.5 py-1.5 bg-[#252525] border border-[#3a3a3a] rounded-lg shadow-2xl text-sm animate-in fade-in duration-100"
+            style={{
+              top: editingLink.getBoundingClientRect().bottom + 6,
+              left: editingLink.getBoundingClientRect().left,
+            }}
+          >
+            <Link2 size={13} className="text-gray-500 shrink-0" />
+            <input
+              autoFocus
+              value={editLinkValue}
+              onChange={(e) => setEditLinkValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  editingLink.href = editLinkValue;
+                  setEditingLink(null);
+                  // Trigger save
+                  if (localInputRef.current) {
+                    onChange(id, localInputRef.current.innerHTML);
+                  }
+                } else if (e.key === 'Escape') {
+                  setEditingLink(null);
+                }
+              }}
+              onBlur={() => {
+                editingLink.href = editLinkValue;
+                setEditingLink(null);
+                if (localInputRef.current) {
+                  onChange(id, localInputRef.current.innerHTML);
+                }
+              }}
+              className="w-52 bg-transparent text-xs text-[#2383e2] outline-none"
+              placeholder="https://..."
+            />
+          </div>
+        )}
+
         {/* Slash Menu */}
         {showMenu && (
-          <SlashMenu 
-            position={{ top: type.startsWith('h') ? 40 : 32, left: 0 }} 
+          <SlashMenu
+            position={{ top: type.startsWith('h') ? 40 : 32, left: 0 }}
             onSelect={handleMenuSelect}
             onClose={() => {
               setShowMenu(false);
@@ -639,7 +782,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
 
         {/* URL Paste Modal */}
         {showUrlModal && (
-          <UrlPasteModal 
+          <UrlPasteModal
             position={modalPosition}
             onClose={() => setShowUrlModal(false)}
             onSelect={handleModalSelect}
