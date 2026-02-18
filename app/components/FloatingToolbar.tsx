@@ -6,19 +6,20 @@ import {
   Sparkles,
   MessageSquareText,
   SmilePlus,
-  Edit3,
   Bold,
   Italic,
   Underline,
   Strikethrough,
   Code,
-  Sigma,
   Link2,
   Palette,
   MoreHorizontal,
   ChevronDown,
 } from 'lucide-react'
+
 import { SlashMenu } from './SlashMenu'
+import SquareRootSmallIcon from './ui/SquareRootSmallIcon';
+import CommentPencilIcon from './ui/CommentPencilIcon';
 
 type Position = {
   top: number
@@ -31,7 +32,7 @@ const TOOLBAR_ITEMS = [
   { type: 'divider' },
   { id: 'comment', icon: <MessageSquareText size={16} />, label: 'Comentário' },
   { id: 'reaction', icon: <SmilePlus size={16} /> },
-  { id: 'edit', icon: <Edit3 size={16} /> },
+  { id: 'edit', icon: <CommentPencilIcon size={20}/> },
   { type: 'divider' },
   { id: 'text', icon: <ChevronDown size={16} /> },
   { id: 'bold', icon: <Bold size={16} /> },
@@ -40,7 +41,7 @@ const TOOLBAR_ITEMS = [
   { id: 'strikethrough', icon: <Strikethrough size={16} /> },
   { type: 'divider' },
   { id: 'code', icon: <Code size={16} /> },
-  { id: 'sigma', icon: <Sigma size={16} /> },
+  { id: 'sigma', icon: <SquareRootSmallIcon size={16}/> },
   { id: 'link', icon: <Link2 size={16} /> },
   { id: 'palette', icon: <Palette size={16} /> },
   { type: 'divider' },
