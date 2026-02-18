@@ -12,19 +12,19 @@ import { useFavorite } from '@/context/FavoriteContext';
 import { useNote } from '@/context/NoteContext';
 import { extractIdFromSlug, createNoteSlug, isLikelyCode } from '@/lib/utils';
 import {
-MoreHorizontal,
-Menu,
-ChevronsRight,
-LockKeyhole,
-ChevronDown,
-Star,
-ChevronRight,
-Share,
-Smile,
-Image as ImageIcon,
-MessageSquareText,
-Trash2,
-RotateCcw
+  MoreHorizontal,
+  Menu,
+  ChevronsRight,
+  LockKeyhole,
+  ChevronDown,
+  Star,
+  ChevronRight,
+  Share,
+  Smile,
+  Image as ImageIcon,
+  MessageSquareText,
+  Trash2,
+  RotateCcw
 } from 'lucide-react';
 import {
   DndContext,
@@ -124,8 +124,9 @@ export default function NotePage() {
         activeEl?.tagName === 'INPUT' ||
         activeEl?.tagName === 'TEXTAREA';
       const isToolbarButton = activeEl?.closest('.floating-mobile-toolbar');
+      const isSlashModal = activeEl?.closest('.mobile-slash-modal') || document.querySelector('.mobile-slash-modal');
 
-      if (!isInput && !isToolbarButton) {
+      if (!isInput && !isToolbarButton && !isSlashModal) {
         setIsToolbarVisible(false);
         setFocusedBlockId(null);
       }
@@ -1166,6 +1167,7 @@ export default function NotePage() {
         <FloatingMobileToolbar
           isVisible={isToolbarVisible}
           position={toolbarPosition}
+          focusedBlockId={focusedBlockId}
         />
       )}
       {selectionBox && (

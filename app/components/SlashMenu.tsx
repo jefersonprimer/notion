@@ -21,7 +21,7 @@ interface SlashMenuProps {
   onClose: () => void;
 }
 
-const MENU_ITEMS = [
+export const MENU_ITEMS = [
   { id: 'text', label: 'Texto', icon: <Type size={18} /> },
   { id: 'h1', label: 'Título 1', icon: <Heading1 size={18} /> },
   { id: 'h2', label: 'Título 2', icon: <Heading2 size={18} /> },
