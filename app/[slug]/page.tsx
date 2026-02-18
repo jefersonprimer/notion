@@ -934,7 +934,7 @@ export default function NotePage() {
 
                 {/* Floating Sidebar */}
                 {isFloatingOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-68 max-h-[80vh] shadow-xl rounded-lg overflow-hidden border border-[#2f2f2f] bg-[#202020] animate-in fade-in zoom-in-95 duration-100 origin-top-left">
+                  <div className="absolute top-full left-0 mt-2 w-68 max-h-[80vh] shadow-xl rounded-lg overflow-visible border border-[#2f2f2f] bg-[#202020] animate-in fade-in zoom-in-95 duration-100 origin-top-left">
                     <Sidebar isFloating={true} />
                   </div>
                 )}
