@@ -1174,7 +1174,7 @@ export default function NotePage() {
           </div>
         </div>
       </main>
-      {!isMobile && <FloatingToolbar />}
+      {!isMobile && <FloatingToolbar userName={session?.user?.displayName || session?.user?.email} updatedAt={note?.updated_at} />}
       {isMobile && (
         <FloatingMobileToolbar
           isVisible={isToolbarVisible}
