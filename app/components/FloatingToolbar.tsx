@@ -46,7 +46,7 @@ const TOOLBAR_ITEMS = [
   { id: 'code', icon: <Code size={16} /> },
   { id: 'sigma', icon: <SquareRootSmallIcon size={16} /> },
   { id: 'link', icon: <Link2 size={16} />, hasChevron: true },
-  { id: 'palette', icon: <Palette size={16} /> },
+  { id: 'palette', icon: <Palette size={16} />, hasChevron: true},
   { type: 'divider' },
   { id: 'more', icon: <MoreHorizontal size={16} /> },
 ]

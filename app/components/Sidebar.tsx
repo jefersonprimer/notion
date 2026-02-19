@@ -214,7 +214,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
 
         <div className="px-2 py-1 text-base">
           <NavItem icon={<Search size={20} />} label="Buscar" onClick={() => setIsSearchModalOpen(true)} title="Encontre páginas e informações do seu espaço de trabalho Ctrl+k" />
-          <NavItem icon={<Home size={20} />} label="Página inicial" href="/" isActive={pathname === '/'} title="Veja páginas recentes, tarefas futuras e muito mais ^+ALT+^+H" />
+          <NavItem icon={<Home size={20} />} label="Página inicial" href="/" isActive={pathname === '/'} title="Veja páginas recentes, tarefas futuras e muito mais ^+ALT+⇧ +H" />
           <NavItem
             icon={<Users size={20} />}
             label="Reuniões"
