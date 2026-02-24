@@ -967,7 +967,7 @@ export default function NotePage() {
               )}
 
               <button
-                className="text-base text-[#f0efed] font-normal truncate max-w-60 hover:bg-[#fffff315] px-2 py-1 rounded-md"
+                className="text-sm text-[#f0efed] font-normal truncate max-w-60 hover:bg-[#fffff315] px-2 py-1 rounded-md"
               >
                 {title.trim() || 'Nova página'}
               </button>
