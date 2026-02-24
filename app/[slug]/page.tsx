@@ -1004,7 +1004,7 @@ export default function NotePage() {
                 Somente você pode acessar
               </div>
 
-              {isShareModalOpen && <ShareModal onClose={() => setIsShareModalOpen(false)} />}
+              <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} />
             </div>
 
 

@@ -3,29 +3,42 @@
 import { useState, useRef, useEffect } from 'react'
 import { Lock, Link2, ChevronDown } from 'lucide-react'
 import Toast from './Toast'
+import { motion, AnimatePresence } from 'framer-motion'
+import { createPortal } from 'react-dom'
 
 interface ShareModalProps {
+  isOpen: boolean;
   onClose: () => void;
 }
 
-export default function ShareModal({ onClose }: ShareModalProps) {
+export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
   const [activeTab, setActiveTab] = useState<'share' | 'publish'>('share')
   const [email, setEmail] = useState('')
   const [showToast, setShowToast] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node) && !isMobile) {
         onClose();
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [onClose]);
+  }, [isOpen, onClose, isMobile]);
 
   const handleCopyLink = () => {
     const url = window.location.href;
@@ -33,105 +46,146 @@ export default function ShareModal({ onClose }: ShareModalProps) {
     setShowToast(true);
   };
 
-  return (
-    <>
-      <div 
-        ref={modalRef}
-        className="absolute right-0 top-[calc(100%+8px)] z-50 w-114 rounded-2xl border border-[#2f2f2f] bg-[#1f1f1f] shadow-2xl text-sm text-[#d4d4d4] overflow-hidden"
-      >
-        {/* Tabs */}
-        <div className="flex px-6 pt-4 border-b border-[#2a2a2a]">
-          <Tab
-            label="Share"
-            active={activeTab === 'share'}
-            onClick={() => setActiveTab('share')}
-          />
-          <Tab
-            label="Publish"
-            active={activeTab === 'publish'}
-            onClick={() => setActiveTab('publish')}
-          />
-        </div>
+  if (typeof document === 'undefined') return null;
 
-        {/* Content */}
-        <div className="p-6 space-y-5">
-          
-          {/* Invite Input */}
-          <div className="flex gap-2">
-            <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email or group, separated by commas"
-              className="flex-1 rounded-lg bg-[#1f1f1f] border border-[#3a3a3a] px-3 py-2.5 text-sm placeholder:text-[#8a8a8a] outline-none focus:border-[#4c8bf5] focus:ring-1 focus:ring-[#4c8bf5]"
+  return createPortal(
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Mobile Overlay */}
+          {isMobile && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onClose}
+              className="fixed inset-0 bg-black/60 z-9998 backdrop-blur-[2px]"
             />
+          )}
 
-            <button className="rounded-lg bg-[#4c8bf5] hover:bg-[#3f7ae0] px-4 font-medium text-white transition-colors">
-              Invite
-            </button>
-          </div>
-
-          {/* User Row */}
-          <div className="flex items-center justify-between rounded-xl px-3 py-2 hover:bg-[#2a2a2a] transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#333] text-sm text-[#cfcfcf]">
-                J
+          <motion.div
+            ref={modalRef}
+            initial={isMobile ? { y: "100%" } : { opacity: 0, scale: 0.95 }}
+            animate={isMobile ? { y: 0 } : { opacity: 1, scale: 1 }}
+            exit={isMobile ? { y: "100%" } : { opacity: 0, scale: 0.95 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            drag={isMobile ? "y" : false}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(_, info) => {
+              if (info.offset.y > 100 || info.velocity.y > 500) {
+                onClose();
+              }
+            }}
+            className={`${
+              isMobile 
+                ? 'fixed inset-x-0 bottom-0 rounded-t-2xl border-t border-[#2f2f2f]' 
+                : 'absolute right-0 top-[calc(100%+8px)] rounded-2xl border border-[#2f2f2f] w-114'
+            } z-9999 bg-[#1f1f1f] shadow-2xl text-sm text-[#d4d4d4] overflow-hidden`}
+          >
+            {/* Mobile Handle */}
+            {isMobile && (
+              <div className="flex justify-center pt-3 pb-1">
+                <div className="w-10 h-1 rounded-full bg-[#3f3f3f]" />
               </div>
+            )}
 
-              <div>
-                <p className="text-[#e4e4e4]">
-                  Jeferson Primer <span className="text-[#8a8a8a]">(You)</span>
-                </p>
-                <p className="text-xs text-[#8a8a8a]">
-                  jefersonprimer@gmail.com
-                </p>
-              </div>
+            {/* Tabs */}
+            <div className="flex px-6 pt-4 border-b border-[#2a2a2a]">
+              <Tab
+                label="Share"
+                active={activeTab === 'share'}
+                onClick={() => setActiveTab('share')}
+              />
+              <Tab
+                label="Publish"
+                active={activeTab === 'publish'}
+                onClick={() => setActiveTab('publish')}
+              />
             </div>
 
-            <button className="text-[#bdbdbd] hover:text-white transition-colors flex items-center gap-1">
-              Full access <ChevronDown size={14} />
-            </button>
-          </div>
+            {/* Content */}
+            <div className={`p-6 space-y-5 ${isMobile ? 'max-h-[70vh]' : ''} overflow-y-auto`}>
+              
+              {/* Invite Input */}
+              <div className="flex gap-2">
+                <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email or group, separated by commas"
+                  className="flex-1 rounded-lg bg-[#1f1f1f] border border-[#3a3a3a] px-3 py-2.5 text-sm placeholder:text-[#8a8a8a] outline-none focus:border-[#4c8bf5] focus:ring-1 focus:ring-[#4c8bf5]"
+                />
 
-          {/* General Access */}
-          <div className="space-y-2">
-            <p className="text-xs text-[#8a8a8a]">General access</p>
+                <button className="rounded-lg bg-[#4c8bf5] hover:bg-[#3f7ae0] px-4 font-medium text-white transition-colors">
+                  Invite
+                </button>
+              </div>
 
-            <div className="flex items-center justify-between rounded-xl bg-[#2a2a2a] px-4 py-3 cursor-pointer hover:bg-[#333] transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#333]">
-                  <Lock size={16} className="text-[#bdbdbd]" />
+              {/* User Row */}
+              <div className="flex items-center justify-between rounded-xl px-3 py-2 hover:bg-[#2a2a2a] transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#333] text-sm text-[#cfcfcf]">
+                    J
+                  </div>
+
+                  <div>
+                    <p className="text-[#e4e4e4]">
+                      Jeferson Primer <span className="text-[#8a8a8a]">(You)</span>
+                    </p>
+                    <p className="text-xs text-[#8a8a8a]">
+                      jefersonprimer@gmail.com
+                    </p>
+                  </div>
                 </div>
 
-                <span>Only people invited</span>
+                <button className="text-[#bdbdbd] hover:text-white transition-colors flex items-center gap-1">
+                  Full access <ChevronDown size={14} />
+                </button>
               </div>
 
-              <ChevronDown size={14} className="text-[#bdbdbd]" />
+              {/* General Access */}
+              <div className="space-y-2">
+                <p className="text-xs text-[#8a8a8a]">General access</p>
+
+                <div className="flex items-center justify-between rounded-xl bg-[#2a2a2a] px-4 py-3 cursor-pointer hover:bg-[#333] transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#333]">
+                      <Lock size={16} className="text-[#bdbdbd]" />
+                    </div>
+
+                    <span>Only people invited</span>
+                  </div>
+
+                  <ChevronDown size={14} className="text-[#bdbdbd]" />
+                </div>
+              </div>
+
+              {/* Bottom */}
+              <div className="flex items-center justify-between pt-3 border-t border-[#2a2a2a]">
+                <button className="text-[#8a8a8a] hover:text-[#d4d4d4] transition-colors">
+                  Learn about sharing
+                </button>
+
+                <button 
+                  onClick={handleCopyLink}
+                  className="flex items-center gap-2 rounded-lg border border-[#3a3a3a] bg-[#262626] hover:bg-[#2f2f2f] px-3 py-2 transition-colors"
+                >
+                  <Link2 size={16} />
+                  Copy link
+                </button>
+              </div>
             </div>
-          </div>
-
-          {/* Bottom */}
-          <div className="flex items-center justify-between pt-3 border-t border-[#2a2a2a]">
-            <button className="text-[#8a8a8a] hover:text-[#d4d4d4] transition-colors">
-              Learn about sharing
-            </button>
-
-            <button 
-              onClick={handleCopyLink}
-              className="flex items-center gap-2 rounded-lg border border-[#3a3a3a] bg-[#262626] hover:bg-[#2f2f2f] px-3 py-2 transition-colors"
-            >
-              <Link2 size={16} />
-              Copy link
-            </button>
-          </div>
-        </div>
-      </div>
-      {showToast && (
-        <Toast 
-          message="Link copiado para o clipboard" 
-          onClose={() => setShowToast(false)} 
-        />
+          </motion.div>
+          {showToast && (
+            <Toast 
+              message="Link copiado para o clipboard" 
+              onClose={() => setShowToast(false)} 
+            />
+          )}
+        </>
       )}
-    </>
+    </AnimatePresence>,
+    document.body
   )
 }
 
