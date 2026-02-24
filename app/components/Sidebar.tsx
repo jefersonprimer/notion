@@ -38,7 +38,6 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
   const { favoriteNotes, isLoading: isLoadingFavorites } = useFavorite();
   const router = useRouter();
   const pathname = usePathname();
-  const userInitial = 'C';
   const [rootNotes, setRootNotes] = useState<Note[]>([]);
   const [loadingRootNotes, setLoadingRootNotes] = useState(true);
   const [expandedSections, setExpandedSections] = useState({
@@ -148,7 +147,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
       )}
       <div
         ref={sidebarRef}
-        className={`group/sidebar w-67 bg-[#202020] text-[#ada9a3] flex flex-col text-sm select-none ${isFloating ? 'h-full max-h-[70vh]' : 'h-screen border-r border-[#2f2f2f]'} ${!isFloating ? 'fixed inset-y-0 left-0 z-50 md:relative' : ''}`}
+        className={`group/sidebar w-60 bg-[#202020] text-[#ada9a3] flex flex-col text-sm select-none ${isFloating ? 'h-full max-h-[70vh]' : 'h-screen border-r border-[#2f2f2f]'} ${!isFloating ? 'fixed inset-y-0 left-0 z-50 md:relative' : ''}`}
       >
         {/* Header */}
         <div
@@ -160,13 +159,13 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
               setUserModalPos({ top: rect.bottom + 5, left: rect.left + 10 });
               setIsUserModalOpen(true);
             }}
-            className="flex items-center p-2 gap-2 transition-all duration-200 group-hover:opacity-100 flex-1 min-w-0"
+            className="flex items-center py-2 px-2   gap-2 transition-all duration-200 group-hover:opacity-100 flex-1 min-w-0"
           >
-            <div className="w-5.5 h-6 bg-[#2f2f2f] rounded flex items-center justify-center text-sm font-medium text-white shrink-0">
-              <span className="leading-none select-none">{userInitial}</span>
+            <div className="w-5 h-5 bg-[#fffff315] rounded flex items-center justify-center text-sm font-medium text-[#ada9a3] shrink-0">
+              <span className="leading-none select-none uppercase">c</span>
             </div>
             <div className="flex items-center gap-1 min-w-0">
-              <span className="text-white text-sm truncate font-medium leading-none">
+              <span className="text-[#f0efed] text-sm truncate font-medium leading-none">
                 {session?.user.displayName || 'Usuário'}
               </span>
               <div className="hidden group-hover:flex items-center text-[#ada9a3] hover:text-white">
@@ -176,7 +175,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           </div>
 
           {/* Actions */}
-          <div className="flex items-center shrink-0 pr-2 gap-0.5">
+          <div className="flex items-center shrink-0 pr-1 gap-0.5">
             {/* Collapse Button (Shown on Hover) */}
             {!isFloating && (
               <button
@@ -191,7 +190,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
             {/* Default Icons */}
             <button
               onClick={(e) => { e.stopPropagation(); handleCreateNote(); }}
-              className="flex items-center justify-center w-7 h-7 text-white hover:bg-[#2f2f2f] rounded transition-colors"
+              className="flex items-center justify-center w-7 h-7 text-[#ada9a3] hover:text-white hover:bg-[#2f2f2f] rounded transition-colors"
               title="Crie uma nova página"
             >
               <SquarePen size={18} />
@@ -212,7 +211,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           </div>
         </div>
 
-        <div className="px-2 py-1 text-base">
+        <div className="px-2 py-1">
           <NavItem icon={<Search size={20} />} label="Buscar" onClick={() => setIsSearchModalOpen(true)} title="Encontre páginas e informações do seu espaço de trabalho Ctrl+k" />
           <NavItem icon={<Home size={20} />} label="Página inicial" href="/" isActive={pathname === '/'} title="Veja páginas recentes, tarefas futuras e muito mais ^+ALT+⇧ +H" />
           <NavItem
@@ -316,7 +315,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
               Compartilhado
             </div>
             <div className=" py-1">
-              <button className="flex items-center text-base gap-2 px-2 py-1.5 hover:bg-[#2f2f2f] rounded w-full text-left transition-colors">
+              <button className="flex items-center text-sm gap-2 px-2 py-1.5 hover:bg-[#2f2f2f] rounded w-full text-left transition-colors">
                 <Plus size={16} />
                 <span>Começar a colaborar</span>
               </button>
@@ -328,11 +327,10 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
             <div className="px-2 py-1 text-xs font-medium text-[#9b9b9b]">
               Aplicativos do Cognition
             </div>
-            <div className="py-1 text-base">
+            <div className="py-1">
               <NavItem icon={<Mail size={20} />} label="Cognition Mail" />
               <NavItem icon={<Calendar size={20} />} label="Cognition Calendar" />
               <NavItem icon={<Monitor size={20} />} label="Cognition para desktop" />
-
             </div>
 
             <div className="my-4 text-base">
@@ -346,7 +344,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
         {/* Bottom Section */}
         <div className="border-t border-[#2f2f2f]">
           <div className="p-2">
-            <button className="hover:bg-[#2f2f2f] p-2 rounded w-full flex items-center transition-colors text-base text-[#ada9a3] hover:text-white">
+            <button className="hover:bg-[#2f2f2f] p-2 rounded w-full flex items-center transition-colors text-[#ada9a3] hover:text-white">
               <HelpCircle size={20} />
             </button>
           </div>
@@ -404,10 +402,10 @@ function NavItem({
   const content = (
     <div className={`flex items-center gap-2 px-2 py-1.5 rounded-md w-full text-left transition-colors truncate ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#2f2f2f] text-[#ada9a3] hover:text-white'}`}>
       <span className="shrink-0">{icon}</span>
-      <span className="truncate text-base flex-1">{label}</span>
+      <span className="truncate text-sm font-medium flex-1">{label}</span>
       {onHoverClick && (
         <div
-          className="hidden group-hover/navitem:flex items-center justify-center w-6 h-6 hover:bg-[#4a4a4a] rounded text-[#ada9a3] hover:text-white"
+          className="hidden group-hover/navitem:flex items-center justify-center w-5 h-5 hover:bg-[#4a4a4a] rounded text-[#ada9a3] hover:text-white"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();

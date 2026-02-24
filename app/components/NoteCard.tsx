@@ -34,7 +34,7 @@ export default function NoteCard({ note }: NoteCardProps) {
     <Link href={`/${noteSlug}`} className="block">
       <div
         className="
-          w-38 h-38
+          w-36 h-36
           rounded-2xl
           bg-white dark:bg-[#ffffff0d]
           border border-gray-200 dark:border-[#2f2f2f]
@@ -75,12 +75,12 @@ export default function NoteCard({ note }: NoteCardProps) {
                 w-4 h-4 rounded-full
                 border border-gray-300 dark:border-[#7d7a75]
                 flex items-center justify-center
-                text-[10px] text-[#7d7a75] font-medium leading-none
+                text-[10px] text-[#ada9a3] font-medium leading-none
               "
             >
               {userInitial}
             </div>
-            <span className="text-sm text-[#7d7a75]" title={`Última edição por ${userName} em ${formatFullDate(updatedDate)}`}>
+            <span className="text-xs text-[#7d7a75]" title={`Última edição por ${userName} em ${formatFullDate(updatedDate)}`}>
               {formatRelativeDate(updatedDate)}
             </span>
           </div>

@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
   File,
-  FileText, 
+  FileText,
+  ArrowRightLeft, 
   ChevronRight, 
   MoreHorizontal, 
   Plus, 
@@ -46,7 +47,7 @@ export function SidebarItemSkeleton({ depth = 0 }: { depth?: number }) {
       style={{ paddingLeft: `${depth * 12 + 8}px` }}
     >
       <div className="w-6 h-6 bg-[#2f2f2f] rounded shrink-0" />
-      <div className="h-4 bg-[#2f2f2f] rounded w-full max-w-[140px]" />
+      <div className="h-4 bg-[#2f2f2f] rounded w-full max-w-35" />
     </div>
   );
 }
@@ -194,7 +195,7 @@ export default function SidebarItem({
     <div className="flex flex-col relative">
       <Link
         href={noteHref}
-        className={`group flex items-center gap-2 px-2 py-1.5 rounded transition-colors relative text-base font-medium ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#ffffff0e] text-[#9b9b9b] hover:text-white'}`}
+        className={`group flex items-center gap-1 px-2 py-1 rounded transition-colors relative text-sm font-medium ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#ffffff0e] text-[#bcbab6] hover:text-white'}`}
         style={{ paddingLeft: `${depth * 12 + 8}px` }}
       >
         {/* Icon & Toggle */}
@@ -218,9 +219,9 @@ export default function SidebarItem({
             className="relative flex items-center justify-center w-6 h-6 shrink-0 z-10 cursor-pointer rounded hover:bg-[#3f3f3f]"
           >
             {hasContent ? (
-              <FileText size={20} className={`transition-opacity duration-200 ${!isFloating ? 'md:group-hover:opacity-0' : ''}`} />
+              <FileText size={18} className={`transition-opacity duration-200 ${!isFloating ? 'md:group-hover:opacity-0' : ''}`} />
             ) : (
-              <File size={20} className={`transition-opacity duration-200 ${!isFloating ? 'md:group-hover:opacity-0' : ''}`} />
+              <File size={18} className={`transition-opacity duration-200 ${!isFloating ? 'md:group-hover:opacity-0' : ''}`} />
             )}
             {!isFloating && (
               <div className="hidden md:flex absolute inset-0 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -234,7 +235,7 @@ export default function SidebarItem({
         </div>
 
         {/* Title */}
-        <span className="truncate text-base flex-1 pr-14">{displayTitle}</span>
+        <span className="truncate text-sm font-medium flex-1 pr-14">{displayTitle}</span>
 
         {/* Actions (Always visible on mobile, hover on desktop) */}
         <div className="flex md:hidden md:group-hover:flex items-center absolute right-2 gap-1">
@@ -265,7 +266,7 @@ export default function SidebarItem({
                           e.stopPropagation();
                           setShowOptions(false);
                         }}
-                        className="fixed inset-0 bg-black/60 z-[9998] backdrop-blur-[2px]"
+                        className="fixed inset-0 bg-black/60 z-9998 backdrop-blur-[2px]"
                       />
                     )}
                     
@@ -283,7 +284,7 @@ export default function SidebarItem({
                           setShowOptions(false);
                         }
                       }}
-                      className={`fixed z-[9999] bg-[#2b2b2b] border-[#3a3a3a] shadow-2xl text-sm text-[#cfcfcf] ${
+                      className={`fixed z-9999 bg-[#2b2b2b] border-[#3a3a3a] shadow-2xl text-sm text-[#cfcfcf] ${
                         isMobile 
                           ? 'inset-x-0 bottom-0 rounded-t-2xl border-t pb-8' 
                           : 'w-70 border rounded-xl py-2'
@@ -305,52 +306,52 @@ export default function SidebarItem({
 
                       {/* Adicionar/Remover dos favoritos */}
                       <button 
-                        className="w-full flex items-center justify-between px-3 py-2 text-[#f0efed] hover:text-white hover:bg-[#ffffff0e] transition-colors"
+                        className="w-full flex items-center justify-between px-2 py-1 text-[#f0efed] hover:text-white hover:bg-[#ffffff0e] transition-colors"
                         onPointerUp={handleToggleFavorite}
                       >
                         <div className="flex items-center gap-2 ">
-                          {isFavorite ? <StarOff size={20} /> : <Star size={20} />}
-                          <span className="text-base">{isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}</span>
+                          {isFavorite ? <StarOff size={18} /> : <Star size={18} />}
+                          <span className="text-sm">{isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}</span>
                         </div>
                       </button>
 
                       {/* Copiar link */}
                       <button 
-                        className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors"
+                        className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors"
                         onPointerUp={handleCopyLink}
                       >
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-                          <LinkIcon size={20}/>
-                          <span className="text-base">Copiar link</span>
+                          <LinkIcon size={18}/>
+                          <span className="text-sm">Copiar link</span>
                         </div>
                       </button>
 
                       {/* Duplicar */}
                       <button 
-                        className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors"
+                        className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors"
                         onPointerUp={handleDuplicate}
                       >
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-                          <Copy size={20}/>
-                          <span className="text-base">Duplicar</span>
+                          <Copy size={18}/>
+                          <span className="text-sm">Duplicar</span>
                         </div>
                         {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+D</span>}
                       </button>
 
                       {/* Renomear */}
-                      <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
+                      <button className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-                          <SquarePen size={20} />
-                          <span className="text-base">Renomear</span>
+                          <SquarePen size={18} />
+                          <span className="text-sm">Renomear</span>
                         </div>
                         {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+R</span>}
                       </button>
 
                       {/* Mover para */}
-                      <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
+                      <button className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                         <div className="flex items-center gap-2 hover:text-[#f0efed] hover:text-white">
-                          <CornerRightUp size={20}/>
-                          <span className="text-base">Mover para</span>
+                          <CornerRightUp size={18}/>
+                          <span className="text-sm">Mover para</span>
                         </div>
                         {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+P</span>}
                       </button>
@@ -360,38 +361,38 @@ export default function SidebarItem({
 
                       {/* Mover para lixeira */}
                       <button 
-                        className="w-full flex items-center justify-between px-3 py-2 text-[#f0efed] hover:text-red-400 hover:bg-[#3a3a3a] transition-colors"
+                        className="w-full flex items-center justify-between px-2 py-1 text-[#f0efed] hover:text-red-400 hover:bg-[#3a3a3a] transition-colors"
                         onPointerUp={handleDeleteAction}
                       >
                         <div className="flex items-center gap-2">
-                          <Trash2 size={20} />
-                          <span className="text-base">Mover para a lixeira</span>
+                          <Trash2 size={18} />
+                          <span className="text-sm">Mover para a lixeira</span>
                         </div>
                       </button>
 
                       {/* Transformar em wiki */}
-                      <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
+                      <button className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-                          <FileText size={20} />
-                          <span className="text-base">Transformar em wiki</span>
+                          <ArrowRightLeft size={18} />
+                          <span className="text-sm">Transformar em wiki</span>
                         </div>
                       </button>
 
                       {/* Abrir em nova guia */}
-                      <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
+                      <button className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-                          <ExternalLink size={20}/>
-                          <span className="text-base">Abrir em nova guia</span>
+                          <ExternalLink size={18}/>
+                          <span className="text-sm">Abrir em nova guia</span>
                         </div>
                         {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+↵</span>}
                       </button>
 
                       {/* Abrir no modo lado a lado */}
                       {!isMobile && (
-                        <button className="w-full flex items-center justify-between px-3 py-2 hover:bg-[#3a3a3a] transition-colors">
+                        <button className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                           <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
-                            <PanelRightOpen size={20} />
-                            <span className="text-base flex-1 truncate max-w-40">Abrir no modo lado a lado</span>
+                            <PanelRightOpen size={18} />
+                            <span className="text-sm flex-1 truncate max-w-40">Abrir no modo lado a lado</span>
                           </div>
                           <span className="text-xs text-[#8a8a8a]">Alt+Click</span>
                         </button>
@@ -441,7 +442,7 @@ export default function SidebarItem({
             </div>
           )}
           {!isLoading && children.length === 0 && hasLoaded && (
-            <div className="py-1 text-base text-[#555]" style={{ paddingLeft: `${(depth + 1) * 12 + 24}px` }}>
+            <div className="py-1 text-sm text-[#555]" style={{ paddingLeft: `${(depth + 1) * 12 + 24}px` }}>
               Não contém páginas
             </div>
           )}

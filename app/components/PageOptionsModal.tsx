@@ -13,7 +13,6 @@ import {
   Lock,
   Pencil,
   Languages,
-  Undo2,
   Download,
   Upload,
   Repeat,
@@ -81,7 +80,7 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={onClose}
-              className="fixed inset-0 bg-black/60 z-[9998] backdrop-blur-[2px]"
+              className="fixed inset-0 bg-black/60 z-9998 backdrop-blur-[2px]"
             />
           )}
 
@@ -99,10 +98,10 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
                 onClose();
               }
             }}
-            className={`fixed z-[9999] bg-[#252525] border-[#2f2f2f] shadow-2xl text-base text-[#d4d4d4] overflow-hidden ${
+            className={`fixed z-9999 bg-[#252525] border-[#2f2f2f] shadow-2xl text-base text-[#d4d4d4] overflow-hidden ${
               isMobile 
                 ? 'inset-x-0 bottom-0 rounded-t-2xl border-t' 
-                : 'right-[20px] top-[50px] w-70 rounded-xl border'
+                : 'right-5 top-12.5 w-70 rounded-xl border'
             }`}
           >
             {/* Mobile Handle */}
@@ -115,7 +114,7 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
             {/* Search */}
             <div className="flex items-center p-2 border-b border-[#2a2a2a]">
               <div className="flex items-center w-full rounded-full px-3 py-2 gap-2 bg-[#ffffff0e]">
-              <Search size={20}/>
+              <Search size={18}/>
               <input
                 placeholder="Search actions..."
                 className="text-base placeholder:text-[#8a8a8a] outline-none focus:none focus:none"
@@ -123,7 +122,7 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
               </div>
             </div>
 
-            <div className={`${isMobile ? 'max-h-[70vh]' : 'max-h-[500px]'} overflow-y-auto`}>
+            <div className={`${isMobile ? 'max-h-[70vh]' : 'max-h-125'} overflow-y-auto`}>
 
               {/* Font Options */}
               <div className="flex justify-center px-4 py-3 border-b border-[#2a2a2a]">
@@ -132,61 +131,61 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
                 <FontOption label="Mono" />
               </div>
 
-              <MenuItem icon={<Link size={20} />} label="Copy link" shortcut={!isMobile ? "Ctrl+Alt+L" : undefined} />
-              <MenuItem icon={<Clipboard size={20} />} label="Copy page contents" />
-              <MenuItem icon={<Copy size={20} />} label="Duplicate" shortcut={!isMobile ? "Ctrl+D" : undefined} />
-              <MenuItem icon={<ArrowRight size={20} />} label="Move to" shortcut={!isMobile ? "Ctrl+Shift+P" : undefined} />
-              <MenuItem icon={<Trash2 size={20} />} label="Move to Trash" onClick={onDelete} />
+              <MenuItem icon={<Link size={18} />} label="Copy link" shortcut={!isMobile ? "Ctrl+Alt+L" : undefined} />
+              <MenuItem icon={<Clipboard size={18} />} label="Copy page contents" />
+              <MenuItem icon={<Copy size={18} />} label="Duplicate" shortcut={!isMobile ? "Ctrl+D" : undefined} />
+              <MenuItem icon={<ArrowRight size={18} />} label="Move to" shortcut={!isMobile ? "Ctrl+Shift+P" : undefined} />
+              <MenuItem icon={<Trash2 size={18} />} label="Move to Trash" onClick={onDelete} />
 
               <Divider />
 
               <ToggleItem
-                icon={<Text size={20} />}
+                icon={<Text size={18} />}
                 label="Small text"
                 checked={smallText}
                 onChange={() => setSmallText(!smallText)}
               />
 
               <ToggleItem
-                icon={<Maximize2 size={20} />}
+                icon={<Maximize2 size={18} />}
                 label="Full width"
                 checked={fullWidth}
                 onChange={() => setFullWidth(!fullWidth)}
               />
 
-              <MenuItem icon={<SlidersHorizontal size={20} />} label="Customize page" />
+              <MenuItem icon={<SlidersHorizontal size={18} />} label="Customize page" />
 
 
               <Divider />
               <ToggleItem
-                icon={<Lock size={20} />}
+                icon={<Lock size={18} />}
                 label="Lock page"
                 checked={lockPage}
                 onChange={() => setLockPage(!lockPage)}
               />
               <Divider />
 
-              <MenuItem icon={<Pencil size={20} />} label="Suggest edits" />
-              <MenuItem icon={<Languages size={20} />} label="Translate" hasArrow />
+              <MenuItem icon={<Pencil size={18} />} label="Suggest edits" />
+              <MenuItem icon={<Languages size={18} />} label="Translate" hasArrow />
               <Divider />
 
-              <MenuItem icon={<Download size={20} />} label="Import" />
-              <MenuItem icon={<Upload size={20} />} label="Export" />
+              <MenuItem icon={<Download size={18} />} label="Import" />
+              <MenuItem icon={<Upload size={18} />} label="Export" />
               <Divider />
 
-              <MenuItem icon={<Repeat size={20} />} label="Turn into wiki" />
+              <MenuItem icon={<Repeat size={18} />} label="Turn into wiki" />
 
               <Divider />
 
-              <MenuItem icon={<Clock size={20} />} label="Updates & analytics" />
-              <MenuItem icon={<Clock size={20} />} label="Version history" />
+              <MenuItem icon={<Clock size={18} />} label="Updates & analytics" />
+              <MenuItem icon={<Clock size={18} />} label="Version history" />
 
 
               <Divider />
-              <MenuItem icon={<Bell size={20} />} label="Notify me" shortcut={!isMobile ? "Comments" : undefined} hasArrow />
+              <MenuItem icon={<Bell size={18} />} label="Notify me" shortcut={!isMobile ? "Comments" : undefined} hasArrow />
               <Divider />
 
-              <MenuItem icon={<GitBranch size={20} />} label="Connections" shortcut={!isMobile ? "None" : undefined} hasArrow />
+              <MenuItem icon={<GitBranch size={18} />} label="Connections" shortcut={!isMobile ? "None" : undefined} hasArrow />
 
               <div className="px-4 py-2 text-xs text-[#7a7a7a] border-t border-[#2a2a2a] space-y-1">
                 <p>Contagem de palavras: {wordCount}</p>
@@ -221,12 +220,12 @@ function MenuItem({
 }) {
   return (
     <div 
-      className="flex items-center justify-between px-4 py-2 hover:bg-[#2a2a2a] cursor-pointer transition-colors"
+      className="flex items-center justify-between px-2 py-1.5 hover:bg-[#2a2a2a] cursor-pointer transition-colors"
       onClick={onClick}
     >
-      <div className="flex items-center gap-3">
-        <span className="text-[#bdbdbd] flex items-center justify-center w-5 h-5">{icon}</span>
-        <span className="leading-none">{label}</span>
+      <div className="flex items-center gap-2">
+        <span className="text-[#bdbdbd] flex items-center justify-center">{icon}</span>
+        <span className="leading-none text-sm">{label}</span>
       </div>
 
       <div className="flex items-center gap-2 text-sm text-[#8a8a8a]">
@@ -249,10 +248,10 @@ function ToggleItem({
   onChange: () => void
 }) {
   return (
-    <div className="flex items-center justify-between px-4 py-2 hover:bg-[#2a2a2a] cursor-pointer transition-colors">
+    <div className="flex items-center justify-between px-2 py-1.5 hover:bg-[#2a2a2a] cursor-pointer transition-colors">
       <div className="flex items-center gap-3">
-        <span className="text-[#bdbdbd] flex items-center justify-center w-5 h-5">{icon}</span>
-        <span className="leading-none">{label}</span>
+        <span className="text-[#bdbdbd] flex items-center justify-center">{icon}</span>
+        <span className="leading-none text-sm">{label}</span>
       </div>
 
       <button
