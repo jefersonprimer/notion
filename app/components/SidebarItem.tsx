@@ -46,8 +46,8 @@ export function SidebarItemSkeleton({ depth = 0 }: { depth?: number }) {
       className="flex items-center gap-2 px-2 py-1.5 animate-pulse"
       style={{ paddingLeft: `${depth * 12 + 8}px` }}
     >
-      <div className="w-6 h-6 bg-[#2f2f2f] rounded shrink-0" />
-      <div className="h-4 bg-[#2f2f2f] rounded w-full max-w-35" />
+      <div className="w-5 h-5 bg-[#2f2f2f] rounded shrink-0" />
+      <div className="h-3 bg-[#2f2f2f] rounded-full w-full max-w-35" />
     </div>
   );
 }
@@ -195,16 +195,16 @@ export default function SidebarItem({
     <div className="flex flex-col relative">
       <Link
         href={noteHref}
-        className={`group flex items-center gap-1 px-2 py-1 rounded transition-colors relative text-sm font-medium ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#ffffff0e] text-[#bcbab6] hover:text-white'}`}
+        className={`group/item flex items-center gap-1 px-2 py-1 rounded transition-colors relative text-sm font-medium ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#ffffff0e] text-[#bcbab6] hover:text-white'}`}
         style={{ paddingLeft: `${depth * 12 + 8}px` }}
       >
         {/* Icon & Toggle */}
         <div className="flex items-center shrink-0">
-          {/* Mobile Chevron (Always visible on mobile or floating) */}
+          {/* Mobile Chevron: Hidden if floating, otherwise visible only on mobile (below md) */}
           <div
             role="button"
             onClick={handleToggle}
-            className={`flex ${isFloating ? '' : 'md:hidden'} items-center justify-center w-5 h-6 cursor-pointer rounded hover:bg-[#3f3f3f]`}
+            className={isFloating ? "hidden" : "flex md:hidden items-center justify-center w-5 h-6 cursor-pointer rounded hover:bg-[#3f3f3f]"}
           >
             <ChevronRight
               size={14}
@@ -212,33 +212,46 @@ export default function SidebarItem({
             />
           </div>
 
-          {/* Desktop Icon (Switches on hover) / Mobile Icon (Always visible) */}
+          {/* Desktop/Floating Icon Container */}
           <div
             role="button"
             onClick={handleToggle}
             className="relative flex items-center justify-center w-6 h-6 shrink-0 z-10 cursor-pointer rounded hover:bg-[#3f3f3f]"
           >
+            {/* File icon: Hidden on hover if desktop or floating */}
             {hasContent ? (
-              <FileText size={18} className={`transition-opacity duration-200 ${!isFloating ? 'md:group-hover:opacity-0' : ''}`} />
+              <FileText 
+                size={18} 
+                className={`transition-opacity duration-200 ${isFloating ? 'group-hover/item:opacity-0' : 'md:group-hover/item:opacity-0'}`} 
+              />
             ) : (
-              <File size={18} className={`transition-opacity duration-200 ${!isFloating ? 'md:group-hover:opacity-0' : ''}`} />
+              <File 
+                size={18} 
+                className={`transition-opacity duration-200 ${isFloating ? 'group-hover/item:opacity-0' : 'md:group-hover/item:opacity-0'}`} 
+              />
             )}
-            {!isFloating && (
-              <div className="hidden md:flex absolute inset-0 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <ChevronRight
-                  size={16}
-                  className={`transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
-                />
-              </div>
-            )}
+            
+            {/* Desktop/Floating Chevron: Shown only on hover */}
+            <div className={isFloating 
+              ? "flex absolute inset-0 items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity duration-200"
+              : "hidden md:flex absolute inset-0 items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity duration-200"
+            }>
+              <ChevronRight
+                size={16}
+                className={`transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
+              />
+            </div>
           </div>
         </div>
 
         {/* Title */}
         <span className="truncate text-sm font-medium flex-1 pr-14">{displayTitle}</span>
 
-        {/* Actions (Always visible on mobile, hover on desktop) */}
-        <div className="flex md:hidden md:group-hover:flex items-center absolute right-2 gap-1">
+        {/* Actions (Hover-only if floating or desktop, always visible if non-floating mobile) */}
+        <div className={isFloating
+          ? "hidden group-hover/item:flex items-center absolute right-2 gap-1"
+          : "flex md:hidden md:group-hover/item:flex items-center absolute right-2 gap-1"
+        }>
           <div className="relative">
             <button
               className="p-1 hover:bg-[#3f3f3f] rounded text-[#ada9a3] hover:text-white relative"
@@ -349,7 +362,7 @@ export default function SidebarItem({
 
                       {/* Mover para */}
                       <button className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
-                        <div className="flex items-center gap-2 hover:text-[#f0efed] hover:text-white">
+                        <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                           <CornerRightUp size={18}/>
                           <span className="text-sm">Mover para</span>
                         </div>

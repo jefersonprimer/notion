@@ -151,7 +151,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
       >
         {/* Header */}
         <div
-          className={`group relative flex items-center justify-between mt-2 mx-2 rounded-md transition-colors cursor-pointer hover:bg-[#252525] ${isUserModalOpen ? 'bg-[#252525]' : ''}`}
+          className={`group relative flex items-center justify-between mt-1.5 mx-2 rounded-md transition-colors cursor-pointer hover:bg-[#252525] ${isUserModalOpen ? 'bg-[#252525]' : ''}`}
         >
           <div
             onClick={(e) => {
@@ -159,7 +159,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
               setUserModalPos({ top: rect.bottom + 5, left: rect.left + 10 });
               setIsUserModalOpen(true);
             }}
-            className="flex items-center py-2 px-2   gap-2 transition-all duration-200 group-hover:opacity-100 flex-1 min-w-0"
+            className="flex items-center py-1.5 px-2 gap-2 transition-all duration-200 group-hover:opacity-100 flex-1 min-w-0"
           >
             <div className="w-5 h-5 bg-[#fffff315] rounded flex items-center justify-center text-sm font-medium text-[#ada9a3] shrink-0">
               <span className="leading-none select-none uppercase">c</span>
@@ -343,8 +343,8 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
 
         {/* Bottom Section */}
         <div className="border-t border-[#2f2f2f]">
-          <div className="p-2">
-            <button className="hover:bg-[#2f2f2f] p-2 rounded w-full flex items-center transition-colors text-[#ada9a3] hover:text-white">
+          <div className="px-2 py-1.5">
+            <button className="hover:bg-[#2f2f2f] p-1.5 rounded flex items-center transition-colors text-[#ada9a3] hover:text-white">
               <HelpCircle size={20} />
             </button>
           </div>
@@ -405,7 +405,7 @@ function NavItem({
       <span className="truncate text-sm font-medium flex-1">{label}</span>
       {onHoverClick && (
         <div
-          className="hidden group-hover/navitem:flex items-center justify-center w-5 h-5 hover:bg-[#4a4a4a] rounded text-[#ada9a3] hover:text-white"
+          className="hidden group-hover/navitem:flex items-center justify-center w-5 h-5 hover:bg-[#4a4a4a] rounded text-sm text-[#ada9a3] hover:text-white"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -422,7 +422,7 @@ function NavItem({
   const containerClasses = "group/navitem relative block w-full";
 
   const tooltip = title ? (
-    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 hidden group-hover/navitem:block bg-[#2f2f2f] text-white text-sm p-2 rounded-md shadow-lg whitespace-nowrap z-50">
+    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 hidden group-hover/navitem:block bg-[#2f2f2f] text-[#ada9a3]text-sm px-2 py-1.5 rounded-md shadow-lg whitespace-nowrap z-50">
       {title}
     </div>
   ) : null;

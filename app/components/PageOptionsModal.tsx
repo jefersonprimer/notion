@@ -98,10 +98,10 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
                 onClose();
               }
             }}
-            className={`fixed z-9999 bg-[#252525] border-[#2f2f2f] shadow-2xl text-base text-[#d4d4d4] overflow-hidden ${
+            className={`fixed z-9999 bg-[#252525] border-[#2f2f2f] shadow-2xl text-base text-[#d4d4d4] overflow-y-auto ${
               isMobile 
                 ? 'inset-x-0 bottom-0 rounded-t-2xl border-t' 
-                : 'right-5 top-12.5 w-70 rounded-xl border'
+                : 'right-5 top-12.5 w-64 rounded-xl border'
             }`}
           >
             {/* Mobile Handle */}
@@ -112,20 +112,20 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
             )}
 
             {/* Search */}
-            <div className="flex items-center p-2 border-b border-[#2a2a2a]">
-              <div className="flex items-center w-full rounded-full px-3 py-2 gap-2 bg-[#ffffff0e]">
-              <Search size={18}/>
+            <div className="flex items-center p-2">
+              <div className="flex items-center w-full rounded-md px-3 py-2 gap-2 bg-[#ffffff0e]">
+              <Search size={20}/>
               <input
                 placeholder="Search actions..."
-                className="text-base placeholder:text-[#8a8a8a] outline-none focus:none focus:none"
+                className="text-sm placeholder:text-[#8a8a8a] outline-none focus:none focus:none"
               />
               </div>
             </div>
 
-            <div className={`${isMobile ? 'max-h-[70vh]' : 'max-h-125'} overflow-y-auto`}>
+            <div className={`${isMobile ? 'max-h-[70vh]' : 'max-h-125'}`}>
 
               {/* Font Options */}
-              <div className="flex justify-center px-4 py-3 border-b border-[#2a2a2a]">
+              <div className="flex items-center justify-center px-2 py-1.5">
                 <FontOption label="Default" active />
                 <FontOption label="Serif" />
                 <FontOption label="Mono" />
@@ -276,7 +276,7 @@ function Divider() {
 
 function FontOption({ label, active }: { label: string; active?: boolean }) {
   return (
-    <div className="flex flex-col items-center cursor-pointer group px-4 py-3 rounded hover:bg-[#ffffff0e]">
+    <div className="flex flex-col items-center cursor-pointer group w-24 h-16  px-3 py-2 rounded hover:bg-[#ffffff0e]">
       <span
         className={`text-2xl ${
           active ? 'text-blue-400' : 'text-[#d4d4d4]'

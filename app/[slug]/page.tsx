@@ -95,6 +95,8 @@ export default function NotePage() {
   const titleInputRef = useRef<HTMLInputElement>(null);
   const inputRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const containerRef = useRef<HTMLDivElement>(null);
+  const shareButtonRef = useRef<HTMLButtonElement>(null);
+  const [shareButtonPosition, setShareButtonPosition] = useState<{ top: number; left: number } | null>(null);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -946,7 +948,7 @@ export default function NotePage() {
 
                 {/* Floating Sidebar */}
                 {isFloatingOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-68 max-h-[80vh] shadow-xl rounded-lg overflow-visible border border-[#2f2f2f] bg-[#202020] animate-in fade-in zoom-in-95 duration-100 origin-top-left">
+                  <div className="absolute top-full left-0 mt-2 w-60 max-h-[80vh] shadow-xl rounded-lg overflow-visible border border-[#2f2f2f] bg-[#202020] animate-in fade-in zoom-in-95 duration-100 origin-top-left">
                     <Sidebar isFloating={true} />
                   </div>
                 )}
@@ -991,7 +993,14 @@ export default function NotePage() {
           <div className="flex items-center gap-2">
             <div className="relative group/share">
               <button
-                onClick={() => setIsShareModalOpen(!isShareModalOpen)}
+                ref={shareButtonRef}
+                onClick={() => {
+                  if (shareButtonRef.current) {
+                    const rect = shareButtonRef.current.getBoundingClientRect();
+                    setShareButtonPosition({ top: rect.bottom, left: rect.left });
+                  }
+                  setIsShareModalOpen(!isShareModalOpen);
+                }}
                 className={`flex items-center justify-center md:gap-2 border border-[#383836] text-sm p-1.5 md:px-2 md:py-1 rounded-md transition-colors ${isShareModalOpen ? 'bg-[#fffff315]' : 'hover:bg-[#fffff315]'}`}
               >
                 <Share size={18} className="md:hidden" />
@@ -1004,7 +1013,7 @@ export default function NotePage() {
                 Somente você pode acessar
               </div>
 
-              <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} />
+              <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} buttonPosition={shareButtonPosition} />
             </div>
 
 

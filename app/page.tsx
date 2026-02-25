@@ -132,22 +132,18 @@ export default function Home() {
                   onClick={() => setIsSidebarOpen(true)}
                   className="p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded transition-colors"
                 >
-                  <Menu size={20} className="md:group-hover:hidden text-[#e6e5e3]" />
+                  <Menu size={20} className="md:group-hover:hidden text-[#f0efed]" />
                   <ChevronsRight size={20} className="hidden md:group-hover:block text-white-500 hover:text-[#e6e5e3s]" />
                 </button>
 
                 {/* Floating Sidebar */}
                 {isFloatingOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-68 max-h-[80vh] shadow-xl rounded-lg overflow-visible border border-[#2f2f2f] bg-[#202020] animate-in fade-in zoom-in-95 duration-100 origin-top-left">
+                  <div className="absolute top-full left-0 mt-2 w-60 max-h-[80vh] shadow-xl rounded-lg overflow-visible border border-[#2f2f2f] bg-[#202020] animate-in fade-in zoom-in-95 duration-100 origin-top-left">
                     <Sidebar isFloating={true} />
                   </div>
                 )}
               </div>
             )}
-
-            <div className="flex md:hidden  items-center gap-2 py-1 rounded hover:bg-[#2f2f2f] cursor-pointer transition-colors group">
-              <span className="text-white font-medium">Página inicial</span>
-            </div>
           </div>
 
           <div className="flex items-center gap-2" ref={moreMenuRef}>

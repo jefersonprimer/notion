@@ -86,7 +86,7 @@ export default function TrashModal({ open, onClose }: Props) {
       />
       
       {/* Modal Container: Full-screen on mobile, floating on desktop */}
-      <div className="absolute inset-0 md:inset-auto md:bottom-2 md:left-[220px] pointer-events-auto w-full h-full md:w-[414px] md:h-[327px] bg-[#252525] md:border border-[#3f3f3f] md:rounded-lg shadow-2xl flex flex-col overflow-hidden text-[#9b9b9b]">
+      <div className="absolute inset-0 md:inset-auto md:bottom-2 md:left-55 pointer-events-auto w-full h-full md:w-103.5 md:h-81.75 bg-[#252525] md:border border-[#3f3f3f] md:rounded-lg shadow-2xl flex flex-col overflow-hidden text-[#9b9b9b]">
         {/* Header */}
         <div className="flex items-center justify-between px-3 py-2 border-b border-[#3f3f3f] bg-[#2f2f2f] text-white shrink-0">
           <span className="text-sm font-medium flex items-center gap-2">
@@ -123,12 +123,12 @@ export default function TrashModal({ open, onClose }: Props) {
             notes.map(note => (
               <div 
                 key={note.id} 
-                className="group flex items-center justify-between p-2 rounded-md hover:bg-[#2f2f2f] text-[#f0efed] transition-colors"
+                className="group flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-[#2f2f2f] text-[#f0efed] transition-colors"
               >
                 <Link 
                   href={`/${createNoteSlug((updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || "Nova página", note.id)}`}
                   onClick={onClose}
-                  className="flex items-center gap-2 overflow-hidden flex-1"
+                  className="flex items-center gap-1 overflow-hidden flex-1"
                 >
                   { (updatedHasContent[note.id] !== undefined 
                       ? updatedHasContent[note.id] 
@@ -137,7 +137,7 @@ export default function TrashModal({ open, onClose }: Props) {
                   ) : (
                     <File size={18} className="shrink-0" />
                   )}
-                  <span className="text-base truncate">
+                  <span className="text-sm truncate">
                     {(updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || "Nova página"}
                   </span>
                 </Link>

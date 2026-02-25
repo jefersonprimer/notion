@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Lock, Link2, ChevronDown } from 'lucide-react'
+import { Lock, Link2, ChevronDown, HelpCircle } from 'lucide-react'
 import Toast from './Toast'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createPortal } from 'react-dom'
@@ -9,9 +9,10 @@ import { createPortal } from 'react-dom'
 interface ShareModalProps {
   isOpen: boolean;
   onClose: () => void;
+  buttonPosition?: { top: number; left: number } | null;
 }
 
-export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
+export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareModalProps) {
   const [activeTab, setActiveTab] = useState<'share' | 'publish'>('share')
   const [email, setEmail] = useState('')
   const [showToast, setShowToast] = useState(false)
@@ -77,10 +78,15 @@ export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
                 onClose();
               }
             }}
+            style={!isMobile && buttonPosition ? { 
+              position: 'fixed', 
+              left: buttonPosition.left - 80, 
+              top: buttonPosition.top + 10 
+            } : undefined}
             className={`${
               isMobile 
                 ? 'fixed inset-x-0 bottom-0 rounded-t-2xl border-t border-[#2f2f2f]' 
-                : 'absolute right-0 top-[calc(100%+8px)] rounded-2xl border border-[#2f2f2f] w-114'
+                : 'fixed left-1/2 -translate-x-1/2 top-20 rounded-2xl border border-[#2f2f2f] w-114'
             } z-9999 bg-[#1f1f1f] shadow-2xl text-sm text-[#d4d4d4] overflow-hidden`}
           >
             {/* Mobile Handle */}
@@ -105,7 +111,7 @@ export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
             </div>
 
             {/* Content */}
-            <div className={`p-6 space-y-5 ${isMobile ? 'max-h-[70vh]' : ''} overflow-y-auto`}>
+            <div className={`p-3 space-y-2 ${isMobile ? 'max-h-[70vh]' : ''} overflow-y-auto`}>
               
               {/* Invite Input */}
               <div className="flex gap-2">
@@ -113,16 +119,16 @@ export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email or group, separated by commas"
-                  className="flex-1 rounded-lg bg-[#1f1f1f] border border-[#3a3a3a] px-3 py-2.5 text-sm placeholder:text-[#8a8a8a] outline-none focus:border-[#4c8bf5] focus:ring-1 focus:ring-[#4c8bf5]"
+                  className="flex-1 rounded-lg bg-[#1f1f1f] border border-[#3a3a3a] px-3 py-2 text-sm placeholder:text-[#8a8a8a] outline-none focus:border-[#4c8bf5] focus:ring-1 focus:ring-[#4c8bf5]"
                 />
 
-                <button className="rounded-lg bg-[#4c8bf5] hover:bg-[#3f7ae0] px-4 font-medium text-white transition-colors">
+                <button className="rounded-md bg-[#4c8bf5] hover:bg-[#3f7ae0] px-2 font-medium text-white transition-colors">
                   Invite
                 </button>
               </div>
 
               {/* User Row */}
-              <div className="flex items-center justify-between rounded-xl px-3 py-2 hover:bg-[#2a2a2a] transition-colors">
+              <div className="flex items-center justify-between rounded-xl p-2 hover:bg-[#2a2a2a] transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#333] text-sm text-[#cfcfcf]">
                     J
@@ -147,8 +153,8 @@ export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
               <div className="space-y-2">
                 <p className="text-xs text-[#8a8a8a]">General access</p>
 
-                <div className="flex items-center justify-between rounded-xl bg-[#2a2a2a] px-4 py-3 cursor-pointer hover:bg-[#333] transition-colors">
-                  <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between py-2 cursor-pointer">
+                  <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#333]">
                       <Lock size={16} className="text-[#bdbdbd]" />
                     </div>
@@ -162,13 +168,14 @@ export default function ShareModal({ isOpen, onClose }: ShareModalProps) {
 
               {/* Bottom */}
               <div className="flex items-center justify-between pt-3 border-t border-[#2a2a2a]">
-                <button className="text-[#8a8a8a] hover:text-[#d4d4d4] transition-colors">
+                <button className="flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-[#8a8a8a] hover:text-[#d4d4d4] hover:bg-[#fffff315] transition-colors">
+                  <HelpCircle size={16}/>
                   Learn about sharing
                 </button>
 
                 <button 
                   onClick={handleCopyLink}
-                  className="flex items-center gap-2 rounded-lg border border-[#3a3a3a] bg-[#262626] hover:bg-[#2f2f2f] px-3 py-2 transition-colors"
+                  className="flex items-center gap-2 text-sm text-[#f0efed] font-medium rounded-md border border-[#ffffeb1a] hover:bg-[#fffff315] bg-[#191919] px-2 py-1.5 transition-colors"
                 >
                   <Link2 size={16} />
                   Copy link
