@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import Sidebar from '../components/Sidebar';
+import Sidebar from '@/components/Sidebar';
 import api from '@/lib/api';
 import { Note } from '@/types/note';
 import { useAuth } from '@/context/AuthContext';
@@ -41,11 +41,11 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
-import { SortableBlock } from '../components/SortableBlock';
-import PageOptionsModal from '../components/PageOptionsModal';
-import ShareModal from '../components/ShareModal';
-import FloatingToolbar from '../components/FloatingToolbar';
-import FloatingMobileToolbar from '../components/FloatingMobileToolbar';
+import { SortableBlock } from '@/components/SortableBlock';
+import PageOptionsModal from '@/components/PageOptionsModal';
+import ShareModal from '@/components/ShareModal';
+import FloatingToolbar from '@/components/FloatingToolbar';
+import FloatingMobileToolbar from '@/components/FloatingMobileToolbar';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -1091,15 +1091,15 @@ export default function NotePage() {
             {/* Title Input */}
             <div className="group relative">
               <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity mb-2 h-10">
-                <button className="flex items-center gap-2 p-2 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-base leading-none font-normal">
+                <button className="flex items-center gap-2 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
                   <Smile size={16} />
                   Adicionar ícone
                 </button>
-                <button className="flex items-center gap-2 p-2 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-base leading-none font-normal">
+                <button className="flex items-center gap-2 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
                   <ImageIcon size={16} />
                   Adicionar capa
                 </button>
-                <button className="flex items-center gap-2 p-2 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-base leading-none font-normal">
+                <button className="flex items-center gap-2 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
                   <MessageSquareText size={16} />
                   Adicionar comentário
                 </button>
