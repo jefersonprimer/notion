@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { FileText, File } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { createNoteSlug, formatRelativeDate, formatFullDate } from '../../lib/utils';
-import { Note } from '../../types/note';
+import { useAuth } from '@/context/AuthContext'; 
+import { createNoteSlug, formatRelativeDate, formatFullDate } from '@/lib/utils';
+import { Note } from '@/types/note';
 
 interface NoteCardProps {
   note: Note;

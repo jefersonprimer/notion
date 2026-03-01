@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import Sidebar from './components/Sidebar';
-import Carousel from './components/Carousel';
+import Sidebar from '@/components/Sidebar';
+import Carousel from '@/components/Carousel';
 import api from '@/lib/api';
 import { Note } from '@/types/note';
 import { useAuth } from '@/context/AuthContext';
