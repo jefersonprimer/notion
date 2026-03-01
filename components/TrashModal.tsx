@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Trash2, RotateCcw, X, FileText, File } from 'lucide-react';
+import { Trash2, RotateCcw, FileText, File } from 'lucide-react';
 import Link from 'next/link';
 import api from '@/lib/api';
 import { Note } from '@/types/note';
@@ -102,12 +102,6 @@ export default function TrashModal({ open, onClose }: Props) {
                 Esvaziar lixeira agora
               </button>
             )}
-            <button 
-              onClick={onClose}
-              className="text-[#9b9b9b] hover:text-white p-1 rounded hover:bg-[#3f3f3f] transition-colors"
-            >
-              <X size={16} />
-            </button>
           </div>
         </div>
 

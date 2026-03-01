@@ -42,7 +42,7 @@ function ActionItem({
       onMouseLeave={onMouseLeave}
       className={`
         group flex w-full items-center justify-between
-        px-2 py-1 rounded-md text-base
+        px-2 py-1 rounded-md text-sm
         transition-colors
         text-[#f0efed]
         hover:bg-[#ffffff0e]
@@ -91,7 +91,7 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
   }, [onClose])
 
   return (
-    <div ref={modalRef} className="relative w-68 rounded-lg border border-zinc-700 bg-[#252525] backdrop-blur-md shadow-2xl p-2">
+    <div ref={modalRef} className="relative w-68 rounded-lg border border-zinc-700 bg-[#252525] backdrop-blur-md shadow-2xl px-1 py-2">
       {/* SlashMenu submenu – positioned to the left */}
       {showSlashMenu && (
         <div
@@ -99,7 +99,7 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
           onMouseEnter={() => setShowSlashMenu(true)}
           onMouseLeave={() => setShowSlashMenu(false)}
         >
-          <div className="w-60 bg-[#252525] border border-[#3f3f3f] rounded-lg shadow-xl overflow-y-auto py-2 animate-in fade-in zoom-in-95 duration-100">
+          <div className="w-60 bg-[#252525] border border-[#3f3f3f] rounded-lg shadow-xl overflow-y-auto px-1 py-2 animate-in fade-in zoom-in-95 duration-100">
             <div className="px-3 py-1 text-xs font-medium text-[#ada9a3]">Blocos básicos</div>
             {MENU_ITEMS.map((item, index) => (
               <button
@@ -109,7 +109,7 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
                   setShowSlashMenu(false)
                   onClose()
                 }}
-                className="w-full flex items-center gap-2 px-3 py-1.5 text-left transition-colors hover:bg-[#3f3f3f]"
+                className="w-full rounded-md flex items-center gap-2 px-2 py-1 text-left transition-colors hover:bg-[#3f3f3f]"
               >
                 <div className="w-6 h-6 border border-[#3f3f3f] rounded flex items-center justify-center bg-[#2f2f2f] text-[#e6e5e3]">
                   {item.icon}
@@ -184,7 +184,7 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
         className="
           w-full mb-2
           rounded-md bg-[#ffffff0e]
-          px-2 py-1 text-base
+          px-2 py-1 text-sm
         text-[#f0efed]
         placeholder:text-[#7d7a75]
           outline-none

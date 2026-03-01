@@ -27,13 +27,13 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
     if (activeTab === 'minha-conta') {
       return (
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-lg text-[#f0efed] font-medium">Conta</h2>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-base text-[#f0efed] font-medium">Conta</h2>
           </div>
 
           <div className="mb-2 h-px w-full bg-[#fffff315]" />
 
-          <div className="mb-8 p-4">
+          <div className="mb-8">
             <div className="flex items-center gap-4 mb-4">
               <div
                 className="
@@ -47,8 +47,8 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
               </div>
               
               <div className="flex flex-col">
-                <div className="text-sm font-medium text-[#bcbab6] mb-1">Nome</div>
-                <div className="px-2 py-1 rounded-lg bg-[#ffffff0e] border border-zinc-800 text-[#f0efed]">
+                <div className="text-xs font-medium text-[#bcbab6] mb-1">Nome</div>
+                <div className="px-2 py-1 text-sm rounded-lg bg-[#ffffff0e] border border-zinc-800 text-[#f0efed]">
                   {userName}
                 </div>
               </div>            
@@ -62,46 +62,46 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
           </div>
 
           <div>
-            <h2 className="text-lg text-[#f0efed] font-medium">Segurança</h2>
+            <h2 className="text-base text-[#f0efed] font-medium">Segurança</h2>
             <div className="my-2 h-px w-full bg-[#fffff315]" />
 
 
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-2">
-                <p className="text-[#f0efed] text-base font-medium">E-mail</p>
-                <p className="text-[#ada9a3] text-sm font-normal">{userEmail}</p>
+                <p className="text-[#f0efed] text-sm font-medium">E-mail</p>
+                <p className="text-[#ada9a3] text-xs font-normal">{userEmail}</p>
               </div>
-              <button className="px-2 py-1 border border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
+              <button className="px-2 py-1 border text-sm border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
                 Gerenciar e-mails
               </button>
             </div>
 
             <div className="flex items-center justify-between my-6">
               <div className="flex flex-col gap-2">
-                <p className="text-[#f0efed] text-base font-medium">senha</p>
-                <p className="text-[#ada9a3] text-sm font-normal">Defina uma senha para sua conta</p>
+                <p className="text-[#f0efed] text-sm font-medium">senha</p>
+                <p className="text-[#ada9a3] text-xs font-normal">Defina uma senha para sua conta</p>
               </div>
-              <button className="px-2 py-1 border border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
+              <button className="px-2 py-1 text-sm border border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
                 Adicionar senha
               </button>
             </div>
 
             <div className="flex items-center justify-between my-6">
               <div className="flex flex-col gap-2">
-                <p className="text-[#f0efed] text-base font-medium">Verificação de duas etapas</p>
-                <p className="text-[#ada9a3] text-sm font-normal">Adicione outra camada de segurança à sua conta</p>
+                <p className="text-[#f0efed] text-sm font-medium">Verificação de duas etapas</p>
+                <p className="text-[#ada9a3] text-xs font-normal">Adicione outra camada de segurança à sua conta</p>
               </div>
-              <button className="px-2 py-1 border border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
+              <button className="px-2 text-sm py-1 border border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
                 Adicionar um método de verificação
               </button>
             </div>
 
             <div className="flex items-center justify-between my-6">
               <div className="flex flex-col gap-2">
-                <p className="text-[#f0efed] text-base font-medium">Chave de acesso</p>
-                <p className="text-[#ada9a3] text-sm font-normal">Entre com segurança usando a autenticação biometrica no dispositivo</p>
+                <p className="text-[#f0efed] text-sm font-medium">Chave de acesso</p>
+                <p className="text-[#ada9a3] text-xs font-normal">Entre com segurança usando a autenticação biometrica no dispositivo</p>
               </div>
-              <button className="px-2 py-1 border border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
+              <button className="px-2 text-sm py-1 border border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
                 Adicionar passkey
               </button>
             </div>
@@ -131,7 +131,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
               {userInitial}
             </div>
             <div className="flex flex-col">
-              <span className="text-base font-medium text-[#f0efed]">
+              <span className="text-sm font-medium text-[#f0efed]">
                 {session?.user.displayName || 'Usuário'}
               </span>
               <span className="text-xs text-[#7d7a75]">
@@ -142,7 +142,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
         </div>
 
         <Section title="Aparência">
-          <Row label="Aparência" description="Personalize a aparência do Notion no seu dispositivo.">
+          <Row label="Aparência" description="Personalize a aparência do Cognition no seu dispositivo.">
             <Select value="Usar configuração do sistema" />
           </Row>
         </Section>
@@ -207,9 +207,9 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
             </button>
             {/* Sidebar - Hidden on mobile */}
             <aside className="hidden md:block w-64 border-r border-zinc-800 overflow-y-auto p-3 text-sm bg-[#272727]">
-              <div className="mb-4 px-2 text-sm text-[#7d7a75] font-medium">Conta</div>
+              <div className="mb-2 px-2 text-sm text-[#7d7a75] font-medium">Conta</div>
               <div 
-                className={`mb-2 flex items-center gap-2 rounded-lg px-2 py-1.5 cursor-pointer hover:bg-[#ffffff0e] transition-colors ${activeTab === 'minha-conta' ? 'bg-[#ffffff0e]' : ''}`}
+                className={`mb-0.5 flex items-center gap-2 rounded-lg px-2 py-1.5 cursor-pointer hover:bg-[#ffffff0e] transition-colors ${activeTab === 'minha-conta' ? 'bg-[#ffffff0e]' : ''}`}
                 onClick={() => setActiveTab('minha-conta')}
               >
                 <div
@@ -222,12 +222,12 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
                 >
                   {userInitial}
                 </div>
-                <span className="text-base text-[#bcbab6]">
+                <span className="text-sm text-[#bcbab6]">
                   {session?.user.displayName || 'Usuário'}
                 </span>
               </div>
 
-              <nav className="space-y-1">
+              <nav className="space-y-0.5">
                 <SidebarItem 
                   icon={Settings2} 
                   label="Preferências" 
@@ -237,23 +237,23 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
                 <SidebarItem icon={Bell} label="Notificações" />
                 <SidebarItem icon={Link2} label="Conexões" />
 
-                <div className="mt-4 px-2 text-sm text-[#7d7a75] font-medium">Espaço de trabalho</div>
+                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">Espaço de trabalho</div>
                 <SidebarItem icon={Settings} label="Geral" />
                 <SidebarItem icon={Users} label="Pessoas" />
                 <SidebarItem icon={Download} label="Importações" />
                 
-                <div className="mt-4 px-2 text-sm text-[#7d7a75] font-medium">Features</div>
-                <SidebarItem icon={Sparkles} label="IA do Notion" />
+                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">Features</div>
+                <SidebarItem icon={Sparkles} label="IA do Cognition" />
                 <SidebarItem icon={Globe} label="Páginas públicas" />
                 <SidebarItem icon={Smile} label="Emoji" />
                 
-                <div className="mt-4 px-2 text-sm text-[#7d7a75] font-medium">Integrations</div>
+                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">Integrations</div>
                 <SidebarItem icon={Link2} label="Conexões" />
                 
-                <div className="mt-4 px-2 text-sm text-[#7d7a75] font-medium">Admin</div>
+                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">Admin</div>
                 <SidebarItem icon={Building2} label="Espaços de equipe" />
 
-                <div className="mt-4 px-2 text-sm text-[#7d7a75] font-medium">Acess e billing</div>
+                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">Acess e billing</div>
                 <SidebarItem icon={CircleArrowUp} label="Fazer upgrade do plano" />
               </nav>
             </aside>
@@ -274,7 +274,7 @@ function SidebarItem({ icon: Icon, label, active, onClick }: any) {
   return (
     <div
       onClick={onClick}
-      className={`flex cursor-pointer items-center text-base text-[#bcbab6] hover:text-[#f0efed] font-medium gap-2 rounded-lg px-2 py-1.5 hover:bg-[#ffffff0e] transition-colors ${
+      className={`flex cursor-pointer items-center text-sm text-[#bcbab6] hover:text-[#f0efed] font-medium gap-2 rounded-lg px-2 py-1.5 hover:bg-[#ffffff0e] transition-colors ${
         active ? "bg-[#ffffff0e] text-[#f0efed]" : ""
       }`}
     >

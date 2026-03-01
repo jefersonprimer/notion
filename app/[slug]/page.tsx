@@ -466,6 +466,21 @@ export default function NotePage() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+        const activeEl = document.activeElement as HTMLElement | null;
+        const isEditingBlock = activeEl?.getAttribute('contenteditable') === 'true';
+        const isEditingTitle = activeEl === titleInputRef.current;
+        const blockText = isEditingBlock ? (activeEl?.innerText || '').trim() : '';
+
+        // If focus is outside editor content or on an empty block, select all blocks.
+        // If typing in a non-empty line or title input, keep native Ctrl/Cmd+A behavior.
+        if (!isEditingTitle && (!isEditingBlock || blockText === '')) {
+          e.preventDefault();
+          setSelectedIds(new Set(blocks.map(block => block.id)));
+          return;
+        }
+      }
+
       // Undo/Redo
       if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
         if (e.shiftKey) {
@@ -518,7 +533,7 @@ export default function NotePage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedIds]);
+  }, [selectedIds, blocks]);
 
   // Listen for changeBlockType custom events from FloatingToolbar
   useEffect(() => {
@@ -583,6 +598,17 @@ export default function NotePage() {
       if (blocks.length > 0) {
         inputRefs.current.get(blocks[0].id)?.focus();
       }
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      if (blocks.length > 0) {
+        inputRefs.current.get(blocks[0].id)?.focus();
+      } else {
+        const newBlock = { id: generateId(), type: 'text', content: '' };
+        updateBlocks([newBlock]);
+        setTimeout(() => {
+          inputRefs.current.get(newBlock.id)?.focus();
+        }, 0);
+      }
     } else if (e.key === 'Enter') {
       e.preventDefault();
       const newBlock = { id: generateId(), type: 'text', content: '' };
@@ -594,16 +620,45 @@ export default function NotePage() {
   };
 
   const setCursor = (el: HTMLDivElement, position: number) => {
-    const range = document.createRange();
-    const sel = window.getSelection();
-    if (el.childNodes.length > 0) {
-      range.setStart(el.childNodes[0], position);
-      range.collapse(true);
-      if (sel) {
-        sel.removeAllRanges();
-        sel.addRange(range);
+    const selection = window.getSelection();
+    if (!selection) return;
+
+    // Convert a plain-text offset into a DOM position inside contentEditable.
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let currentNode = walker.nextNode();
+    let remaining = position;
+
+    while (currentNode) {
+      const textLength = currentNode.textContent?.length ?? 0;
+      if (remaining <= textLength) {
+        const range = document.createRange();
+        range.setStart(currentNode, remaining);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        return;
       }
+      remaining -= textLength;
+      currentNode = walker.nextNode();
     }
+
+    // Fallback to end when there is no text node (or offset is beyond length).
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  };
+
+  const getCaretOffset = (el: HTMLDivElement) => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return 0;
+
+    const range = selection.getRangeAt(0);
+    const preCaretRange = range.cloneRange();
+    preCaretRange.selectNodeContents(el);
+    preCaretRange.setEnd(range.endContainer, range.endOffset);
+    return preCaretRange.toString().length;
   };
 
   const handleBlockKeyDown = (e: React.KeyboardEvent, id: string) => {
@@ -661,7 +716,7 @@ export default function NotePage() {
       const selection = window.getSelection();
       if (!selection || !selection.anchorNode) return;
 
-      const isAtStart = selection.isCollapsed && selection.anchorOffset === 0;
+      const isAtStart = selection.isCollapsed && getCaretOffset(el) === 0;
       const prefixedTypes = ['bullet', 'number', 'todo', 'toggle'];
       const isPrefixedType = prefixedTypes.includes(blocks[index].type);
 
@@ -721,7 +776,7 @@ export default function NotePage() {
       const selection = window.getSelection();
       if (!selection || !selection.anchorNode) return;
 
-      const isAtEnd = selection.isCollapsed && selection.anchorOffset === el.innerText.length;
+      const isAtEnd = selection.isCollapsed && getCaretOffset(el) === el.innerText.length;
 
       if (isAtEnd) {
         const nextBlock = blocks[index + 1];
@@ -882,17 +937,17 @@ export default function NotePage() {
         <SidebarElement />
         <main className="flex-1 flex flex-col h-screen overflow-hidden">
           {/* Header Skeleton */}
-          <div className="h-12 flex items-center justify-between px-4 relative z-20">
-            <div className="flex items-center gap-4">
-              {!isSidebarOpen && <div className="w-8 h-8 bg-[#2f2f2f] rounded animate-pulse" />}
-              <div className="flex items-center gap-2">
-                <div className="h-4 w-32 bg-[#2f2f2f] rounded animate-pulse" />
-                <div className="h-4 w-4 bg-[#2f2f2f] rounded animate-pulse" />
-                <div className="h-4 w-24 bg-[#2f2f2f] rounded animate-pulse" />
+          <div className="h-12 flex items-center justify-between px-4 relative z-20 overflow-hidden">
+            <div className="flex items-center gap-2 min-w-0">
+              {!isSidebarOpen && <div className="w-8 h-8 bg-[#2f2f2f] rounded animate-pulse shrink-0" />}
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="h-4 w-24 md:w-32 bg-[#2f2f2f] rounded animate-pulse shrink-0" />
+                <div className="h-4 w-4 bg-[#2f2f2f] rounded animate-pulse hidden md:block shrink-0" />
+                <div className="h-4 w-20 md:w-24 bg-[#2f2f2f] rounded animate-pulse hidden md:block shrink-0" />
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="h-7 w-28 bg-[#2f2f2f] rounded animate-pulse" />
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="h-7 w-7 md:w-28 bg-[#2f2f2f] rounded animate-pulse" />
               <div className="h-7 w-7 bg-[#2f2f2f] rounded animate-pulse" />
               <div className="h-7 w-7 bg-[#2f2f2f] rounded animate-pulse" />
             </div>
@@ -1090,20 +1145,21 @@ export default function NotePage() {
           <div ref={containerRef} className="max-w-4xl mx-auto px-6 md:px-12 py-6 md:py-12">
             {/* Title Input */}
             <div className="group relative">
-              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity mb-2 h-10">
-                <button className="flex items-center gap-2 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
+              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity h-10">
+                <button className="flex items-center gap-1 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
                   <Smile size={16} />
                   Adicionar ícone
                 </button>
-                <button className="flex items-center gap-2 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
+                <button className="flex items-center gap-1 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
                   <ImageIcon size={16} />
                   Adicionar capa
                 </button>
-                <button className="flex items-center gap-2 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
+                <button className="flex items-center gap-1 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
                   <MessageSquareText size={16} />
                   Adicionar comentário
                 </button>
               </div>
+
               <input
                 ref={titleInputRef}
                 type="text"
@@ -1114,7 +1170,7 @@ export default function NotePage() {
                 onFocus={() => handleBlockFocus('title')}
                 onBlur={handleBlockBlur}
                 placeholder="Nova página"
-                className="w-full text-4xl font-bold text-gray-900 dark:text-gray-100 mb-6 bg-transparent border-none outline-none placeholder:text-gray-300 dark:placeholder:text-[#373737]"
+                className="w-full text-[40px] font-bold text-gray-900 dark:text-gray-100 mb-3 bg-transparent border-none outline-none placeholder:text-gray-300 dark:placeholder:text-[#373737]"
               />
             </div>
 

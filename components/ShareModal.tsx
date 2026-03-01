@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Lock, Link2, ChevronDown, HelpCircle } from 'lucide-react'
+import { Lock, Link, ChevronDown, HelpCircle } from 'lucide-react'
 import Toast from './Toast'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createPortal } from 'react-dom'
@@ -177,7 +177,7 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
                   onClick={handleCopyLink}
                   className="flex items-center gap-2 text-sm text-[#f0efed] font-medium rounded-md border border-[#ffffeb1a] hover:bg-[#fffff315] bg-[#191919] px-2 py-1.5 transition-colors"
                 >
-                  <Link2 size={16} />
+                  <Link size={16} />
                   Copy link
                 </button>
               </div>

@@ -297,7 +297,7 @@ export default function SidebarItem({
                           setShowOptions(false);
                         }
                       }}
-                      className={`fixed z-9999 bg-[#2b2b2b] border-[#3a3a3a] shadow-2xl text-sm text-[#cfcfcf] ${
+                      className={`fixed z-9999 p-1 bg-[#2b2b2b] border-[#3a3a3a] shadow-2xl text-sm text-[#cfcfcf] ${
                         isMobile 
                           ? 'inset-x-0 bottom-0 rounded-t-2xl border-t pb-8' 
                           : 'w-70 border rounded-xl py-2'
@@ -319,7 +319,7 @@ export default function SidebarItem({
 
                       {/* Adicionar/Remover dos favoritos */}
                       <button 
-                        className="w-full flex items-center justify-between px-2 py-1 text-[#f0efed] hover:text-white hover:bg-[#ffffff0e] transition-colors"
+                        className="w-full flex rounded-md items-center justify-between px-2 py-1 text-[#f0efed] hover:text-white hover:bg-[#ffffff0e] transition-colors"
                         onPointerUp={handleToggleFavorite}
                       >
                         <div className="flex items-center gap-2 ">
@@ -330,7 +330,7 @@ export default function SidebarItem({
 
                       {/* Copiar link */}
                       <button 
-                        className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors"
+                        className="w-full rounded-md flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors"
                         onPointerUp={handleCopyLink}
                       >
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
@@ -341,7 +341,7 @@ export default function SidebarItem({
 
                       {/* Duplicar */}
                       <button 
-                        className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors"
+                        className="w-full rounded-md flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors"
                         onPointerUp={handleDuplicate}
                       >
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
@@ -352,7 +352,7 @@ export default function SidebarItem({
                       </button>
 
                       {/* Renomear */}
-                      <button className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
+                      <button className="w-full rounded-md flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                           <SquarePen size={18} />
                           <span className="text-sm">Renomear</span>
@@ -361,7 +361,7 @@ export default function SidebarItem({
                       </button>
 
                       {/* Mover para */}
-                      <button className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
+                      <button className="w-full rounded-md flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                           <CornerRightUp size={18}/>
                           <span className="text-sm">Mover para</span>
@@ -374,7 +374,7 @@ export default function SidebarItem({
 
                       {/* Mover para lixeira */}
                       <button 
-                        className="w-full flex items-center justify-between px-2 py-1 text-[#f0efed] hover:text-red-400 hover:bg-[#3a3a3a] transition-colors"
+                        className="w-full rounded-md flex items-center justify-between px-2 py-1 text-[#f0efed] hover:text-red-400 hover:bg-[#3a3a3a] transition-colors"
                         onPointerUp={handleDeleteAction}
                       >
                         <div className="flex items-center gap-2">
@@ -384,7 +384,7 @@ export default function SidebarItem({
                       </button>
 
                       {/* Transformar em wiki */}
-                      <button className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
+                      <button className="w-full rounded-md flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                           <ArrowRightLeft size={18} />
                           <span className="text-sm">Transformar em wiki</span>
@@ -392,7 +392,7 @@ export default function SidebarItem({
                       </button>
 
                       {/* Abrir em nova guia */}
-                      <button className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
+                      <button className="w-full rounded-md flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                           <ExternalLink size={18}/>
                           <span className="text-sm">Abrir em nova guia</span>
@@ -402,7 +402,7 @@ export default function SidebarItem({
 
                       {/* Abrir no modo lado a lado */}
                       {!isMobile && (
-                        <button className="w-full flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
+                        <button className="w-full rounded-md flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                           <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                             <PanelRightOpen size={18} />
                             <span className="text-sm flex-1 truncate max-w-40">Abrir no modo lado a lado</span>

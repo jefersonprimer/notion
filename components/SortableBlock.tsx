@@ -379,10 +379,11 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
         className={`group/block flex items-start -ml-12 pl-2 py-1 relative rounded transition-colors my-2 ${isSelected ? 'bg-[#2383e233]' : ''}`}
       >
         <div className={`absolute left-0 top-1 flex items-center gap-1 opacity-0 group-hover/block:opacity-100 transition-opacity px-1 select-none z-10 h-8`}>
-          <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
+          <button tabIndex={-1} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
             <Plus size={16} />
           </button>
           <button
+            tabIndex={-1}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
             {...attributes}
             {...listeners}
@@ -507,10 +508,11 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
         className={`group flex items-start -ml-12 pl-2 py-1 relative rounded transition-colors ${getContainerMargins()}`}
       >
         <div className={`absolute left-0 top-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 select-none z-10 ${lineHeight}`}>
-          <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
+          <button tabIndex={-1} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
             <Plus size={16} />
           </button>
           <button
+            tabIndex={-1}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
             {...attributes}
             {...listeners}
@@ -550,10 +552,11 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
         className={`group flex items-start -ml-12 pl-2 py-1 relative rounded transition-colors my-4 ${isSelected ? 'bg-[#2383e233]' : ''}`}
       >
         <div className={`absolute left-0 top-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 select-none z-10 h-8`}>
-          <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
+          <button tabIndex={-1} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
             <Plus size={16} />
           </button>
           <button
+            tabIndex={-1}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
             {...attributes}
             {...listeners}
@@ -626,15 +629,16 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     >
       {/* Drag Handle & Add Button Container */}
       <div className={`absolute left-0 top-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity px-1 select-none z-10 ${lineHeight}`}>
-        <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
-          <Plus size={16} />
+        <button tabIndex={-1} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
+          <Plus size={18} />
         </button>
         <button
+          tabIndex={-1}
           className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
           {...attributes}
           {...listeners}
         >
-          <GripVertical size={16} />
+          <GripVertical size={18} />
         </button>
       </div>
 
@@ -658,9 +662,20 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
           ref={setRefs}
           id={id}
           contentEditable="true"
+          tabIndex={0}
           className={`w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-300 resize-none focus:outline-none ${getStyles()} ${isContentEmptyAndUnfocused ? 'py-0' : ''}`}
           onInput={handleInput}
-          onKeyDown={(e) => onKeyDown(e, id)}
+          onKeyDown={(e) => {
+            if (e.key === 'Tab') {
+              e.preventDefault();
+              document.execCommand('insertHTML', false, '&nbsp;&nbsp;');
+              if (localInputRef.current) {
+                onChange(id, localInputRef.current.innerHTML);
+              }
+              return;
+            }
+            onKeyDown(e, id);
+          }}
           onClick={(e) => {
             const target = (e.target as HTMLElement).closest('a') as HTMLAnchorElement | null;
             if (target) {

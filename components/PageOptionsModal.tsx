@@ -98,7 +98,7 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
                 onClose();
               }
             }}
-            className={`fixed z-9999 bg-[#252525] border-[#2f2f2f] shadow-2xl text-base text-[#d4d4d4] overflow-y-auto ${
+            className={`fixed z-9999 bg-[#252525] border-[#2f2f2f] shadow-2xl text-base text-[#d4d4d4] overflow-y-auto p-1 ${
               isMobile 
                 ? 'inset-x-0 bottom-0 rounded-t-2xl border-t' 
                 : 'right-5 top-12.5 w-64 rounded-xl border'
@@ -113,11 +113,11 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
 
             {/* Search */}
             <div className="flex items-center p-2">
-              <div className="flex items-center w-full rounded-md px-3 py-2 gap-2 bg-[#ffffff0e]">
+              <div className="flex items-center rounded-md px-2 py-1.5 gap-2 bg-[#ffffff0e]">
               <Search size={20}/>
               <input
                 placeholder="Search actions..."
-                className="text-sm placeholder:text-[#8a8a8a] outline-none focus:none focus:none"
+                className="text-sm w-full placeholder:text-[#8a8a8a] outline-none focus:none focus:none"
               />
               </div>
             </div>
@@ -220,7 +220,7 @@ function MenuItem({
 }) {
   return (
     <div 
-      className="flex items-center justify-between px-2 py-1.5 hover:bg-[#2a2a2a] cursor-pointer transition-colors"
+      className="flex items-center rounded-md justify-between px-2 py-1.5 hover:bg-[#2a2a2a] cursor-pointer transition-colors"
       onClick={onClick}
     >
       <div className="flex items-center gap-2">
