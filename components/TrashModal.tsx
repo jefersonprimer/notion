@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { Trash2, RotateCcw, FileText, File } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import api from '@/lib/api';
 import { Note } from '@/types/note';
@@ -13,9 +14,11 @@ type Props = {
 };
 
 export default function TrashModal({ open, onClose }: Props) {
+  const t = useTranslations('TrashModal');
   const { updatedTitles, updatedHasContent } = useNote();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(false);
+  const defaultNoteTitle = 'Nova página';
 
   useEffect(() => {
     if (open) {
@@ -91,7 +94,7 @@ export default function TrashModal({ open, onClose }: Props) {
         <div className="flex items-center justify-between px-3 py-2 border-b border-[#3f3f3f] bg-[#2f2f2f] text-white shrink-0">
           <span className="text-sm font-medium flex items-center gap-2">
             <Trash2 size={16} />
-            Lixeira
+            {t('title')}
           </span>
           <div className="flex items-center gap-2">
             {notes.length > 0 && (
@@ -99,7 +102,7 @@ export default function TrashModal({ open, onClose }: Props) {
                 onClick={handleEmptyTrash}
                 className="text-xs text-[#ff5f5f] hover:text-[#ff8f8f] px-2 py-1 rounded hover:bg-[#3f3f3f] transition-colors"
               >
-                Esvaziar lixeira agora
+                {t('actions.emptyTrashNow')}
               </button>
             )}
           </div>
@@ -108,10 +111,10 @@ export default function TrashModal({ open, onClose }: Props) {
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {loading ? (
-            <div className="flex items-center justify-center h-full text-xs">Carregando...</div>
+            <div className="flex items-center justify-center h-full text-xs">{t('states.loading')}</div>
           ) : notes.length === 0 ? (
             <div className="flex items-center justify-center h-full text-xs text-center px-4">
-              A lixeira está vazia.
+              {t('states.empty')}
             </div>
           ) : (
             notes.map(note => (
@@ -120,19 +123,19 @@ export default function TrashModal({ open, onClose }: Props) {
                 className="group flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-[#2f2f2f] text-[#f0efed] transition-colors"
               >
                 <Link 
-                  href={`/${createNoteSlug((updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || "Nova página", note.id)}`}
+                  href={`/${createNoteSlug((updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || t('defaultNoteTitle'), note.id)}`}
                   onClick={onClose}
                   className="flex items-center gap-1 overflow-hidden flex-1"
                 >
                   { (updatedHasContent[note.id] !== undefined 
                       ? updatedHasContent[note.id] 
-                      : (note.title && note.title !== 'Nova página' && note.title.trim() !== '' && note.description && note.description.trim() !== '')) ? (
+                      : (note.title && note.title !== defaultNoteTitle && note.title.trim() !== '' && note.description && note.description.trim() !== '')) ? (
                     <FileText size={18} className="shrink-0" />
                   ) : (
                     <File size={18} className="shrink-0" />
                   )}
                   <span className="text-sm truncate">
-                    {(updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || "Nova página"}
+                    {(updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || t('defaultNoteTitle')}
                   </span>
                 </Link>
                 
@@ -140,14 +143,14 @@ export default function TrashModal({ open, onClose }: Props) {
                   <button 
                     onClick={() => handleRestore(note.id)}
                     className="p-1 hover:bg-[#3f3f3f] rounded text-[#ada9a3] hover:text-white"
-                    title="Restaurar"
+                    title={t('actions.restore')}
                   >
                     <RotateCcw size={16} />
                   </button>
                   <button 
                     onClick={() => handlePermanentDelete(note.id)}
                     className="p-1 hover:bg-[#3f3f3f] rounded text-[#ada9a3] hover:text-[#ff8f8f]"
-                    title="Excluir permanentemente"
+                    title={t('actions.deletePermanently')}
                   >
                     <Trash2 size={16} />
                   </button>

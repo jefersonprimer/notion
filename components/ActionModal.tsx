@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react"
+import { useTranslations } from "next-intl"
 import { formatRelativeDate } from '@/lib/utils'
 import {
   ChevronRight,
@@ -72,6 +73,7 @@ type ActionModalProps = {
 }
 
 export default function ActionModal({ onClose, userName, updatedAt, onTransformSelect, onApplyColor }: ActionModalProps) {
+  const t = useTranslations('ActionModal')
   const modalRef = useRef<HTMLDivElement>(null)
   const [showSlashMenu, setShowSlashMenu] = useState(false)
   const [showColorMenu, setShowColorMenu] = useState(false)
@@ -100,7 +102,7 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
           onMouseLeave={() => setShowSlashMenu(false)}
         >
           <div className="w-60 bg-[#252525] border border-[#3f3f3f] rounded-lg shadow-xl overflow-y-auto px-1 py-2 animate-in fade-in zoom-in-95 duration-100">
-            <div className="px-3 py-1 text-xs font-medium text-[#ada9a3]">Blocos básicos</div>
+            <div className="px-3 py-1 text-xs font-medium text-[#ada9a3]">{t('menus.basicBlocks')}</div>
             {MENU_ITEMS.map((item, index) => (
               <button
                 key={item.id}
@@ -130,12 +132,12 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
         >
           <div className="w-64 bg-[#252525] border border-[#3f3f3f] rounded-lg shadow-xl p-3 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-100">
             <div>
-              <div className="text-[10px] text-gray-500 font-semibold uppercase mb-2 px-1">Cor do texto</div>
+              <div className="text-[10px] text-gray-500 font-semibold uppercase mb-2 px-1">{t('menus.textColor')}</div>
               <div className="grid grid-cols-5 gap-1">
                 <button
                   onClick={() => { onApplyColor?.('text', 'inherit'); setShowColorMenu(false) }}
                   className="flex items-center justify-center w-10 h-10 rounded hover:bg-[#2a2a2a] transition-colors border border-transparent hover:border-[#3f3f3f]"
-                  title="Padrão"
+                  title={t('menus.default')}
                 >
                   <span className="text-lg font-medium border px-1.5 rounded text-gray-300 border-gray-500">A</span>
                 </button>
@@ -152,12 +154,12 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
             </div>
 
             <div>
-              <div className="text-[10px] text-gray-500 font-semibold uppercase mb-2 px-1">Cor de fundo</div>
+              <div className="text-[10px] text-gray-500 font-semibold uppercase mb-2 px-1">{t('menus.backgroundColor')}</div>
               <div className="grid grid-cols-5 gap-1">
                 <button
                   onClick={() => { onApplyColor?.('bg', 'transparent'); setShowColorMenu(false) }}
                   className="flex items-center justify-center w-10 h-10 rounded hover:bg-[#2a2a2a] transition-colors border border-transparent hover:border-[#3f3f3f]"
-                  title="Padrão"
+                  title={t('menus.default')}
                 >
                   <div className="w-6 h-6 rounded border border-dashed border-gray-500 flex items-center justify-center">
                     <span className="text-[10px] text-gray-500">⊘</span>
@@ -180,7 +182,7 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
 
       {/* Search */}
       <input
-        placeholder="Pesquisar ações..."
+        placeholder={t('searchPlaceholder')}
         className="
           w-full mb-2
           rounded-md bg-[#ffffff0e]
@@ -194,13 +196,13 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
 
       {/* Title */}
       <div className="px-2 py-1 text-sm text-[#ada9a3] font-medium">
-        Título 2
+        {t('title')}
       </div>
 
       <div className="space-y-1">
         <ActionItem
           icon={<Repeat2 size={20} />}
-          label="Transformar em"
+          label={t('actions.transformInto')}
           hasArrow
           onMouseEnter={() => { setShowSlashMenu(true); setShowColorMenu(false) }}
           onMouseLeave={() => setShowSlashMenu(false)}
@@ -208,7 +210,7 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
 
         <ActionItem
           icon={<Palette size={18} />}
-          label="Cor"
+          label={t('actions.color')}
           hasArrow
           onMouseEnter={() => { setShowColorMenu(true); setShowSlashMenu(false) }}
           onMouseLeave={() => setShowColorMenu(false)}
@@ -216,26 +218,26 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
 
         <ActionItem
           icon={<Link size={18} />}
-          label="Link para o bloco"
-          shortcut="Alt + ⇧ + L"
+          label={t('actions.linkToBlock')}
+          shortcut={t('shortcuts.linkToBlock')}
         />
 
         <ActionItem
           icon={<Copy size={18} />}
-          label="Duplicar"
-          shortcut="Ctrl + D"
+          label={t('actions.duplicate')}
+          shortcut={t('shortcuts.duplicate')}
         />
 
         <ActionItem
           icon={<CornerUpRight size={18} />}
-          label="Mover para"
-          shortcut="Ctrl + ⇧ + P"
+          label={t('actions.moveTo')}
+          shortcut={t('shortcuts.moveTo')}
         />
 
         <ActionItem
           icon={<Trash2 size={18} />}
-          label="Excluir"
-          shortcut="Del"
+          label={t('actions.delete')}
+          shortcut={t('shortcuts.delete')}
           danger
         />
 
@@ -243,28 +245,28 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
 
         <ActionItem
           icon={<MessageSquareText size={18} />}
-          label="Comentário"
-          shortcut="Ctrl + ⇧ + M"
+          label={t('actions.comment')}
+          shortcut={t('shortcuts.comment')}
         />
 
         <ActionItem
           icon={<CommentPencilIcon size={22} />}
-          label="Sugerir edições"
-          shortcut="Ctrl + ⇧ + Alt + X"
+          label={t('actions.suggestEdits')}
+          shortcut={t('shortcuts.suggestEdits')}
         />
 
         <div className="my-1 border-t border-zinc-700" />
         <ActionItem
           icon={<Sparkles size={18} />}
-          label="Peça à IA"
-          shortcut="Ctrl + J"
+          label={t('actions.askAI')}
+          shortcut={t('shortcuts.askAI')}
         />
       </div>
 
       <div className="my-1 border-t border-zinc-700" />
       {/* Footer */}
       <div className="py-1 text-xs text-[#7d7a75]">
-        Última edição por <span className="text-zinc-300">{userName || 'Usuário'}</span>
+        {t('lastEditedBy')} <span className="text-zinc-300">{userName || t('user.fallbackName')}</span>
         <br />
         {formattedDate}
       </div>

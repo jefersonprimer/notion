@@ -3,9 +3,9 @@
 import { X, ChevronDown, Bell, Settings, Settings2, Users, Globe, Smile, Link2, Download, Building2, Sparkles, CircleArrowUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useAuth } from '@/context/AuthContext';
 
 interface SettingsModalProps {
@@ -14,34 +14,30 @@ interface SettingsModalProps {
 }
 
 export default function SettingsModal({ open, onClose }: SettingsModalProps) {
-  const [mounted, setMounted] = useState(false);
+  const t = useTranslations('SettingsModal');
   const [activeTab, setActiveTab] = useState('preferencias');
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const router = useRouter();
   const locale = useLocale();
   const { session } = useAuth();
-  const userName = session?.user.displayName || 'Usuário';
+  const userName = session?.user.displayName || t('user.fallbackName');
   const userEmail = session?.user.email;
-  const userInitial = userName[0]?.toUpperCase() || 'U';
+  const userInitial = userName[0]?.toUpperCase() || t('user.fallbackInitial');
   const languageOptions = [
-    { value: 'pt-BR', label: 'Português (Brasil)' },
-    { value: 'en', label: 'English' },
+    { value: 'pt-BR', label: t('languageOptions.ptBR') },
+    { value: 'en', label: t('languageOptions.en') },
   ];
   const selectedLanguageLabel =
-    languageOptions.find((option) => option.value === locale)?.label || 'English';
+    languageOptions.find((option) => option.value === locale)?.label || t('languageOptions.en');
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
+  if (typeof document === 'undefined') return null;
 
   const renderContent = () => {
     if (activeTab === 'minha-conta') {
       return (
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-200">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-base text-[#f0efed] font-medium">Conta</h2>
+            <h2 className="text-base text-[#f0efed] font-medium">{t('account.title')}</h2>
           </div>
 
           <div className="mb-2 h-px w-full bg-[#fffff315]" />
@@ -60,7 +56,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
               </div>
               
               <div className="flex flex-col">
-                <div className="text-xs font-medium text-[#bcbab6] mb-1">Nome</div>
+                <div className="text-xs font-medium text-[#bcbab6] mb-1">{t('account.name')}</div>
                 <div className="px-2 py-1 text-sm rounded-lg bg-[#ffffff0e] border border-zinc-800 text-[#f0efed]">
                   {userName}
                 </div>
@@ -68,54 +64,54 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
             </div>
             
             <p className="text-sm text-[#7d7a75]">
-              <a href="#" className="text-[#2783de]">Adicione uma foto </a> 
-              ou
-              <a href="#" className="text-[#2783de]">  crie um autorretrati personalizado com o Cognition Face.</a> 
+              <a href="#" className="text-[#2783de]">{t('account.addPhoto')}</a> 
+              {t('account.or')}
+              <a href="#" className="text-[#2783de]"> {t('account.createAvatarWithFace')}</a> 
             </p>
           </div>
 
           <div>
-            <h2 className="text-base text-[#f0efed] font-medium">Segurança</h2>
+            <h2 className="text-base text-[#f0efed] font-medium">{t('security.title')}</h2>
             <div className="my-2 h-px w-full bg-[#fffff315]" />
 
 
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-2">
-                <p className="text-[#f0efed] text-sm font-medium">E-mail</p>
+                <p className="text-[#f0efed] text-sm font-medium">{t('security.email')}</p>
                 <p className="text-[#ada9a3] text-xs font-normal">{userEmail}</p>
               </div>
               <button className="px-2 py-1 border text-sm border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
-                Gerenciar e-mails
+                {t('security.manageEmails')}
               </button>
             </div>
 
             <div className="flex items-center justify-between my-6">
               <div className="flex flex-col gap-2">
-                <p className="text-[#f0efed] text-sm font-medium">senha</p>
-                <p className="text-[#ada9a3] text-xs font-normal">Defina uma senha para sua conta</p>
+                <p className="text-[#f0efed] text-sm font-medium">{t('security.password')}</p>
+                <p className="text-[#ada9a3] text-xs font-normal">{t('security.setPasswordDescription')}</p>
               </div>
               <button className="px-2 py-1 text-sm border border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
-                Adicionar senha
+                {t('security.addPassword')}
               </button>
             </div>
 
             <div className="flex items-center justify-between my-6">
               <div className="flex flex-col gap-2">
-                <p className="text-[#f0efed] text-sm font-medium">Verificação de duas etapas</p>
-                <p className="text-[#ada9a3] text-xs font-normal">Adicione outra camada de segurança à sua conta</p>
+                <p className="text-[#f0efed] text-sm font-medium">{t('security.twoStepVerification')}</p>
+                <p className="text-[#ada9a3] text-xs font-normal">{t('security.twoStepVerificationDescription')}</p>
               </div>
               <button className="px-2 text-sm py-1 border border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
-                Adicionar um método de verificação
+                {t('security.addVerificationMethod')}
               </button>
             </div>
 
             <div className="flex items-center justify-between my-6">
               <div className="flex flex-col gap-2">
-                <p className="text-[#f0efed] text-sm font-medium">Chave de acesso</p>
-                <p className="text-[#ada9a3] text-xs font-normal">Entre com segurança usando a autenticação biometrica no dispositivo</p>
+                <p className="text-[#f0efed] text-sm font-medium">{t('security.passkey')}</p>
+                <p className="text-[#ada9a3] text-xs font-normal">{t('security.passkeyDescription')}</p>
               </div>
               <button className="px-2 text-sm py-1 border border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
-                Adicionar passkey
+                {t('security.addPasskey')}
               </button>
             </div>
           </div>
@@ -126,12 +122,12 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
     return (
       <div className="animate-in fade-in slide-in-from-bottom-2 duration-200">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Configurações</h2>
+          <h2 className="text-xl font-semibold">{t('preferences.title')}</h2>
         </div>
 
         {/* Account Section - Visible on mobile only since it's in the sidebar on desktop */}
         <div className="md:hidden mb-8" onClick={() => setActiveTab('minha-conta')}>
-          <div className="mb-4 text-sm text-[#7d7a75] font-medium uppercase tracking-wider">Conta</div>
+          <div className="mb-4 text-sm text-[#7d7a75] font-medium uppercase tracking-wider">{t('account.title')}</div>
           <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-800/50 border border-zinc-800">
             <div
               className="
@@ -145,7 +141,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-medium text-[#f0efed]">
-                {session?.user.displayName || 'Usuário'}
+                {session?.user.displayName || t('user.fallbackName')}
               </span>
               <span className="text-xs text-[#7d7a75]">
                 {userEmail}
@@ -154,14 +150,14 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
           </div>
         </div>
 
-        <Section title="Aparência">
-          <Row label="Aparência" description="Personalize a aparência do Cognition no seu dispositivo.">
-            <Select value="Usar configuração do sistema" />
+        <Section title={t('preferences.appearance.sectionTitle')}>
+          <Row label={t('preferences.appearance.label')} description={t('preferences.appearance.description')}>
+            <Select value={t('preferences.appearance.systemSetting')} />
           </Row>
         </Section>
 
-        <Section title="Idioma e horário">
-          <Row label="Idioma" description="Altere o idioma usado na interface.">
+        <Section title={t('preferences.languageAndTime.sectionTitle')}>
+          <Row label={t('preferences.languageAndTime.languageLabel')} description={t('preferences.languageAndTime.languageDescription')}>
             <LanguageSelect
               value={selectedLanguageLabel}
               open={languageMenuOpen}
@@ -180,27 +176,27 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
             />
           </Row>
 
-          <Toggle label="Sempre mostra os controles de direção do texto" />
-          <Toggle label="Iniciar semana na segunda-feira" />
-          <Toggle label="Defina o fuso horário automaticamente usando sua localização" checked />
+          <Toggle label={t('preferences.languageAndTime.alwaysShowTextDirectionControls')} />
+          <Toggle label={t('preferences.languageAndTime.startWeekOnMonday')} />
+          <Toggle label={t('preferences.languageAndTime.setTimeZoneAutomatically')} checked />
 
-          <Row label="Fuso horário">
-            <Select value="(GMT-3:00) São Paulo" />
+          <Row label={t('preferences.languageAndTime.timeZoneLabel')}>
+            <Select value={t('preferences.languageAndTime.timeZoneValue')} />
           </Row>
         </Section>
 
         <div className="md:hidden space-y-8">
-          <Section title="Notificações">
-             <Toggle label="Notificações no desktop" checked />
-             <Toggle label="Notificações por e-mail" />
+          <Section title={t('preferences.notifications.sectionTitle')}>
+             <Toggle label={t('preferences.notifications.desktopNotifications')} checked />
+             <Toggle label={t('preferences.notifications.emailNotifications')} />
           </Section>
 
-          <Section title="Segurança">
+          <Section title={t('security.title')}>
             <button className="w-full text-left px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition text-sm">
-              Alterar senha
+              {t('preferences.security.changePassword')}
             </button>
             <button className="w-full text-left px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition text-sm text-red-400">
-              Sair de todas as sessões
+              {t('preferences.security.signOutAllSessions')}
             </button>
           </Section>
         </div>
@@ -235,7 +231,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
             </button>
             {/* Sidebar - Hidden on mobile */}
             <aside className="hidden md:block w-64 border-r border-zinc-800 overflow-y-auto p-3 text-sm bg-[#272727]">
-              <div className="mb-2 px-2 text-sm text-[#7d7a75] font-medium">Conta</div>
+              <div className="mb-2 px-2 text-sm text-[#7d7a75] font-medium">{t('account.title')}</div>
               <div 
                 className={`mb-0.5 flex items-center gap-2 rounded-lg px-2 py-1.5 cursor-pointer hover:bg-[#ffffff0e] transition-colors ${activeTab === 'minha-conta' ? 'bg-[#ffffff0e]' : ''}`}
                 onClick={() => setActiveTab('minha-conta')}
@@ -251,38 +247,38 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
                   {userInitial}
                 </div>
                 <span className="text-sm text-[#bcbab6]">
-                  {session?.user.displayName || 'Usuário'}
+                  {session?.user.displayName || t('user.fallbackName')}
                 </span>
               </div>
 
               <nav className="space-y-0.5">
                 <SidebarItem 
                   icon={Settings2} 
-                  label="Preferências" 
+                  label={t('sidebar.preferences')} 
                   active={activeTab === 'preferencias'} 
                   onClick={() => setActiveTab('preferencias')}
                 />
-                <SidebarItem icon={Bell} label="Notificações" />
-                <SidebarItem icon={Link2} label="Conexões" />
+                <SidebarItem icon={Bell} label={t('sidebar.notifications')} />
+                <SidebarItem icon={Link2} label={t('sidebar.connections')} />
 
-                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">Espaço de trabalho</div>
-                <SidebarItem icon={Settings} label="Geral" />
-                <SidebarItem icon={Users} label="Pessoas" />
-                <SidebarItem icon={Download} label="Importações" />
+                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">{t('sidebar.workspaceSection')}</div>
+                <SidebarItem icon={Settings} label={t('sidebar.general')} />
+                <SidebarItem icon={Users} label={t('sidebar.people')} />
+                <SidebarItem icon={Download} label={t('sidebar.imports')} />
                 
-                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">Features</div>
-                <SidebarItem icon={Sparkles} label="IA do Cognition" />
-                <SidebarItem icon={Globe} label="Páginas públicas" />
-                <SidebarItem icon={Smile} label="Emoji" />
+                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">{t('sidebar.featuresSection')}</div>
+                <SidebarItem icon={Sparkles} label={t('sidebar.cognitionAI')} />
+                <SidebarItem icon={Globe} label={t('sidebar.publicPages')} />
+                <SidebarItem icon={Smile} label={t('sidebar.emoji')} />
                 
-                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">Integrations</div>
-                <SidebarItem icon={Link2} label="Conexões" />
+                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">{t('sidebar.integrationsSection')}</div>
+                <SidebarItem icon={Link2} label={t('sidebar.connections')} />
                 
-                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">Admin</div>
-                <SidebarItem icon={Building2} label="Espaços de equipe" />
+                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">{t('sidebar.adminSection')}</div>
+                <SidebarItem icon={Building2} label={t('sidebar.teamspaces')} />
 
-                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">Acess e billing</div>
-                <SidebarItem icon={CircleArrowUp} label="Fazer upgrade do plano" />
+                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">{t('sidebar.accessAndBillingSection')}</div>
+                <SidebarItem icon={CircleArrowUp} label={t('sidebar.upgradePlan')} />
               </nav>
             </aside>
 
@@ -298,7 +294,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
   );
 }
 
-function SidebarItem({ icon: Icon, label, active, onClick }: any) {
+function SidebarItem({ icon: Icon, label, active, onClick }: { icon: React.ComponentType<{ size?: number }>; label: string; active?: boolean; onClick?: () => void }) {
   return (
     <div
       onClick={onClick}
@@ -312,7 +308,7 @@ function SidebarItem({ icon: Icon, label, active, onClick }: any) {
   );
 }
 
-function Section({ title, children }: any) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mb-8">
       <h3 className="mb-4 border-b border-zinc-800 pb-2 text-sm font-semibold text-zinc-300">
@@ -323,7 +319,7 @@ function Section({ title, children }: any) {
   );
 }
 
-function Row({ label, description, children }: any) {
+function Row({ label, description, children }: { label: string; description?: string; children?: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-4">
       <div>

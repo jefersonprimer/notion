@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { Ellipsis, Settings, Users, Check, Plus } from 'lucide-react';
 
@@ -10,6 +11,7 @@ interface UserModalProps {
 } 
 
 export default function UserModal({ isOpen, onClose, position, onOpenSettings }: UserModalProps) {
+  const t = useTranslations('UserModal');
   const { session, signOut } = useAuth();
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -44,9 +46,9 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
 
           <div className='flex flex-col min-w-0'>
             <div className="flex items-center text-sm text-[#f0efed] font-medium truncate">
-              Cognition de {session?.user.displayName || 'Usuário'}
+              {t('workspaceTitle', { name: session?.user.displayName || t('user.fallbackName') })}
             </div>
-            <div className="text-xs text-[#ada9a3]">Conta Gratuita</div>
+            <div className="text-xs text-[#ada9a3]">{t('freeAccount')}</div>
           </div>
         </div>
 
@@ -59,12 +61,12 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
             className="rounded-md border border-[#3f3f3f] px-2 py-1  hover:bg-[#2f2f2f] flex items-center gap-2 text-xs font-medium transition-colors"
           >
             <Settings size={16} />
-            <span>Configurações</span>
+            <span>{t('actions.settings')}</span>
           </button>
 
           <button className="rounded-md border border-[#3f3f3f] px-2 py-1 hover:bg-[#2f2f2f] flex items-center gap-2 text-xs font-medium transition-colors">
             <Users size={16} />
-            <span>Convidar Membros</span>
+            <span>{t('actions.inviteMembers')}</span>
           </button>
         </div>
       </div>
@@ -84,7 +86,7 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
           </div>
 
           <div className='flex items-center justify-between flex-1 px-2 text-white min-w-0'>
-            <span className="text-sm truncate">Cognition de {session?.user.displayName}</span>
+            <span className="text-sm truncate">{t('workspaceTitle', { name: session?.user.displayName || t('user.fallbackName') })}</span>
             <Check size={16} className="shrink-0" />
           </div>
         </div>
@@ -92,7 +94,7 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
         <div className='px-2 mx-1 py-1.5 hover:bg-[#3f3f3f] rounded-md transition-colors'>
           <button className="flex items-center gap-2 text-blue-400 text-sm w-full">
             <Plus size={16} />
-            <span>Novo espaço de trabalho</span>
+            <span>{t('actions.newWorkspace')}</span>
           </button>
         </div>
       </div>
@@ -101,11 +103,11 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
 
       <div className="flex flex-col mx-auto my-1">
         <button className="text-left px-2 mx-1 py-1 hover:bg-[#2f2f2f] rounded-md flex items-center gap-2 text-sm transition-colors">
-          Criar conta de trabalho
+          {t('actions.createWorkAccount')}
         </button>
 
         <button className="text-left px-2 mx-1 py-1 hover:bg-[#2f2f2f] rounded-md flex items-center gap-2 text-sm transition-colors">
-          Adicionar outra conta
+          {t('actions.addAnotherAccount')}
         </button>
 
         <button
@@ -115,16 +117,16 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
           }}
           className="text-left px-2 mx-1 py-1 hover:bg-[#2f2f2f] rounded-md flex items-center gap-2 text-sm transition-colors text-red-400 hover:text-red-300"
         >
-          Sair
+          {t('actions.signOut')}
         </button>
       </div>
 
       <div className='h-0.5 mx-3 my-1 border-b border-[#3f3f3f] transition-all duration-300' />
 
-        <div className="px-2 mx-1 py-1 hover:bg-[#2f2f2f] rounded-md flex items-center gap-2 text-sm transition-colors">Obter App Mac
+        <div className="px-2 mx-1 py-1 hover:bg-[#2f2f2f] rounded-md flex items-center gap-2 text-sm transition-colors">{t('actions.getMacApp')}
         </div>
         
-        <div className="px-2 mx-1 py-1 hover:bg-[#2f2f2f] rounded-md flex items-center gap-2 text-sm transition-colors">Obter App IOS e Android
+        <div className="px-2 mx-1 py-1 hover:bg-[#2f2f2f] rounded-md flex items-center gap-2 text-sm transition-colors">{t('actions.getMobileApp')}
         </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import Sidebar from '@/components/Sidebar';
 import api from '@/lib/api';
@@ -65,6 +66,7 @@ const PREFIXES: Record<string, string> = {
 };
 
 export default function NotePage() {
+  const t = useTranslations('NotePage');
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
@@ -89,6 +91,8 @@ export default function NotePage() {
   const [focusedBlockId, setFocusedBlockId] = useState<string | null>(null);
   const [toolbarPosition, setToolbarPosition] = useState<{ top: number, left: number } | undefined>(undefined);
   const [isToolbarVisible, setIsToolbarVisible] = useState(false);
+  const storedDefaultTitle = 'Nova página';
+  const displayDefaultTitle = t('defaultTitle');
 
   const titleDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const blocksDebounceRef = useRef<NodeJS.Timeout | null>(null);
@@ -263,9 +267,9 @@ export default function NotePage() {
         const childrenData = childrenResponse.data;
 
         setNote(noteData);
-        setTitle(noteData.title === 'Nova página' ? '' : noteData.title);
+        setTitle(noteData.title === storedDefaultTitle ? '' : noteData.title);
 
-        const hasInitialContent = (noteData.title && noteData.title !== 'Nova página' && noteData.title.trim() !== '') && (noteData.description && noteData.description.trim() !== '');
+        const hasInitialContent = (noteData.title && noteData.title !== storedDefaultTitle && noteData.title.trim() !== '') && (noteData.description && noteData.description.trim() !== '');
         updateNoteHasContent(noteData.id, !!hasInitialContent);
 
         // Fetch parent note if exists
@@ -317,14 +321,14 @@ export default function NotePage() {
 
       } catch (error) {
         console.error('Error fetching note:', error);
-        setError('Nota não encontrada');
+        setError(t('errors.noteNotFound'));
       } finally {
         setLoading(false);
       }
     }
 
     fetchNote();
-  }, [session, params]);
+  }, [session, params, storedDefaultTitle, t]);
 
   useEffect(() => {
     if (!loading && searchParams?.get('showMoveTo')) {
@@ -385,7 +389,7 @@ export default function NotePage() {
         const content = b.type === 'code' ? b.content.replace(/\n/g, '\\n') : b.content;
         return prefix + content;
       }).join('\n');
-      const hasContent = (newTitle.trim() !== '' && newTitle !== 'Nova página') && currentDescription.trim() !== '';
+      const hasContent = (newTitle.trim() !== '' && newTitle !== storedDefaultTitle) && currentDescription.trim() !== '';
       updateNoteHasContent(note.id, hasContent);
 
       const cleanId = note.id.replace(/-/g, '');
@@ -428,7 +432,7 @@ export default function NotePage() {
         return prefix + content;
       }).join('\n');
 
-      const hasContent = (title.trim() !== '' && title !== 'Nova página') && description.trim() !== '';
+      const hasContent = (title.trim() !== '' && title !== storedDefaultTitle) && description.trim() !== '';
       updateNoteHasContent(note.id, hasContent);
 
       try {
@@ -439,7 +443,7 @@ export default function NotePage() {
         console.error("Failed to save description", err);
       }
     }, 1000);
-  }, [blocks, note, session, loading]);
+  }, [blocks, note, session, loading, title, storedDefaultTitle, updateNoteHasContent]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -554,7 +558,7 @@ export default function NotePage() {
     if (newType === 'page') {
       if (!session || !note) return;
       try {
-        const response = await api.post('/notes', { title: "Nova página", parentId: note.id }, {
+        const response = await api.post('/notes', { title: storedDefaultTitle, parentId: note.id }, {
           headers: { Authorization: `Bearer ${session.accessToken}` }
         });
         const newNote = response.data;
@@ -564,7 +568,7 @@ export default function NotePage() {
         const newBlock = {
           id: generateId(),
           type: 'page',
-          content: `${cleanId}|${newNote.title || "Nova página"}`
+          content: `${cleanId}|${newNote.title || storedDefaultTitle}`
         };
 
         const updatedBlocks = blocks.map(b => b.id === id ? newBlock : b);
@@ -899,9 +903,9 @@ export default function NotePage() {
     if (title) {
       document.title = `${title}`;
     } else if (note) {
-      document.title = `Nova página`;
+      document.title = displayDefaultTitle;
     }
-  }, [title, note]);
+  }, [title, note, displayDefaultTitle]);
 
   const handleToggleFavorite = () => {
     if (!note) return;
@@ -922,7 +926,7 @@ export default function NotePage() {
       router.push('/');
     } catch (error) {
       console.error('Error deleting note:', error);
-      alert('Erro ao excluir nota');
+      alert(t('errors.deleteNote'));
     }
   };
 
@@ -966,7 +970,7 @@ export default function NotePage() {
       <div className="flex min-h-screen bg-white dark:bg-[#191919]">
         <SidebarElement />
         <div className="flex-1 flex items-center justify-center text-gray-500">
-          {error || 'Nota não encontrada'}
+          {error || t('errors.noteNotFound')}
         </div>
       </div>
     );
@@ -1017,7 +1021,7 @@ export default function NotePage() {
                     href={`/${createNoteSlug(updatedTitles[parentNote.id] || parentNote.title, parentNote.id)}`}
                     className="text-sm text-[#ada9a3] hover:text-[#f0efed] truncate max-w-37.5 hover:bg-[#fffff315] px-2 py-1 rounded-md transition-colors"
                   >
-                    {updatedTitles[parentNote.id] || parentNote.title || 'Nova página'}
+                    {updatedTitles[parentNote.id] || parentNote.title || displayDefaultTitle}
                   </Link>
                   <ChevronRight size={14} className="text-[#7d7a75]" />
                 </>
@@ -1026,7 +1030,7 @@ export default function NotePage() {
               <button
                 className="text-sm text-[#f0efed] font-normal truncate max-w-60 hover:bg-[#fffff315] px-2 py-1 rounded-md"
               >
-                {title.trim() || 'Nova página'}
+                {title.trim() || displayDefaultTitle}
               </button>
 
               <div className="hidden md:flex relative group/particular">
@@ -1034,12 +1038,12 @@ export default function NotePage() {
                   className="flex items-center justify-center text-sm font-normal text-[#7d7a75] hover:text-[#f0efed] gap-2 hover:bg-[#202020] px-2 py-1 rounded-md"
                 >
                   <LockKeyhole size={14} />
-                  Particular
+                  {t('privacy.private')}
                   <ChevronDown size={14} />
                 </button>
                 <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 hidden group-hover/particular:block bg-[#2f2f2f] text-[#f0efed] text-xs p-1 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
-                  Somente você tem acesso <br />
-                  <span className="text-gray-400">Clique para mover</span>
+                  {t('privacy.onlyYouHaveAccess')} <br />
+                  <span className="text-gray-400">{t('privacy.clickToMove')}</span>
                 </div>
               </div>
             </div>
@@ -1060,12 +1064,12 @@ export default function NotePage() {
               >
                 <Share size={18} className="md:hidden" />
                 <LockKeyhole size={14} className="hidden md:inline" />
-                <span className="hidden md:inline">Compartilhar</span>
+                <span className="hidden md:inline">{t('actions.share')}</span>
                 <ChevronDown size={14} className="hidden md:inline" />
               </button>
 
               <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/share:block bg-[#2f2f2f] text-[#f0efed] text-xs p-2 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
-                Somente você pode acessar
+                {t('privacy.onlyYouCanAccess')}
               </div>
 
               <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} buttonPosition={shareButtonPosition} />
@@ -1082,7 +1086,7 @@ export default function NotePage() {
                 </button>
 
                 <div className="absolute top-full right-[-28] mt-2 hidden group-hover/favorite:block bg-[#2f2f2f] text-[#f0efed] text-xs p-2 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
-                  {isFavorite ? "Remover dos seus Favoritos" : "Adicionar aos seus favoritos"}
+                  {isFavorite ? t('favorites.removeFromFavorites') : t('favorites.addToFavorites')}
                 </div>
               </div>
             </div>
@@ -1097,7 +1101,7 @@ export default function NotePage() {
                 </button>
 
                 <div className="absolute top-full right-0 mt-2 hidden group-hover/more:block bg-[#2f2f2f] text-[#f0efed] text-xs p-2 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
-                  Defina estilos, exporte e faça muito mais...
+                  {t('actions.moreOptionsTooltip')}
                 </div>
 
                 <PageOptionsModal
@@ -1118,7 +1122,11 @@ export default function NotePage() {
           <div className="bg-[#eb5757] text-[#f0efed] hover:text-white px-4 py-2 flex items-center justify-center md:justify-between text-sm">
             <div className="hidden md:flex items-center gap-2">
               <span>
-                {session?.user?.displayName || session?.user?.email} moveu esta página para a lixeira em {getMinutesSinceDeletion()} minutos atrás. Ela será excluída automaticamente em 30 dias.
+                {t('trashBanner.deletedMessage', {
+                  user: session?.user?.displayName || session?.user?.email || t('user.fallbackName'),
+                  minutes: getMinutesSinceDeletion(),
+                  days: 30
+                })}
               </span>
             </div>
             <div className="flex items-center gap-4">
@@ -1127,14 +1135,14 @@ export default function NotePage() {
                 className="flex items-center border border-[#f0efed] hover:border-white px-2 py-1 rounded-md gap-2 font-medium"
               >
                 <RotateCcw size={16} />
-                Restaurar página
+                {t('trashBanner.restorePage')}
               </button>
               <button
                 onClick={handlePermanentDelete}
                 className="flex items-center border border-[#f0efed] hover:border-white px-2 py-1 rounded-md gap-2 font-medium"
               >
                 <Trash2 size={16} />
-                Excluir da lixeira
+                {t('trashBanner.deleteFromTrash')}
               </button>
             </div>
           </div>
@@ -1148,15 +1156,15 @@ export default function NotePage() {
               <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity h-10">
                 <button className="flex items-center gap-1 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
                   <Smile size={16} />
-                  Adicionar ícone
+                  {t('titleActions.addIcon')}
                 </button>
                 <button className="flex items-center gap-1 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
                   <ImageIcon size={16} />
-                  Adicionar capa
+                  {t('titleActions.addCover')}
                 </button>
                 <button className="flex items-center gap-1 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
                   <MessageSquareText size={16} />
-                  Adicionar comentário
+                  {t('titleActions.addComment')}
                 </button>
               </div>
 
@@ -1169,7 +1177,7 @@ export default function NotePage() {
                 onPaste={handleTitlePaste} // Add onPaste handler here
                 onFocus={() => handleBlockFocus('title')}
                 onBlur={handleBlockBlur}
-                placeholder="Nova página"
+                placeholder={displayDefaultTitle}
                 className="w-full text-[40px] font-bold text-gray-900 dark:text-gray-100 mb-3 bg-transparent border-none outline-none placeholder:text-gray-300 dark:placeholder:text-[#373737]"
               />
             </div>

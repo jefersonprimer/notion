@@ -29,6 +29,377 @@
       "recentAccesses": "Recent accesses",
       "favorites": "Favorites"
     }
+  },
+  "Sidebar": {
+    "user": {
+      "fallbackName": "User"
+    },
+    "actions": {
+      "closeSidebarTitle": "Close sidebar Ctrl+\\",
+      "createPageTitle": "Create a new page",
+      "moreOptionsTitle": "More options"
+    },
+    "nav": {
+      "search": {
+        "label": "Search",
+        "title": "Find pages and information in your workspace Ctrl+k"
+      },
+      "home": {
+        "label": "Home",
+        "title": "See recent pages, upcoming tasks, and more ^+ALT+⇧ +H"
+      },
+      "meetings": {
+        "label": "Meetings",
+        "title": "Create and manage AI notes in one place",
+        "hoverIconTitle": "Create new AI note"
+      },
+      "ai": {
+        "label": "Cognition AI",
+        "title": "Ask, search, and create with AI",
+        "hoverIconTitle": "Chat history",
+        "openChatHistoryLog": "Open chat history"
+      },
+      "inbox": {
+        "label": "Inbox",
+        "title": "Review notifications and updates ^+ALT+U"
+      }
+    },
+    "sections": {
+      "favorites": "Favorites",
+      "private": "Private",
+      "noNotes": "No notes",
+      "shared": "Shared",
+      "startCollaborating": "Start collaborating",
+      "apps": "Cognition apps"
+    },
+    "apps": {
+      "mail": "Cognition Mail",
+      "calendar": "Cognition Calendar",
+      "desktop": "Cognition for desktop",
+      "settings": "Settings",
+      "templates": "Templates",
+      "trash": "Trash"
+    }
+  },
+  "SidebarItem": {
+    "defaultNoteTitle": "New page",
+    "user": {
+      "fallbackName": "User"
+    },
+    "alerts": {
+      "duplicateError": "Error duplicating note",
+      "deleteError": "Error deleting note"
+    },
+    "toast": {
+      "linkCopied": "Link copied to clipboard"
+    },
+    "empty": {
+      "noPages": "No pages inside"
+    },
+    "menu": {
+      "sectionTitle": "Page",
+      "addToFavorites": "Add to favorites",
+      "removeFromFavorites": "Remove from favorites",
+      "copyLink": "Copy link",
+      "duplicate": "Duplicate",
+      "rename": "Rename",
+      "moveTo": "Move to",
+      "moveToTrash": "Move to trash",
+      "turnIntoWiki": "Turn into wiki",
+      "openInNewTab": "Open in new tab",
+      "openInSideBySide": "Open in side-by-side mode",
+      "lastEditedBy": "Last edited by {name}"
+    }
+  },
+  "UserModal": {
+    "user": {
+      "fallbackName": "User"
+    },
+    "workspaceTitle": "Cognition by {name}",
+    "freeAccount": "Free Account",
+    "actions": {
+      "settings": "Settings",
+      "inviteMembers": "Invite Members",
+      "newWorkspace": "New workspace",
+      "createWorkAccount": "Create work account",
+      "addAnotherAccount": "Add another account",
+      "signOut": "Sign out",
+      "getMacApp": "Get Mac App",
+      "getMobileApp": "Get iOS and Android App"
+    }
+  },
+  "ActionModal": {
+    "user": {
+      "fallbackName": "User"
+    },
+    "searchPlaceholder": "Search actions...",
+    "title": "Heading 2",
+    "lastEditedBy": "Last edited by",
+    "menus": {
+      "basicBlocks": "Basic blocks",
+      "textColor": "Text color",
+      "backgroundColor": "Background color",
+      "default": "Default"
+    },
+    "actions": {
+      "transformInto": "Turn into",
+      "color": "Color",
+      "linkToBlock": "Link to block",
+      "duplicate": "Duplicate",
+      "moveTo": "Move to",
+      "delete": "Delete",
+      "comment": "Comment",
+      "suggestEdits": "Suggest edits",
+      "askAI": "Ask AI"
+    },
+    "shortcuts": {
+      "linkToBlock": "Alt + ⇧ + L",
+      "duplicate": "Ctrl + D",
+      "moveTo": "Ctrl + ⇧ + P",
+      "delete": "Del",
+      "comment": "Ctrl + ⇧ + M",
+      "suggestEdits": "Ctrl + ⇧ + Alt + X",
+      "askAI": "Ctrl + J"
+    }
+  },
+  "LinkModal": {
+    "defaultNoteTitle": "New page",
+    "input": {
+      "placeholder": "Paste link or search notes",
+      "linkTo": "Link to {url}"
+    },
+    "states": {
+      "loading": "Loading...",
+      "empty": "No notes found"
+    },
+    "sections": {
+      "linkToNote": "Link to note"
+    }
+  },
+  "MoreOptionsModal": {
+    "items": {
+      "page": "Page",
+      "aiNotes": "AI notes",
+      "database": "Database",
+      "templates": "Templates"
+    }
+  },
+  "PageOptionsModal": {
+    "user": {
+      "fallbackName": "User"
+    },
+    "searchPlaceholder": "Search actions...",
+    "wordCount": "Word count: {count}",
+    "lastEditedBy": "Last edited by {name}",
+    "fonts": {
+      "default": "Default",
+      "serif": "Serif",
+      "mono": "Mono"
+    },
+    "items": {
+      "copyLink": "Copy link",
+      "copyPageContents": "Copy page contents",
+      "duplicate": "Duplicate",
+      "moveTo": "Move to",
+      "moveToTrash": "Move to Trash",
+      "smallText": "Small text",
+      "fullWidth": "Full width",
+      "customizePage": "Customize page",
+      "lockPage": "Lock page",
+      "suggestEdits": "Suggest edits",
+      "translate": "Translate",
+      "import": "Import",
+      "export": "Export",
+      "turnIntoWiki": "Turn into wiki",
+      "updatesAndAnalytics": "Updates & analytics",
+      "versionHistory": "Version history",
+      "notifyMe": "Notify me",
+      "connections": "Connections"
+    },
+    "shortcuts": {
+      "copyLink": "Ctrl+Alt+L",
+      "duplicate": "Ctrl+D",
+      "moveTo": "Ctrl+Shift+P",
+      "comments": "Comments",
+      "none": "None"
+    }
+  },
+  "SearchModal": {
+    "defaultNoteTitle": "New page",
+    "searchPlaceholder": "Search or ask a question in Notion by Jeferson Primer...",
+    "filters": {
+      "sort": "Sort",
+      "titleOnly": "Title only",
+      "createdBy": "Created by",
+      "inPage": "In page",
+      "date": "Date"
+    },
+    "states": {
+      "loading": "Loading...",
+      "empty": "No notes found."
+    },
+    "footer": {
+      "openInNewTabShortcut": "Ctrl+↵ Open in new tab"
+    },
+    "settings": {
+      "persistFilters": "Persist filters across sessions",
+      "hideSearchAllSourcesWithAI": "Hide \"Search all sources with AI\""
+    },
+    "date": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "dayBeforeYesterday": "Day before yesterday"
+    }
+  },
+  "ShareModal": {
+    "tabs": {
+      "share": "Share",
+      "publish": "Publish"
+    },
+    "input": {
+      "placeholder": "Email or group, separated by commas"
+    },
+    "labels": {
+      "you": "You",
+      "fullAccess": "Full access",
+      "generalAccess": "General access",
+      "onlyPeopleInvited": "Only people invited"
+    },
+    "actions": {
+      "invite": "Invite",
+      "learnAboutSharing": "Learn about sharing",
+      "copyLink": "Copy link"
+    },
+    "toast": {
+      "linkCopied": "Link copied to clipboard"
+    }
+  },
+  "TrashModal": {
+    "defaultNoteTitle": "New page",
+    "title": "Trash",
+    "states": {
+      "loading": "Loading...",
+      "empty": "Trash is empty."
+    },
+    "actions": {
+      "emptyTrashNow": "Empty trash now",
+      "restore": "Restore",
+      "deletePermanently": "Delete permanently"
+    }
+  },
+  "SettingsModal": {
+    "user": {
+      "fallbackName": "User",
+      "fallbackInitial": "U"
+    },
+    "languageOptions": {
+      "ptBR": "Portuguese (Brazil)",
+      "en": "English"
+    },
+    "account": {
+      "title": "Account",
+      "name": "Name",
+      "addPhoto": "Add a photo",
+      "or": " or ",
+      "createAvatarWithFace": "create a custom portrait with Cognition Face."
+    },
+    "security": {
+      "title": "Security",
+      "email": "Email",
+      "manageEmails": "Manage emails",
+      "password": "Password",
+      "setPasswordDescription": "Set a password for your account",
+      "addPassword": "Add password",
+      "twoStepVerification": "Two-step verification",
+      "twoStepVerificationDescription": "Add another layer of security to your account",
+      "addVerificationMethod": "Add a verification method",
+      "passkey": "Passkey",
+      "passkeyDescription": "Sign in securely using biometric authentication on your device",
+      "addPasskey": "Add passkey"
+    },
+    "preferences": {
+      "title": "Settings",
+      "appearance": {
+        "sectionTitle": "Appearance",
+        "label": "Appearance",
+        "description": "Customize how Cognition looks on your device.",
+        "systemSetting": "Use system setting"
+      },
+      "languageAndTime": {
+        "sectionTitle": "Language and time",
+        "languageLabel": "Language",
+        "languageDescription": "Change the language used in the interface.",
+        "alwaysShowTextDirectionControls": "Always show text direction controls",
+        "startWeekOnMonday": "Start week on Monday",
+        "setTimeZoneAutomatically": "Set time zone automatically using your location",
+        "timeZoneLabel": "Time zone",
+        "timeZoneValue": "(GMT-3:00) Sao Paulo"
+      },
+      "notifications": {
+        "sectionTitle": "Notifications",
+        "desktopNotifications": "Desktop notifications",
+        "emailNotifications": "Email notifications"
+      },
+      "security": {
+        "changePassword": "Change password",
+        "signOutAllSessions": "Sign out of all sessions"
+      }
+    },
+    "sidebar": {
+      "preferences": "Preferences",
+      "notifications": "Notifications",
+      "connections": "Connections",
+      "workspaceSection": "Workspace",
+      "general": "General",
+      "people": "People",
+      "imports": "Imports",
+      "featuresSection": "Features",
+      "cognitionAI": "Cognition AI",
+      "publicPages": "Public pages",
+      "emoji": "Emoji",
+      "integrationsSection": "Integrations",
+      "adminSection": "Admin",
+      "teamspaces": "Teamspaces",
+      "accessAndBillingSection": "Access and billing",
+      "upgradePlan": "Upgrade plan"
+    }
+  },
+  "NotePage": {
+    "defaultTitle": "New page",
+    "user": {
+      "fallbackName": "User"
+    },
+    "errors": {
+      "noteNotFound": "Note not found",
+      "deleteNote": "Error deleting note"
+    },
+    "privacy": {
+      "private": "Private",
+      "onlyYouHaveAccess": "Only you have access",
+      "clickToMove": "Click to move",
+      "onlyYouCanAccess": "Only you can access"
+    },
+    "actions": {
+      "share": "Share",
+      "moreOptionsTooltip": "Set styles, export, and do much more..."
+    },
+    "favorites": {
+      "removeFromFavorites": "Remove from your favorites",
+      "addToFavorites": "Add to your favorites"
+    },
+    "trashBanner": {
+      "deletedMessage": "{user} moved this page to trash {minutes} minutes ago. It will be permanently deleted in {days} days.",
+      "restorePage": "Restore page",
+      "deleteFromTrash": "Delete from trash"
+    },
+    "titleActions": {
+      "addIcon": "Add icon",
+      "addCover": "Add cover",
+      "addComment": "Add comment"
+    }
+  },
+  "ColorModal": {
+    "textColor": "Cor do texto",
+    "backgroundColor": "Cor de fundo"
   }
 }
-

@@ -29,6 +29,377 @@
       "recentAccesses": "Acessos recentes",
       "favorites": "Favoritos"
     }
+  },
+  "Sidebar": {
+    "user": {
+      "fallbackName": "Usuário"
+    },
+    "actions": {
+      "closeSidebarTitle": "Fechar barra lateral Ctrl+\\",
+      "createPageTitle": "Crie uma nova página",
+      "moreOptionsTitle": "Mais opções"
+    },
+    "nav": {
+      "search": {
+        "label": "Buscar",
+        "title": "Encontre páginas e informações do seu espaço de trabalho Ctrl+k"
+      },
+      "home": {
+        "label": "Página inicial",
+        "title": "Veja páginas recentes, tarefas futuras e muito mais ^+ALT+⇧ +H"
+      },
+      "meetings": {
+        "label": "Reuniões",
+        "title": "Crie e gerencie anotações de IA em um só lugar",
+        "hoverIconTitle": "Criar nova anotação IA"
+      },
+      "ai": {
+        "label": "IA do Cognition",
+        "title": "Pergunte, busque, crie com a IA",
+        "hoverIconTitle": "Histórico do chat",
+        "openChatHistoryLog": "Abrir histórico do chat"
+      },
+      "inbox": {
+        "label": "Caixa de entrada",
+        "title": "Revise notificações e atualizações ^+ALT+U"
+      }
+    },
+    "sections": {
+      "favorites": "Favoritos",
+      "private": "Particular",
+      "noNotes": "Nenhuma nota",
+      "shared": "Compartilhado",
+      "startCollaborating": "Começar a colaborar",
+      "apps": "Aplicativos do Cognition"
+    },
+    "apps": {
+      "mail": "Cognition Mail",
+      "calendar": "Cognition Calendar",
+      "desktop": "Cognition para desktop",
+      "settings": "Configurações",
+      "templates": "Modelos",
+      "trash": "Lixeira"
+    }
+  },
+  "SidebarItem": {
+    "defaultNoteTitle": "Nova página",
+    "user": {
+      "fallbackName": "Usuário"
+    },
+    "alerts": {
+      "duplicateError": "Erro ao duplicar nota",
+      "deleteError": "Erro ao excluir nota"
+    },
+    "toast": {
+      "linkCopied": "Link copiado para o clipboard"
+    },
+    "empty": {
+      "noPages": "Não contém páginas"
+    },
+    "menu": {
+      "sectionTitle": "Página",
+      "addToFavorites": "Adicionar aos favoritos",
+      "removeFromFavorites": "Remover dos favoritos",
+      "copyLink": "Copiar link",
+      "duplicate": "Duplicar",
+      "rename": "Renomear",
+      "moveTo": "Mover para",
+      "moveToTrash": "Mover para a lixeira",
+      "turnIntoWiki": "Transformar em wiki",
+      "openInNewTab": "Abrir em nova guia",
+      "openInSideBySide": "Abrir no modo lado a lado",
+      "lastEditedBy": "Última edição por {name}"
+    }
+  },
+  "UserModal": {
+    "user": {
+      "fallbackName": "Usuário"
+    },
+    "workspaceTitle": "Cognition de {name}",
+    "freeAccount": "Conta Gratuita",
+    "actions": {
+      "settings": "Configurações",
+      "inviteMembers": "Convidar Membros",
+      "newWorkspace": "Novo espaço de trabalho",
+      "createWorkAccount": "Criar conta de trabalho",
+      "addAnotherAccount": "Adicionar outra conta",
+      "signOut": "Sair",
+      "getMacApp": "Obter App Mac",
+      "getMobileApp": "Obter App IOS e Android"
+    }
+  },
+  "ActionModal": {
+    "user": {
+      "fallbackName": "Usuário"
+    },
+    "searchPlaceholder": "Pesquisar ações...",
+    "title": "Título 2",
+    "lastEditedBy": "Última edição por",
+    "menus": {
+      "basicBlocks": "Blocos básicos",
+      "textColor": "Cor do texto",
+      "backgroundColor": "Cor de fundo",
+      "default": "Padrão"
+    },
+    "actions": {
+      "transformInto": "Transformar em",
+      "color": "Cor",
+      "linkToBlock": "Link para o bloco",
+      "duplicate": "Duplicar",
+      "moveTo": "Mover para",
+      "delete": "Excluir",
+      "comment": "Comentário",
+      "suggestEdits": "Sugerir edições",
+      "askAI": "Peça à IA"
+    },
+    "shortcuts": {
+      "linkToBlock": "Alt + ⇧ + L",
+      "duplicate": "Ctrl + D",
+      "moveTo": "Ctrl + ⇧ + P",
+      "delete": "Del",
+      "comment": "Ctrl + ⇧ + M",
+      "suggestEdits": "Ctrl + ⇧ + Alt + X",
+      "askAI": "Ctrl + J"
+    }
+  },
+  "LinkModal": {
+    "defaultNoteTitle": "Nova página",
+    "input": {
+      "placeholder": "Colar link ou pesquisar notas",
+      "linkTo": "Link para {url}"
+    },
+    "states": {
+      "loading": "Carregando...",
+      "empty": "Nenhuma nota encontrada"
+    },
+    "sections": {
+      "linkToNote": "Link para nota"
+    }
+  },
+  "MoreOptionsModal": {
+    "items": {
+      "page": "Página",
+      "aiNotes": "Anotações IA",
+      "database": "Base de dados",
+      "templates": "Modelos"
+    }
+  },
+  "PageOptionsModal": {
+    "user": {
+      "fallbackName": "Usuário"
+    },
+    "searchPlaceholder": "Pesquisar ações...",
+    "wordCount": "Contagem de palavras: {count}",
+    "lastEditedBy": "Última edição por {name}",
+    "fonts": {
+      "default": "Padrão",
+      "serif": "Serif",
+      "mono": "Mono"
+    },
+    "items": {
+      "copyLink": "Copiar link",
+      "copyPageContents": "Copiar conteúdo da página",
+      "duplicate": "Duplicar",
+      "moveTo": "Mover para",
+      "moveToTrash": "Mover para lixeira",
+      "smallText": "Texto pequeno",
+      "fullWidth": "Largura total",
+      "customizePage": "Personalizar página",
+      "lockPage": "Bloquear página",
+      "suggestEdits": "Sugerir edições",
+      "translate": "Traduzir",
+      "import": "Importar",
+      "export": "Exportar",
+      "turnIntoWiki": "Transformar em wiki",
+      "updatesAndAnalytics": "Atualizações e análises",
+      "versionHistory": "Histórico de versões",
+      "notifyMe": "Notificar-me",
+      "connections": "Conexões"
+    },
+    "shortcuts": {
+      "copyLink": "Ctrl+Alt+L",
+      "duplicate": "Ctrl+D",
+      "moveTo": "Ctrl+Shift+P",
+      "comments": "Comentários",
+      "none": "Nenhum"
+    }
+  },
+  "SearchModal": {
+    "defaultNoteTitle": "Nova página",
+    "searchPlaceholder": "Pesquise ou faça uma pergunta em Notion de Jeferson Primer...",
+    "filters": {
+      "sort": "Ordenar",
+      "titleOnly": "Somente título",
+      "createdBy": "Criado por",
+      "inPage": "Na página",
+      "date": "Data"
+    },
+    "states": {
+      "loading": "Carregando...",
+      "empty": "Nenhuma nota encontrada."
+    },
+    "footer": {
+      "openInNewTabShortcut": "Ctrl+↵ Abrir em nova guia"
+    },
+    "settings": {
+      "persistFilters": "Persistir filtros entre sessões",
+      "hideSearchAllSourcesWithAI": "Ocultar \"Pesquisar todas as fontes com IA\""
+    },
+    "date": {
+      "today": "Hoje",
+      "yesterday": "Ontem",
+      "dayBeforeYesterday": "Anteontem"
+    }
+  },
+  "ShareModal": {
+    "tabs": {
+      "share": "Compartilhar",
+      "publish": "Publicar"
+    },
+    "input": {
+      "placeholder": "E-mail ou grupo, separados por vírgulas"
+    },
+    "labels": {
+      "you": "Você",
+      "fullAccess": "Acesso total",
+      "generalAccess": "Acesso geral",
+      "onlyPeopleInvited": "Somente pessoas convidadas"
+    },
+    "actions": {
+      "invite": "Convidar",
+      "learnAboutSharing": "Saiba mais sobre compartilhamento",
+      "copyLink": "Copiar link"
+    },
+    "toast": {
+      "linkCopied": "Link copiado para o clipboard"
+    }
+  },
+  "TrashModal": {
+    "defaultNoteTitle": "Nova página",
+    "title": "Lixeira",
+    "states": {
+      "loading": "Carregando...",
+      "empty": "A lixeira está vazia."
+    },
+    "actions": {
+      "emptyTrashNow": "Esvaziar lixeira agora",
+      "restore": "Restaurar",
+      "deletePermanently": "Excluir permanentemente"
+    }
+  },
+  "SettingsModal": {
+    "user": {
+      "fallbackName": "Usuário",
+      "fallbackInitial": "U"
+    },
+    "languageOptions": {
+      "ptBR": "Português (Brasil)",
+      "en": "English"
+    },
+    "account": {
+      "title": "Conta",
+      "name": "Nome",
+      "addPhoto": "Adicione uma foto",
+      "or": " ou ",
+      "createAvatarWithFace": "crie um autorretrato personalizado com o Cognition Face."
+    },
+    "security": {
+      "title": "Segurança",
+      "email": "E-mail",
+      "manageEmails": "Gerenciar e-mails",
+      "password": "Senha",
+      "setPasswordDescription": "Defina uma senha para sua conta",
+      "addPassword": "Adicionar senha",
+      "twoStepVerification": "Verificação de duas etapas",
+      "twoStepVerificationDescription": "Adicione outra camada de segurança à sua conta",
+      "addVerificationMethod": "Adicionar um método de verificação",
+      "passkey": "Chave de acesso",
+      "passkeyDescription": "Entre com segurança usando a autenticação biométrica no dispositivo",
+      "addPasskey": "Adicionar passkey"
+    },
+    "preferences": {
+      "title": "Configurações",
+      "appearance": {
+        "sectionTitle": "Aparência",
+        "label": "Aparência",
+        "description": "Personalize a aparência do Cognition no seu dispositivo.",
+        "systemSetting": "Usar configuração do sistema"
+      },
+      "languageAndTime": {
+        "sectionTitle": "Idioma e horário",
+        "languageLabel": "Idioma",
+        "languageDescription": "Altere o idioma usado na interface.",
+        "alwaysShowTextDirectionControls": "Sempre mostra os controles de direção do texto",
+        "startWeekOnMonday": "Iniciar semana na segunda-feira",
+        "setTimeZoneAutomatically": "Defina o fuso horário automaticamente usando sua localização",
+        "timeZoneLabel": "Fuso horário",
+        "timeZoneValue": "(GMT-3:00) São Paulo"
+      },
+      "notifications": {
+        "sectionTitle": "Notificações",
+        "desktopNotifications": "Notificações no desktop",
+        "emailNotifications": "Notificações por e-mail"
+      },
+      "security": {
+        "changePassword": "Alterar senha",
+        "signOutAllSessions": "Sair de todas as sessões"
+      }
+    },
+    "sidebar": {
+      "preferences": "Preferências",
+      "notifications": "Notificações",
+      "connections": "Conexões",
+      "workspaceSection": "Espaço de trabalho",
+      "general": "Geral",
+      "people": "Pessoas",
+      "imports": "Importações",
+      "featuresSection": "Features",
+      "cognitionAI": "IA do Cognition",
+      "publicPages": "Páginas públicas",
+      "emoji": "Emoji",
+      "integrationsSection": "Integrações",
+      "adminSection": "Admin",
+      "teamspaces": "Espaços de equipe",
+      "accessAndBillingSection": "Acesso e cobrança",
+      "upgradePlan": "Fazer upgrade do plano"
+    }
+  },
+  "NotePage": {
+    "defaultTitle": "Nova página",
+    "user": {
+      "fallbackName": "Usuário"
+    },
+    "errors": {
+      "noteNotFound": "Nota não encontrada",
+      "deleteNote": "Erro ao excluir nota"
+    },
+    "privacy": {
+      "private": "Particular",
+      "onlyYouHaveAccess": "Somente você tem acesso",
+      "clickToMove": "Clique para mover",
+      "onlyYouCanAccess": "Somente você pode acessar"
+    },
+    "actions": {
+      "share": "Compartilhar",
+      "moreOptionsTooltip": "Defina estilos, exporte e faça muito mais..."
+    },
+    "favorites": {
+      "removeFromFavorites": "Remover dos seus Favoritos",
+      "addToFavorites": "Adicionar aos seus favoritos"
+    },
+    "trashBanner": {
+      "deletedMessage": "{user} moveu esta página para a lixeira em {minutes} minutos atrás. Ela será excluída automaticamente em {days} dias.",
+      "restorePage": "Restaurar página",
+      "deleteFromTrash": "Excluir da lixeira"
+    },
+    "titleActions": {
+      "addIcon": "Adicionar ícone",
+      "addCover": "Adicionar capa",
+      "addComment": "Adicionar comentário"
+    }
+  },
+  "ColorModal": {
+    "textColor": "Cor do texto",
+    "backgroundColor": "Cor de fundo"
   }
 }
-

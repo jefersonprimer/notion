@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { 
   File,
   FileText,
@@ -61,6 +62,7 @@ export default function SidebarItem({
   currentPathname,
   isFloating = false
 }: SidebarItemProps) {
+  const t = useTranslations('SidebarItem');
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [children, setChildren] = useState<Note[]>([]);
@@ -75,10 +77,11 @@ export default function SidebarItem({
   const { updatedTitles, updatedHasContent } = useNote();
   const isFavorite = favoriteNotes.some(n => n.id === note.id);
 
-  const displayTitle = (updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || "Nova página";
+  const defaultNoteTitle = 'Nova página';
+  const displayTitle = (updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || t('defaultNoteTitle');
   const hasContent = updatedHasContent[note.id] !== undefined 
     ? updatedHasContent[note.id] 
-    : (note.title && note.title !== 'Nova página' && note.title.trim() !== '' && note.description && note.description.trim() !== '');
+    : (note.title && note.title !== defaultNoteTitle && note.title.trim() !== '' && note.description && note.description.trim() !== '');
   
   const noteHref = `/${createNoteSlug(displayTitle, note.id)}`;
   const isActive = currentPathname === noteHref;
@@ -160,7 +163,7 @@ export default function SidebarItem({
       window.location.reload();
     } catch (error) {
       console.error('Error duplicating note:', error);
-      alert('Erro ao duplicar nota');
+      alert(t('alerts.duplicateError'));
     }
     setShowOptions(false);
   };
@@ -183,7 +186,7 @@ export default function SidebarItem({
       }
     } catch (error) {
       console.error('Error deleting note:', error);
-      alert('Erro ao excluir nota');
+      alert(t('alerts.deleteError'));
     }
   };
 
@@ -315,7 +318,7 @@ export default function SidebarItem({
                       )}
 
                       {/* Section Title */}
-                      <div className="px-3 pb-1 text-xs text-[#8f8f8f] pt-1">Página</div>
+                      <div className="px-3 pb-1 text-xs text-[#8f8f8f] pt-1">{t('menu.sectionTitle')}</div>
 
                       {/* Adicionar/Remover dos favoritos */}
                       <button 
@@ -324,7 +327,7 @@ export default function SidebarItem({
                       >
                         <div className="flex items-center gap-2 ">
                           {isFavorite ? <StarOff size={18} /> : <Star size={18} />}
-                          <span className="text-sm">{isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}</span>
+                          <span className="text-sm">{isFavorite ? t('menu.removeFromFavorites') : t('menu.addToFavorites')}</span>
                         </div>
                       </button>
 
@@ -335,7 +338,7 @@ export default function SidebarItem({
                       >
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                           <LinkIcon size={18}/>
-                          <span className="text-sm">Copiar link</span>
+                          <span className="text-sm">{t('menu.copyLink')}</span>
                         </div>
                       </button>
 
@@ -346,7 +349,7 @@ export default function SidebarItem({
                       >
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                           <Copy size={18}/>
-                          <span className="text-sm">Duplicar</span>
+                          <span className="text-sm">{t('menu.duplicate')}</span>
                         </div>
                         {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+D</span>}
                       </button>
@@ -355,7 +358,7 @@ export default function SidebarItem({
                       <button className="w-full rounded-md flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                           <SquarePen size={18} />
-                          <span className="text-sm">Renomear</span>
+                          <span className="text-sm">{t('menu.rename')}</span>
                         </div>
                         {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+R</span>}
                       </button>
@@ -364,7 +367,7 @@ export default function SidebarItem({
                       <button className="w-full rounded-md flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                           <CornerRightUp size={18}/>
-                          <span className="text-sm">Mover para</span>
+                          <span className="text-sm">{t('menu.moveTo')}</span>
                         </div>
                         {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+P</span>}
                       </button>
@@ -379,7 +382,7 @@ export default function SidebarItem({
                       >
                         <div className="flex items-center gap-2">
                           <Trash2 size={18} />
-                          <span className="text-sm">Mover para a lixeira</span>
+                          <span className="text-sm">{t('menu.moveToTrash')}</span>
                         </div>
                       </button>
 
@@ -387,7 +390,7 @@ export default function SidebarItem({
                       <button className="w-full rounded-md flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                           <ArrowRightLeft size={18} />
-                          <span className="text-sm">Transformar em wiki</span>
+                          <span className="text-sm">{t('menu.turnIntoWiki')}</span>
                         </div>
                       </button>
 
@@ -395,7 +398,7 @@ export default function SidebarItem({
                       <button className="w-full rounded-md flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                         <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                           <ExternalLink size={18}/>
-                          <span className="text-sm">Abrir em nova guia</span>
+                          <span className="text-sm">{t('menu.openInNewTab')}</span>
                         </div>
                         {!isMobile && <span className="text-xs text-[#8a8a8a]">Ctrl+↵</span>}
                       </button>
@@ -405,7 +408,7 @@ export default function SidebarItem({
                         <button className="w-full rounded-md flex items-center justify-between px-2 py-1 hover:bg-[#3a3a3a] transition-colors">
                           <div className="flex items-center gap-2 text-[#f0efed] hover:text-white">
                             <PanelRightOpen size={18} />
-                            <span className="text-sm flex-1 truncate max-w-40">Abrir no modo lado a lado</span>
+                            <span className="text-sm flex-1 truncate max-w-40">{t('menu.openInSideBySide')}</span>
                           </div>
                           <span className="text-xs text-[#8a8a8a]">Alt+Click</span>
                         </button>
@@ -413,7 +416,7 @@ export default function SidebarItem({
 
                       {/* Footer */}
                       <div className="mt-2 pt-2 border-t border-[#3a3a3a] px-3 text-xs text-[#7a7a7a]">
-                        Última edição por {session?.user?.displayName || 'Usuário'} <br />
+                        {t('menu.lastEditedBy', { name: session?.user?.displayName || t('user.fallbackName') })} <br />
                         {formatRelativeDate(new Date(note.updated_at))}
                       </div>
                     </motion.div>
@@ -439,7 +442,7 @@ export default function SidebarItem({
 
       {showToast && (
         <Toast 
-          message="Link copiado para o clipboard" 
+          message={t('toast.linkCopied')}
           onClose={() => setShowToast(false)} 
         />
       )}
@@ -456,7 +459,7 @@ export default function SidebarItem({
           )}
           {!isLoading && children.length === 0 && hasLoaded && (
             <div className="py-1 text-sm text-[#555]" style={{ paddingLeft: `${(depth + 1) * 12 + 24}px` }}>
-              Não contém páginas
+              {t('empty.noPages')}
             </div>
           )}
           {children.map(child => (
@@ -476,4 +479,3 @@ export default function SidebarItem({
     </div>
   );
 }
-

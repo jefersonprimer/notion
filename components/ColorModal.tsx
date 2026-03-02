@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useEffect, useState, useRef } from 'react'
 
 export const TEXT_COLORS = [
@@ -26,6 +27,7 @@ export default function ColorModal({
     const modalRef = useRef<HTMLDivElement>(null)
     const [flipAbove, setFlipAbove] = useState(false)
     const [adjustedLeft, setAdjustedLeft] = useState<number | null>(null)
+    const t = useTranslations('ColorModal');
 
     useEffect(() => {
         if (modalRef.current) {
@@ -74,7 +76,9 @@ export default function ColorModal({
             </div>
 
             <div>
-                <div className="text-[10px] text-gray-500 font-semibold uppercase mb-2 px-1">Cor do texto</div>
+                <div className="text-[10px] text-gray-500 font-semibold uppercase mb-2 px-1">
+                    {t('textColor')}
+                </div>
                 <div className="grid grid-cols-5 gap-1">
                     <button
                         onClick={() => onResetColor('text')}
@@ -96,7 +100,9 @@ export default function ColorModal({
             </div>
 
             <div>
-                <div className="text-[10px] text-gray-500 font-semibold uppercase mb-2 px-1">Cor de fundo</div>
+                <div className="text-[10px] text-gray-500 font-semibold uppercase mb-2 px-1">
+                    {t('backgroundColor')}
+                </div>
                 <div className="grid grid-cols-5 gap-1">
                     <button
                         onClick={() => onResetColor('bg')}

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { Link2, FileText, File } from 'lucide-react'
 import api from '@/lib/api'
 import { Note } from '@/types/note'
@@ -13,6 +14,7 @@ type Props = {
 }
 
 export default function LinkModal({ onApplyLink, onClose }: Props) {
+    const t = useTranslations('LinkModal')
     const { updatedTitles, updatedHasContent } = useNote()
     const [url, setUrl] = useState('')
     const [notes, setNotes] = useState<Note[]>([])
@@ -21,6 +23,7 @@ export default function LinkModal({ onApplyLink, onClose }: Props) {
     const modalRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
     const [flipAbove, setFlipAbove] = useState(false)
+    const defaultNoteTitle = 'Nova página'
 
     // Focus input on mount
     useEffect(() => {
@@ -78,7 +81,7 @@ export default function LinkModal({ onApplyLink, onClose }: Props) {
     }
 
     const handleNoteSelect = (note: Note) => {
-        const displayTitle = updatedTitles[note.id] || note.title || 'Nova página'
+        const displayTitle = updatedTitles[note.id] || note.title || t('defaultNoteTitle')
         const slug = createNoteSlug(displayTitle, note.id)
         onApplyLink(`/${slug}`)
     }
@@ -123,7 +126,7 @@ export default function LinkModal({ onApplyLink, onClose }: Props) {
                             setSelectedIndex(-1)
                         }}
                         onKeyDown={handleKeyDown}
-                        placeholder="Colar link ou pesquisar notas"
+                        placeholder={t('input.placeholder')}
                         className="w-full bg-transparent text-sm text-white outline-none placeholder:text-gray-500"
                     />
                 </div>
@@ -136,7 +139,7 @@ export default function LinkModal({ onApplyLink, onClose }: Props) {
                         className="w-full mt-2 flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-[#2383e2] hover:bg-[#2383e21a] transition-colors"
                     >
                         <Link2 size={14} />
-                        <span>Link para {url}</span>
+                        <span>{t('input.linkTo', { url })}</span>
                     </button>
                 )}
             </div>
@@ -144,19 +147,19 @@ export default function LinkModal({ onApplyLink, onClose }: Props) {
             {/* Notes List */}
             <div className="max-h-52 overflow-y-auto">
                 {loading && notes.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500 text-sm">Carregando...</div>
+                    <div className="p-4 text-center text-gray-500 text-sm">{t('states.loading')}</div>
                 ) : notes.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500 text-sm">Nenhuma nota encontrada</div>
+                    <div className="p-4 text-center text-gray-500 text-sm">{t('states.empty')}</div>
                 ) : (
                     <div className="p-1">
                         <div className="px-2 py-1.5 text-[10px] text-gray-500 uppercase font-semibold">
-                            Link para nota
+                            {t('sections.linkToNote')}
                         </div>
                         {notes.slice(0, 8).map((note, index) => {
-                            const title = (updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || 'Nova página'
+                            const title = (updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || t('defaultNoteTitle')
                             const hasContent = updatedHasContent[note.id] !== undefined
                                 ? updatedHasContent[note.id]
-                                : (note.title && note.title !== 'Nova página' && note.title.trim() !== '' && note.description && note.description.trim() !== '')
+                                : (note.title && note.title !== defaultNoteTitle && note.title.trim() !== '' && note.description && note.description.trim() !== '')
 
                             return (
                                 <button

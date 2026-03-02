@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Lock, Link, ChevronDown, HelpCircle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Toast from './Toast'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createPortal } from 'react-dom'
@@ -13,6 +14,7 @@ interface ShareModalProps {
 }
 
 export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareModalProps) {
+  const t = useTranslations('ShareModal')
   const [activeTab, setActiveTab] = useState<'share' | 'publish'>('share')
   const [email, setEmail] = useState('')
   const [showToast, setShowToast] = useState(false)
@@ -99,12 +101,12 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
             {/* Tabs */}
             <div className="flex px-6 pt-4 border-b border-[#2a2a2a]">
               <Tab
-                label="Share"
+                label={t('tabs.share')}
                 active={activeTab === 'share'}
                 onClick={() => setActiveTab('share')}
               />
               <Tab
-                label="Publish"
+                label={t('tabs.publish')}
                 active={activeTab === 'publish'}
                 onClick={() => setActiveTab('publish')}
               />
@@ -118,12 +120,12 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
                 <input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email or group, separated by commas"
+                  placeholder={t('input.placeholder')}
                   className="flex-1 rounded-lg bg-[#1f1f1f] border border-[#3a3a3a] px-3 py-2 text-sm placeholder:text-[#8a8a8a] outline-none focus:border-[#4c8bf5] focus:ring-1 focus:ring-[#4c8bf5]"
                 />
 
                 <button className="rounded-md bg-[#4c8bf5] hover:bg-[#3f7ae0] px-2 font-medium text-white transition-colors">
-                  Invite
+                  {t('actions.invite')}
                 </button>
               </div>
 
@@ -136,7 +138,7 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
 
                   <div>
                     <p className="text-[#e4e4e4]">
-                      Jeferson Primer <span className="text-[#8a8a8a]">(You)</span>
+                      Jeferson Primer <span className="text-[#8a8a8a]">({t('labels.you')})</span>
                     </p>
                     <p className="text-xs text-[#8a8a8a]">
                       jefersonprimer@gmail.com
@@ -145,13 +147,13 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
                 </div>
 
                 <button className="text-[#bdbdbd] hover:text-white transition-colors flex items-center gap-1">
-                  Full access <ChevronDown size={14} />
+                  {t('labels.fullAccess')} <ChevronDown size={14} />
                 </button>
               </div>
 
               {/* General Access */}
               <div className="space-y-2">
-                <p className="text-xs text-[#8a8a8a]">General access</p>
+                <p className="text-xs text-[#8a8a8a]">{t('labels.generalAccess')}</p>
 
                 <div className="flex items-center justify-between py-2 cursor-pointer">
                   <div className="flex items-center gap-2">
@@ -159,7 +161,7 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
                       <Lock size={16} className="text-[#bdbdbd]" />
                     </div>
 
-                    <span>Only people invited</span>
+                    <span>{t('labels.onlyPeopleInvited')}</span>
                   </div>
 
                   <ChevronDown size={14} className="text-[#bdbdbd]" />
@@ -170,7 +172,7 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
               <div className="flex items-center justify-between pt-3 border-t border-[#2a2a2a]">
                 <button className="flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-[#8a8a8a] hover:text-[#d4d4d4] hover:bg-[#fffff315] transition-colors">
                   <HelpCircle size={16}/>
-                  Learn about sharing
+                  {t('actions.learnAboutSharing')}
                 </button>
 
                 <button 
@@ -178,14 +180,14 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
                   className="flex items-center gap-2 text-sm text-[#f0efed] font-medium rounded-md border border-[#ffffeb1a] hover:bg-[#fffff315] bg-[#191919] px-2 py-1.5 transition-colors"
                 >
                   <Link size={16} />
-                  Copy link
+                  {t('actions.copyLink')}
                 </button>
               </div>
             </div>
           </motion.div>
           {showToast && (
             <Toast 
-              message="Link copiado para o clipboard" 
+              message={t('toast.linkCopied')}
               onClose={() => setShowToast(false)} 
             />
           )}

@@ -21,6 +21,7 @@ import {
   GitBranch,
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { formatRelativeDate } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createPortal } from 'react-dom'
@@ -35,6 +36,7 @@ interface PageOptionsModalProps {
 }
 
 export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt, wordCount, onDelete }: PageOptionsModalProps) {
+  const t = useTranslations('PageOptionsModal')
   const [smallText, setSmallText] = useState(false)
   const [fullWidth, setFullWidth] = useState(false)
   const [lockPage, setLockPage] = useState(false)
@@ -116,7 +118,7 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
               <div className="flex items-center rounded-md px-2 py-1.5 gap-2 bg-[#ffffff0e]">
               <Search size={20}/>
               <input
-                placeholder="Search actions..."
+                placeholder={t('searchPlaceholder')}
                 className="text-sm w-full placeholder:text-[#8a8a8a] outline-none focus:none focus:none"
               />
               </div>
@@ -126,71 +128,71 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
 
               {/* Font Options */}
               <div className="flex items-center justify-center px-2 py-1.5">
-                <FontOption label="Default" active />
-                <FontOption label="Serif" />
-                <FontOption label="Mono" />
+                <FontOption label={t('fonts.default')} active />
+                <FontOption label={t('fonts.serif')} />
+                <FontOption label={t('fonts.mono')} />
               </div>
 
-              <MenuItem icon={<Link size={18} />} label="Copy link" shortcut={!isMobile ? "Ctrl+Alt+L" : undefined} />
-              <MenuItem icon={<Clipboard size={18} />} label="Copy page contents" />
-              <MenuItem icon={<Copy size={18} />} label="Duplicate" shortcut={!isMobile ? "Ctrl+D" : undefined} />
-              <MenuItem icon={<ArrowRight size={18} />} label="Move to" shortcut={!isMobile ? "Ctrl+Shift+P" : undefined} />
-              <MenuItem icon={<Trash2 size={18} />} label="Move to Trash" onClick={onDelete} />
+              <MenuItem icon={<Link size={18} />} label={t('items.copyLink')} shortcut={!isMobile ? t('shortcuts.copyLink') : undefined} />
+              <MenuItem icon={<Clipboard size={18} />} label={t('items.copyPageContents')} />
+              <MenuItem icon={<Copy size={18} />} label={t('items.duplicate')} shortcut={!isMobile ? t('shortcuts.duplicate') : undefined} />
+              <MenuItem icon={<ArrowRight size={18} />} label={t('items.moveTo')} shortcut={!isMobile ? t('shortcuts.moveTo') : undefined} />
+              <MenuItem icon={<Trash2 size={18} />} label={t('items.moveToTrash')} onClick={onDelete} />
 
               <Divider />
 
               <ToggleItem
                 icon={<Text size={18} />}
-                label="Small text"
+                label={t('items.smallText')}
                 checked={smallText}
                 onChange={() => setSmallText(!smallText)}
               />
 
               <ToggleItem
                 icon={<Maximize2 size={18} />}
-                label="Full width"
+                label={t('items.fullWidth')}
                 checked={fullWidth}
                 onChange={() => setFullWidth(!fullWidth)}
               />
 
-              <MenuItem icon={<SlidersHorizontal size={18} />} label="Customize page" />
+              <MenuItem icon={<SlidersHorizontal size={18} />} label={t('items.customizePage')} />
 
 
               <Divider />
               <ToggleItem
                 icon={<Lock size={18} />}
-                label="Lock page"
+                label={t('items.lockPage')}
                 checked={lockPage}
                 onChange={() => setLockPage(!lockPage)}
               />
               <Divider />
 
-              <MenuItem icon={<Pencil size={18} />} label="Suggest edits" />
-              <MenuItem icon={<Languages size={18} />} label="Translate" hasArrow />
+              <MenuItem icon={<Pencil size={18} />} label={t('items.suggestEdits')} />
+              <MenuItem icon={<Languages size={18} />} label={t('items.translate')} hasArrow />
               <Divider />
 
-              <MenuItem icon={<Download size={18} />} label="Import" />
-              <MenuItem icon={<Upload size={18} />} label="Export" />
+              <MenuItem icon={<Download size={18} />} label={t('items.import')} />
+              <MenuItem icon={<Upload size={18} />} label={t('items.export')} />
               <Divider />
 
-              <MenuItem icon={<Repeat size={18} />} label="Turn into wiki" />
+              <MenuItem icon={<Repeat size={18} />} label={t('items.turnIntoWiki')} />
 
               <Divider />
 
-              <MenuItem icon={<Clock size={18} />} label="Updates & analytics" />
-              <MenuItem icon={<Clock size={18} />} label="Version history" />
+              <MenuItem icon={<Clock size={18} />} label={t('items.updatesAndAnalytics')} />
+              <MenuItem icon={<Clock size={18} />} label={t('items.versionHistory')} />
 
 
               <Divider />
-              <MenuItem icon={<Bell size={18} />} label="Notify me" shortcut={!isMobile ? "Comments" : undefined} hasArrow />
+              <MenuItem icon={<Bell size={18} />} label={t('items.notifyMe')} shortcut={!isMobile ? t('shortcuts.comments') : undefined} hasArrow />
               <Divider />
 
-              <MenuItem icon={<GitBranch size={18} />} label="Connections" shortcut={!isMobile ? "None" : undefined} hasArrow />
+              <MenuItem icon={<GitBranch size={18} />} label={t('items.connections')} shortcut={!isMobile ? t('shortcuts.none') : undefined} hasArrow />
 
               <div className="px-4 py-2 text-xs text-[#7a7a7a] border-t border-[#2a2a2a] space-y-1">
-                <p>Contagem de palavras: {wordCount}</p>
+                <p>{t('wordCount', { count: wordCount })}</p>
                 <div className="mt-1">
-                  Última edição por {userName || 'Usuário'} <br />
+                  {t('lastEditedBy', { name: userName || t('user.fallbackName') })} <br />
                   {formattedDate}
                 </div>
               </div>
@@ -290,4 +292,3 @@ function FontOption({ label, active }: { label: string; active?: boolean }) {
     </div>
   )
 }
-

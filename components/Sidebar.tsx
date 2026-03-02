@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   Search,
   Home,
@@ -19,6 +20,7 @@ import {
   Trash2,
   ChevronsLeft,
   History,
+  type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useLayout } from '@/context/LayoutContext';
@@ -33,6 +35,7 @@ import SettingsModal from './SettingsModal';
 import MoreOptionsModal from './MoreOptionsModal';
 
 export default function Sidebar({ isFloating = false }: { isFloating?: boolean }) {
+  const t = useTranslations('Sidebar');
   const { session } = useAuth();
   const { setIsSidebarOpen } = useLayout();
   const { favoriteNotes, isLoading: isLoadingFavorites } = useFavorite();
@@ -110,8 +113,8 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
 
       router.push(url);
       setRootNotes(prev => [newNote, ...prev]);
-    } catch (error: any) {
-      console.error('Error creating note:', error.response?.data || error.message);
+    } catch (error: unknown) {
+      console.error('Error creating note:', error);
     }
   };
 
@@ -127,7 +130,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
       const cleanId = newNote.id.replace(/-/g, '');
       const url = `/${cleanId}?showMoveTo=true&saveParent=true`;
       router.push(url);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating child note:', error);
     }
   };
@@ -166,7 +169,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
             </div>
             <div className="flex items-center gap-1 min-w-0">
               <span className="text-[#f0efed] text-sm truncate font-medium leading-none">
-                {session?.user.displayName || 'Usuário'}
+                {session?.user.displayName || t('user.fallbackName')}
               </span>
               <div className="hidden group-hover:flex items-center text-[#ada9a3] hover:text-white">
                 <ChevronDown size={14} />
@@ -181,7 +184,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
               <button
                 onClick={(e) => { e.stopPropagation(); setIsSidebarOpen(false); }}
                 className="hidden group-hover/sidebar:flex items-center justify-center w-7 h-7 hover:bg-[#3f3f3f] rounded text-[#ada9a3] hover:text-white"
-                title="Fechar barra lateral Ctrl+\"
+                title={t('actions.closeSidebarTitle')}
               >
                 <ChevronsLeft size={20} />
               </button>
@@ -191,7 +194,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
             <button
               onClick={(e) => { e.stopPropagation(); handleCreateNote(); }}
               className="flex items-center justify-center w-7 h-7 text-[#ada9a3] hover:text-white hover:bg-[#2f2f2f] rounded transition-colors"
-              title="Crie uma nova página"
+              title={t('actions.createPageTitle')}
             >
               <SquarePen size={18} />
             </button>
@@ -204,7 +207,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
                 setIsMoreOptionsModalOpen(true);
               }}
               className={`flex items-center justify-center w-5 h-7 hover:bg-[#3f3f3f] rounded hover:text-white ${isMoreOptionsModalOpen ? 'bg-[#3f3f3f] text-white' : 'text-[#ada9a3]'}`}
-              title="Mais opções"
+              title={t('actions.moreOptionsTitle')}
             >
               <ChevronDown size={14} />
             </button>
@@ -212,30 +215,30 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
         </div>
 
         <div className="px-2 py-1">
-          <NavItem icon={<Search size={20} />} label="Buscar" onClick={() => setIsSearchModalOpen(true)} title="Encontre páginas e informações do seu espaço de trabalho Ctrl+k" />
-          <NavItem icon={<Home size={20} />} label="Página inicial" href="/" isActive={pathname === '/'} title="Veja páginas recentes, tarefas futuras e muito mais ^+ALT+⇧ +H" />
+          <NavItem icon={<Search size={20} />} label={t('nav.search.label')} onClick={() => setIsSearchModalOpen(true)} title={t('nav.search.title')} />
+          <NavItem icon={<Home size={20} />} label={t('nav.home.label')} href="/" isActive={pathname === '/'} title={t('nav.home.title')} />
           <NavItem
             icon={<Users size={20} />}
-            label="Reuniões"
-            title="Crie e gerencie anotações de IA em um só lugar"
+            label={t('nav.meetings.label')}
+            title={t('nav.meetings.title')}
             onHoverClick={() => {
               // Logica para criar nova anotação IA
               handleCreateNote();
             }}
-            hoverIconTitle="Criar nova anotação IA"
+            hoverIconTitle={t('nav.meetings.hoverIconTitle')}
           />
           <NavItem
             icon={<Sparkle size={20} />}
-            label="IA do Cognition"
-            title="Pergunte, busque, crie com a IA"
+            label={t('nav.ai.label')}
+            title={t('nav.ai.title')}
             onHoverClick={() => {
               // Logica para ver histórico do chat
-              console.log("Abrir histórico do chat");
+              console.log(t('nav.ai.openChatHistoryLog'));
             }}
             hoverIcon={History}
-            hoverIconTitle="Histórico do chat"
+            hoverIconTitle={t('nav.ai.hoverIconTitle')}
           />
-          <NavItem icon={<Inbox size={20} />} label="Caixa de entrada" title="Revise notificaçães e atualizações ^+ALT+U" />
+          <NavItem icon={<Inbox size={20} />} label={t('nav.inbox.label')} title={t('nav.inbox.title')} />
         </div>
 
         {/* Scrollable Content */}
@@ -244,7 +247,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           {(isLoadingFavorites || favoriteNotes.length > 0) && (
             <div className="mt-4 px-2">
               <div className="px-2 py-1 text-xs font-medium text-[#9b9b9b]">
-                Favoritos
+                {t('sections.favorites')}
               </div>
               {expandedSections.favoritos && (
                 <div className="py-1">
@@ -278,7 +281,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
               onClick={() => toggleSection('particular')}
               className="w-full flex items-center justify-between px-2 py-1 text-xs font-medium text-[#9b9b9b] hover:bg-[#2f2f2f] hover:text-[#ada9a3] transition-colors group"
             >
-              <span>Particular</span>
+              <span>{t('sections.private')}</span>
               <Plus size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
 
@@ -291,7 +294,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
                     ))}
                   </div>
                 ) : rootNotes.length === 0 ? (
-                  <div className="px-2 py-1 text-xs text-[#555]">Nenhuma nota</div>
+                  <div className="px-2 py-1 text-xs text-[#555]">{t('sections.noNotes')}</div>
                 ) : (
                   rootNotes.map(note => (
                     <SidebarItem
@@ -312,12 +315,12 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           {/* Compartilhado Section */}
           <div className="mt-4 px-2">
             <div className="px-2 py-1 text-xs font-medium text-[#9b9b9b]">
-              Compartilhado
+              {t('sections.shared')}
             </div>
             <div className=" py-1">
               <button className="flex items-center text-sm gap-2 px-2 py-1.5 hover:bg-[#2f2f2f] rounded w-full text-left transition-colors">
                 <Plus size={16} />
-                <span>Começar a colaborar</span>
+                <span>{t('sections.startCollaborating')}</span>
               </button>
             </div>
           </div>
@@ -325,18 +328,18 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           {/* Aplicativos do Cognition */}
           <div className="mt-4 px-2">
             <div className="px-2 py-1 text-xs font-medium text-[#9b9b9b]">
-              Aplicativos do Cognition
+              {t('sections.apps')}
             </div>
             <div className="py-1">
-              <NavItem icon={<Mail size={20} />} label="Cognition Mail" />
-              <NavItem icon={<Calendar size={20} />} label="Cognition Calendar" />
-              <NavItem icon={<Monitor size={20} />} label="Cognition para desktop" />
+              <NavItem icon={<Mail size={20} />} label={t('apps.mail')} />
+              <NavItem icon={<Calendar size={20} />} label={t('apps.calendar')} />
+              <NavItem icon={<Monitor size={20} />} label={t('apps.desktop')} />
             </div>
 
             <div className="my-4 text-base">
-              <NavItem icon={<Settings size={20} />} label="Configurações" onClick={() => setIsSettingsModalOpen(true)} />
-              <NavItem icon={<Layers size={20} />} label="Modelos" />
-              <NavItem icon={<Trash2 size={20} />} label="Lixeira" onClick={() => setIsTrashModalOpen(true)} />
+              <NavItem icon={<Settings size={20} />} label={t('apps.settings')} onClick={() => setIsSettingsModalOpen(true)} />
+              <NavItem icon={<Layers size={20} />} label={t('apps.templates')} />
+              <NavItem icon={<Trash2 size={20} />} label={t('apps.trash')} onClick={() => setIsTrashModalOpen(true)} />
             </div>
           </div>
         </div>
@@ -397,7 +400,7 @@ function NavItem({
   title?: string;
   onHoverClick?: (e: React.MouseEvent) => void;
   hoverIconTitle?: string;
-  hoverIcon?: any;
+  hoverIcon?: LucideIcon;
 }) {
   const content = (
     <div className={`flex items-center gap-2 px-2 py-1.5 rounded-md w-full text-left transition-colors truncate ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#2f2f2f] text-[#ada9a3] hover:text-white'}`}>
