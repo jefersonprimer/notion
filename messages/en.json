@@ -1,0 +1,34 @@
+{
+  "Home": {
+    "documentTitle": "Home | Cognition",
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "menu": {
+      "changeStartPage": "Change start page to...",
+      "toggleWidgets": "Show/hide widgets",
+      "startPageOptions": {
+        "home": "Home page",
+        "lastVisited": "Last visited page",
+        "topSidebar": "Top page in sidebar",
+        "ai": "Notion AI"
+      },
+      "learnMore": "Learn more about the home page..."
+    },
+    "widgets": {
+      "greeting": "Greeting",
+      "upcomingEvents": "Upcoming events",
+      "myTasks": "My tasks",
+      "databaseViews": "Database views",
+      "tips": "Tips",
+      "featuredTemplates": "Featured templates"
+    },
+    "sections": {
+      "recentAccesses": "Recent accesses",
+      "favorites": "Favorites"
+    }
+  }
+}
+

@@ -8,9 +8,24 @@ import { Note } from '@/types/note';
 import { useAuth } from '@/context/AuthContext';
 import { useLayout } from '@/context/LayoutContext';
 import { useRouter } from 'next/navigation';
-import { Menu, ChevronsRight, MoreHorizontal, ChevronRight, Home as HomeIcon, Clock, ArrowUpCircle, Sparkles, Check, FileText, Eye, HelpCircle } from 'lucide-react';
+import {
+  Menu,
+  ChevronsRight,
+  MoreHorizontal,
+  ChevronRight,
+  Home as HomeIcon,
+  Clock,
+  ArrowUpCircle,
+  Sparkles,
+  Check,
+  FileText,
+  Eye,
+  HelpCircle,
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function Home() {
+  const t = useTranslations('Home');
   const { session } = useAuth();
   const { isSidebarOpen, setIsSidebarOpen } = useLayout();
   const [notes, setNotes] = useState<Note[]>([]);
@@ -24,15 +39,15 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    document.title = 'Página inicial | Cognition';
-  }, []);
+    document.title = t('documentTitle');
+  }, [t]);
 
   useEffect(() => {
     const hour = new Date().getHours();
-    if (hour < 12) setGreeting('Bom dia');
-    else if (hour < 18) setGreeting('Boa tarde');
-    else setGreeting('Boa noite');
-  }, []);
+    if (hour < 12) setGreeting(t('greeting.morning'));
+    else if (hour < 18) setGreeting(t('greeting.afternoon'));
+    else setGreeting(t('greeting.evening'));
+  }, [t]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -156,7 +171,7 @@ export default function Home() {
 
             {isMoreMenuOpen && (
               <div className="absolute top-full right-3 mt-1 w-72 bg-[#252525] border border-[#3f3f3f] rounded-lg shadow-xl py-1 z-50 text-sm text-[#9b9b9b]">
-                {/* Option 1: Alterar a página inicial */}
+                {/* Option 1: Change homepage */}
                 <div
                   className="relative px-3 py-1.5 hover:bg-[#3f3f3f] hover:text-white cursor-pointer flex items-center justify-between mx-1 rounded group"
                   onClick={() => {
@@ -166,7 +181,7 @@ export default function Home() {
                 >
                   <span className="flex items-center gap-2 truncate">
                     <FileText size={16} />
-                    Alterar a página inicial para...
+                    {t('menu.changeStartPage')}
                   </span>
                   <ChevronRight size={14} />
 
@@ -174,16 +189,16 @@ export default function Home() {
                   {showStartPageSubmenu && (
                     <div className="absolute top-0 right-full mr-1 w-64 bg-[#252525] border border-[#3f3f3f] rounded-lg shadow-xl py-1 text-[#9b9b9b] z-50">
                       <button className="w-full text-left px-3 py-1.5 hover:bg-[#3f3f3f] hover:text-white flex items-center gap-2">
-                        <HomeIcon size={16} /> <span>Página inicial</span>
+                        <HomeIcon size={16} /> <span>{t('menu.startPageOptions.home')}</span>
                       </button>
                       <button className="w-full text-left px-3 py-1.5 hover:bg-[#3f3f3f] hover:text-white flex items-center gap-2">
-                        <Clock size={16} /> <span>Última página visitada</span>
+                        <Clock size={16} /> <span>{t('menu.startPageOptions.lastVisited')}</span>
                       </button>
                       <button className="w-full text-left px-3 py-1.5 hover:bg-[#3f3f3f] hover:text-white flex items-center gap-2">
-                        <ArrowUpCircle size={16} /> <span>Página superior na barra lateral</span>
+                        <ArrowUpCircle size={16} /> <span>{t('menu.startPageOptions.topSidebar')}</span>
                       </button>
                       <button className="w-full text-left px-3 py-1.5 hover:bg-[#3f3f3f] hover:text-white flex items-center gap-2">
-                        <Sparkles size={16} /> <span>IA do Notion</span>
+                        <Sparkles size={16} /> <span>{t('menu.startPageOptions.ai')}</span>
                       </button>
                     </div>
                   )}
@@ -199,7 +214,7 @@ export default function Home() {
                 >
                   <span className="flex items-center gap-2 truncate">
                     <Eye size={16} />
-                    Mostrar/ocultar widgets
+                    {t('menu.toggleWidgets')}
                   </span>
                   <ChevronRight size={14} />
 
@@ -207,12 +222,12 @@ export default function Home() {
                   {showWidgetsSubmenu && (
                     <div className="absolute top-0 right-full mr-1 w-64 bg-[#252525] border border-[#3f3f3f] rounded-lg shadow-xl py-1 text-[#9b9b9b] z-50">
                       {[
-                        "Saudação",
-                        "Próximos eventos",
-                        "Minhas tarefas",
-                        "Visualizações de base de dados",
-                        "Dicas",
-                        "Modelos em destaque"
+                        t('widgets.greeting'),
+                        t('widgets.upcomingEvents'),
+                        t('widgets.myTasks'),
+                        t('widgets.databaseViews'),
+                        t('widgets.tips'),
+                        t('widgets.featuredTemplates'),
                       ].map((widget) => (
                         <button key={widget} className="w-full text-left px-3 py-1.5 hover:bg-[#3f3f3f] hover:text-white flex items-center justify-between">
                           <span>{widget}</span>
@@ -231,7 +246,7 @@ export default function Home() {
                 >
                   <span className="flex items-center gap-2">
                     <HelpCircle size={16} />
-                    Saiba mais sobre a página in...
+                    {t('menu.learnMore')}
                   </span>
                 </button>
               </div>
@@ -248,11 +263,11 @@ export default function Home() {
           </header>
 
           <div className="space-y-8">
-            <Carousel title="Acessos recentes" notes={notes} />
+            <Carousel title={t('sections.recentAccesses')} notes={notes} />
             {/* We can filter notes for different carousels if needed, e.g. Favorites */}
             {notes.some(n => n.is_favorite) && (
               <Carousel
-                title="Favoritos"
+                title={t('sections.favorites')}
                 notes={notes.filter(n => n.is_favorite)}
               />
             )}

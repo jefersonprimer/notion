@@ -1,0 +1,34 @@
+{
+  "Home": {
+    "documentTitle": "Página inicial | Cognition",
+    "greeting": {
+      "morning": "Bom dia",
+      "afternoon": "Boa tarde",
+      "evening": "Boa noite"
+    },
+    "menu": {
+      "changeStartPage": "Alterar a página inicial para...",
+      "toggleWidgets": "Mostrar/ocultar widgets",
+      "startPageOptions": {
+        "home": "Página inicial",
+        "lastVisited": "Última página visitada",
+        "topSidebar": "Página superior na barra lateral",
+        "ai": "IA do Notion"
+      },
+      "learnMore": "Saiba mais sobre a página inicial..."
+    },
+    "widgets": {
+      "greeting": "Saudação",
+      "upcomingEvents": "Próximos eventos",
+      "myTasks": "Minhas tarefas",
+      "databaseViews": "Visualizações de base de dados",
+      "tips": "Dicas",
+      "featuredTemplates": "Modelos em destaque"
+    },
+    "sections": {
+      "recentAccesses": "Acessos recentes",
+      "favorites": "Favoritos"
+    }
+  }
+}
+

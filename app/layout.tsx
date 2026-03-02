@@ -4,7 +4,8 @@ import { AuthProvider } from "@/context/AuthContext";
 import { LayoutProvider } from "@/context/LayoutContext";
 import { FavoriteProvider } from "@/context/FavoriteContext";
 import { NoteProvider } from "@/context/NoteContext";
-
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -22,25 +23,28 @@ export const metadata: Metadata = {
   description: "Cognition is more than just a notepad - Developed by Primer",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          <NoteProvider>
-            <FavoriteProvider>
-              <LayoutProvider>
-                {children}
-              </LayoutProvider>
-            </FavoriteProvider>
-          </NoteProvider>
-        </AuthProvider>
+        <NextIntlClientProvider messages={messages} locale={locale}>
+          <AuthProvider>
+            <NoteProvider>
+              <FavoriteProvider>
+                <LayoutProvider>{children}</LayoutProvider>
+              </FavoriteProvider>
+            </NoteProvider>
+          </AuthProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

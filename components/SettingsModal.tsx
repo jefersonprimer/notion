@@ -1,7 +1,11 @@
+"use client";
+
 import { X, ChevronDown, Bell, Settings, Settings2, Users, Globe, Smile, Link2, Download, Building2, Sparkles, CircleArrowUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import { useAuth } from '@/context/AuthContext';
 
 interface SettingsModalProps {
@@ -12,10 +16,19 @@ interface SettingsModalProps {
 export default function SettingsModal({ open, onClose }: SettingsModalProps) {
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState('preferencias');
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
+  const router = useRouter();
+  const locale = useLocale();
   const { session } = useAuth();
   const userName = session?.user.displayName || 'Usuário';
   const userEmail = session?.user.email;
   const userInitial = userName[0]?.toUpperCase() || 'U';
+  const languageOptions = [
+    { value: 'pt-BR', label: 'Português (Brasil)' },
+    { value: 'en', label: 'English' },
+  ];
+  const selectedLanguageLabel =
+    languageOptions.find((option) => option.value === locale)?.label || 'English';
 
   useEffect(() => {
     setMounted(true);
@@ -149,7 +162,22 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
 
         <Section title="Idioma e horário">
           <Row label="Idioma" description="Altere o idioma usado na interface.">
-            <Select value="Português (Brasil)" />
+            <LanguageSelect
+              value={selectedLanguageLabel}
+              open={languageMenuOpen}
+              options={languageOptions}
+              onToggle={() => setLanguageMenuOpen((prev) => !prev)}
+              onSelect={(nextLocale) => {
+                if (nextLocale === locale) {
+                  setLanguageMenuOpen(false);
+                  return;
+                }
+
+                document.cookie = `locale=${encodeURIComponent(nextLocale)}; path=/; max-age=31536000; samesite=lax`;
+                setLanguageMenuOpen(false);
+                router.refresh();
+              }}
+            />
           </Row>
 
           <Toggle label="Sempre mostra os controles de direção do texto" />
@@ -313,6 +341,46 @@ function Select({ value }: { value: string }) {
       {value}
       <ChevronDown size={14} className="text-zinc-400" />
     </button>
+  );
+}
+
+function LanguageSelect({
+  value,
+  open,
+  options,
+  onToggle,
+  onSelect,
+}: {
+  value: string;
+  open: boolean;
+  options: { value: string; label: string }[];
+  onToggle: () => void;
+  onSelect: (value: string) => void;
+}) {
+  return (
+    <div className="relative">
+      <button
+        onClick={onToggle}
+        className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm hover:bg-zinc-700"
+      >
+        {value}
+        <ChevronDown size={14} className="text-zinc-400" />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 z-20 mt-2 min-w-44 rounded-lg border border-zinc-700 bg-zinc-900 p-1 shadow-xl">
+          {options.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => onSelect(option.value)}
+              className="block w-full rounded-md px-2 py-1.5 text-left text-sm text-zinc-200 hover:bg-zinc-800"
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
