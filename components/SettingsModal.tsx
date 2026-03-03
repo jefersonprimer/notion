@@ -287,7 +287,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
                 <SidebarItem icon={Download} label={t('sidebar.imports')} />
                 
                 <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">{t('sidebar.featuresSection')}</div>
-                <SidebarItem icon={Sparkles} label={t('sidebar.cognitionAI')} />
+                <SidebarItem icon={Sparkles} label={t('sidebar.NolioAI')} />
                 <SidebarItem icon={Globe} label={t('sidebar.publicPages')} />
                 <SidebarItem icon={Smile} label={t('sidebar.emoji')} />
                 

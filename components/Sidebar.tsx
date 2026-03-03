@@ -325,7 +325,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
             </div>
           </div>
 
-          {/* Aplicativos do Cognition */}
+          {/* Aplicativos do Nolio */}
           <div className="mt-4 px-2">
             <div className="px-2 py-1 text-xs font-medium text-[#9b9b9b]">
               {t('sections.apps')}

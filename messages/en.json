@@ -1,6 +1,6 @@
 {
   "Home": {
-    "documentTitle": "Home | Cognition",
+    "documentTitle": "Home | Nolio",
     "greeting": {
       "morning": "Good morning",
       "afternoon": "Good afternoon",
@@ -13,7 +13,7 @@
         "home": "Home page",
         "lastVisited": "Last visited page",
         "topSidebar": "Top page in sidebar",
-        "ai": "Notion AI"
+        "ai": "Nolio AI"
       },
       "learnMore": "Learn more about the home page..."
     },
@@ -54,7 +54,7 @@
         "hoverIconTitle": "Create new AI note"
       },
       "ai": {
-        "label": "Cognition AI",
+        "label": "Nolio AI",
         "title": "Ask, search, and create with AI",
         "hoverIconTitle": "Chat history",
         "openChatHistoryLog": "Open chat history"
@@ -70,12 +70,12 @@
       "noNotes": "No notes",
       "shared": "Shared",
       "startCollaborating": "Start collaborating",
-      "apps": "Cognition apps"
+      "apps": "Nolio apps"
     },
     "apps": {
-      "mail": "Cognition Mail",
-      "calendar": "Cognition Calendar",
-      "desktop": "Cognition for desktop",
+      "mail": "Nolio Mail",
+      "calendar": "Nolio Calendar",
+      "desktop": "Nolio for desktop",
       "settings": "Settings",
       "templates": "Templates",
       "trash": "Trash"
@@ -115,7 +115,7 @@
     "user": {
       "fallbackName": "User"
     },
-    "workspaceTitle": "Cognition by {name}",
+    "workspaceTitle": "Nolio by {name}",
     "freeAccount": "Free Account",
     "actions": {
       "settings": "Settings",
@@ -129,7 +129,7 @@
     },
     "signOutConfirm": {
       "title": "Log out of your account?",
-      "description": "You will need to log in again to access your Cognition workspaces.",
+      "description": "You will need to log in again to access your Nolio workspaces.",
       "confirmButton": "Log out",
       "cancelButton": "Cancel"
     }
@@ -267,7 +267,7 @@
   },
   "SearchModal": {
     "defaultNoteTitle": "New page",
-    "searchPlaceholder": "Search or ask a question in Notion by Jeferson Primer...",
+    "searchPlaceholder": "Search or ask a question in Nolio by Jeferson Primer...",
     "filters": {
       "sort": "Sort",
       "titleOnly": "Title only",
@@ -342,7 +342,7 @@
       "name": "Name",
       "addPhoto": "Add a photo",
       "or": " or ",
-      "createAvatarWithFace": "create a custom portrait with Cognition Face."
+      "createAvatarWithFace": "create a custom portrait with Nolio Face."
     },
     "security": {
       "title": "Security",
@@ -363,7 +363,7 @@
       "appearance": {
         "sectionTitle": "Appearance",
         "label": "Appearance",
-        "description": "Customize how Cognition looks on your device.",
+        "description": "Customize how Nolio looks on your device.",
         "systemSetting": "Use system setting",
         "options": {
           "dark": "Dark",
@@ -400,7 +400,7 @@
       "people": "People",
       "imports": "Imports",
       "featuresSection": "Features",
-      "cognitionAI": "Cognition AI",
+      "NolioAI": "Nolio AI",
       "publicPages": "Public pages",
       "emoji": "Emoji",
       "integrationsSection": "Integrations",

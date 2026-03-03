@@ -9,7 +9,7 @@ interface ThemeContextValue {
   setTheme: (theme: Theme) => void;
 }
 
-const THEME_STORAGE_KEY = "cognition-theme";
+const THEME_STORAGE_KEY = "Nolio-theme";
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 function getSystemPrefersDark(): boolean {

@@ -1,4 +1,4 @@
-# Cognition
+# Nolio
 
 Aplicação web com Next.js.
 
@@ -10,8 +10,8 @@ Aplicação web com Next.js.
 ## 1) Clonar o repositório
 
 ```bash
-git clone https://github.com/jefersonprimer/cognition.git
-cd cognition
+git clone https://github.com/jefersonprimer/Nolio.git
+cd Nolio
 ```
 
 ## 2) Instalar dependências

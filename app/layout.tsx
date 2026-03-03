@@ -21,8 +21,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cognition",
-  description: "Cognition is more than just a notepad - Developed by Primer",
+  title: "Nolio",
+  description: "Nolio is more than just a notepad - Developed by Primer",
 };
 
 export default async function RootLayout({
@@ -41,7 +41,7 @@ export default async function RootLayout({
             __html: `
               (function () {
                 try {
-                  var theme = localStorage.getItem("cognition-theme") || "dark";
+                  var theme = localStorage.getItem("Nolio-theme") || "dark";
                   var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
                   var shouldUseDark = theme === "dark" || (theme === "system" && prefersDark);
                   document.documentElement.classList.toggle("dark", shouldUseDark);

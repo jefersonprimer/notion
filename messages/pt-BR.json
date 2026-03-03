@@ -1,6 +1,6 @@
 {
   "Home": {
-    "documentTitle": "Página inicial | Cognition",
+    "documentTitle": "Página inicial | Nolio",
     "greeting": {
       "morning": "Bom dia",
       "afternoon": "Boa tarde",
@@ -13,7 +13,7 @@
         "home": "Página inicial",
         "lastVisited": "Última página visitada",
         "topSidebar": "Página superior na barra lateral",
-        "ai": "IA do Notion"
+        "ai": "IA do Nolio"
       },
       "learnMore": "Saiba mais sobre a página inicial..."
     },
@@ -54,7 +54,7 @@
         "hoverIconTitle": "Criar nova anotação IA"
       },
       "ai": {
-        "label": "IA do Cognition",
+        "label": "IA do Nolio",
         "title": "Pergunte, busque, crie com a IA",
         "hoverIconTitle": "Histórico do chat",
         "openChatHistoryLog": "Abrir histórico do chat"
@@ -70,12 +70,12 @@
       "noNotes": "Nenhuma nota",
       "shared": "Compartilhado",
       "startCollaborating": "Começar a colaborar",
-      "apps": "Aplicativos do Cognition"
+      "apps": "Aplicativos do Nolio"
     },
     "apps": {
-      "mail": "Cognition Mail",
-      "calendar": "Cognition Calendar",
-      "desktop": "Cognition para desktop",
+      "mail": "Nolio Mail",
+      "calendar": "Nolio Calendar",
+      "desktop": "Nolio para desktop",
       "settings": "Configurações",
       "templates": "Modelos",
       "trash": "Lixeira"
@@ -115,7 +115,7 @@
     "user": {
       "fallbackName": "Usuário"
     },
-    "workspaceTitle": "Cognition de {name}",
+    "workspaceTitle": "Nolio de {name}",
     "freeAccount": "Conta Gratuita",
     "actions": {
       "settings": "Configurações",
@@ -129,7 +129,7 @@
     },
     "signOutConfirm": {
       "title": "Fazer logout da sua conta?",
-      "description": "Sera necessario fazer login de novo para acessar seus espacos de trabalho do Cognition.",
+      "description": "Sera necessario fazer login de novo para acessar seus espacos de trabalho do Nolio.",
       "confirmButton": "Fazer logout",
       "cancelButton": "Cancelar"
     }
@@ -267,7 +267,7 @@
   },
   "SearchModal": {
     "defaultNoteTitle": "Nova página",
-    "searchPlaceholder": "Pesquise ou faça uma pergunta em Notion de Jeferson Primer...",
+    "searchPlaceholder": "Pesquise ou faça uma pergunta em Nolio de Jeferson Primer...",
     "filters": {
       "sort": "Ordenar",
       "titleOnly": "Somente título",
@@ -342,7 +342,7 @@
       "name": "Nome",
       "addPhoto": "Adicione uma foto",
       "or": " ou ",
-      "createAvatarWithFace": "crie um autorretrato personalizado com o Cognition Face."
+      "createAvatarWithFace": "crie um autorretrato personalizado com o Nolio Face."
     },
     "security": {
       "title": "Segurança",
@@ -363,7 +363,7 @@
       "appearance": {
         "sectionTitle": "Aparência",
         "label": "Aparência",
-        "description": "Personalize a aparência do Cognition no seu dispositivo.",
+        "description": "Personalize a aparência do Nolio no seu dispositivo.",
         "systemSetting": "Usar configuração do sistema",
         "options": {
           "dark": "Escuro",
@@ -400,7 +400,7 @@
       "people": "Pessoas",
       "imports": "Importações",
       "featuresSection": "Features",
-      "cognitionAI": "IA do Cognition",
+      "NolioAI": "IA do Nolio",
       "publicPages": "Páginas públicas",
       "emoji": "Emoji",
       "integrationsSection": "Integrações",
