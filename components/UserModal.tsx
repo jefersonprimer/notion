@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { Ellipsis, Settings, Users, Check, Plus } from 'lucide-react';
@@ -14,6 +14,7 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
   const t = useTranslations('UserModal');
   const { session, signOut } = useAuth();
   const modalRef = useRef<HTMLDivElement>(null);
+  const [isSignOutConfirmOpen, setIsSignOutConfirmOpen] = useState(false);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -22,13 +23,19 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
       }
     }
 
-    if (isOpen) {
+    if (isOpen && !isSignOutConfirmOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, isSignOutConfirmOpen, onClose]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setIsSignOutConfirmOpen(false);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -112,8 +119,7 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
 
         <button
           onClick={() => {
-            signOut();
-            onClose();
+            setIsSignOutConfirmOpen(true);
           }}
           className="text-left px-2 mx-1 py-1 hover:bg-[#2f2f2f] rounded-md flex items-center gap-2 text-sm transition-colors text-red-400 hover:text-red-300"
         >
@@ -128,6 +134,36 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
         
         <div className="px-2 mx-1 py-1 hover:bg-[#2f2f2f] rounded-md flex items-center gap-2 text-sm transition-colors">{t('actions.getMobileApp')}
         </div>
+
+      {isSignOutConfirmOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-80 text-center rounded-xl border border-[#3f3f3f] bg-[#202020] p-5 text-[#f0efed] shadow-2xl">
+            <h3 className="text-lg font-semibold">{t('signOutConfirm.title')}</h3>
+            <p className="mt-2 text-sm text-[#ada9a3]">
+              {t('signOutConfirm.description')}
+            </p>
+
+            <div className="mt-5 flex flex-col gap-2">
+              <button
+                onClick={() => {
+                  signOut();
+                  setIsSignOutConfirmOpen(false);
+                  onClose();
+                }}
+                className="w-full rounded-md bg-red-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600"
+              >
+                {t('signOutConfirm.confirmButton')}
+              </button>
+              <button
+                onClick={() => setIsSignOutConfirmOpen(false)}
+                className="w-full rounded-md border border-[#3f3f3f] px-3 py-2 text-sm font-medium text-[#f0efed] transition-colors hover:bg-[#2a2a2a]"
+              >
+                {t('signOutConfirm.cancelButton')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -126,6 +126,47 @@
       "signOut": "Sair",
       "getMacApp": "Obter App Mac",
       "getMobileApp": "Obter App IOS e Android"
+    },
+    "signOutConfirm": {
+      "title": "Fazer logout da sua conta?",
+      "description": "Sera necessario fazer login de novo para acessar seus espacos de trabalho do Cognition.",
+      "confirmButton": "Fazer logout",
+      "cancelButton": "Cancelar"
+    }
+  },
+  "LoginPage": {
+    "title": "Entrar",
+    "subtitleLink": "criar conta",
+    "rememberMe": "Lembrar de mim",
+    "forgotPassword": "Esqueceu sua senha?",
+    "submit": "Entrar",
+    "submitting": "Entrando...",
+    "fields": {
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "Insita seu endereço de e-mail...",
+      "passwordLabel": "Senha",
+      "passwordPlaceholder": "••••••••"
+    },
+    "errors": {
+      "invalidCredentials": "Falha no login. Verifique suas credenciais."
+    }
+  },
+  "SignupPage": {
+    "title": "Criar uma conta",
+    "subtitlePrefix": "Ja tem uma conta?",
+    "subtitleLink": "Entrar",
+    "submit": "Cadastrar",
+    "submitting": "Criando conta...",
+    "fields": {
+      "displayNameLabel": "Nome",
+      "displayNamePlaceholder": "Insira o seu nome",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "Insita seu endereço de e-mail...",
+      "passwordLabel": "Senha",
+      "passwordPlaceholder": "••••••••"
+    },
+    "errors": {
+      "generic": "Falha no cadastro. Tente novamente."
     }
   },
   "ActionModal": {

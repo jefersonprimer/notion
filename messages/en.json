@@ -126,6 +126,47 @@
       "signOut": "Sign out",
       "getMacApp": "Get Mac App",
       "getMobileApp": "Get iOS and Android App"
+    },
+    "signOutConfirm": {
+      "title": "Log out of your account?",
+      "description": "You will need to log in again to access your Cognition workspaces.",
+      "confirmButton": "Log out",
+      "cancelButton": "Cancel"
+    }
+  },
+  "LoginPage": {
+    "title": "Sign in",
+    "subtitleLink": "create a account",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot your password?",
+    "submit": "Sign in",
+    "submitting": "Signing in...",
+    "fields": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter your email address...",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••"
+    },
+    "errors": {
+      "invalidCredentials": "Login failed. Please check your credentials."
+    }
+  },
+  "SignupPage": {
+    "title": "Create an account",
+    "subtitlePrefix": "Already have an account?",
+    "subtitleLink": "Sign in",
+    "submit": "Sign up",
+    "submitting": "Creating account...",
+    "fields": {
+      "displayNameLabel": "Display Name",
+      "displayNamePlaceholder": "Enter your name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter your email address...",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••"
+    },
+    "errors": {
+      "generic": "Signup failed. Please try again."
     }
   },
   "ActionModal": {
