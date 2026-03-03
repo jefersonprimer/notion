@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Lock, Link, ChevronDown, HelpCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useAuth } from '@/context/AuthContext';
 import Toast from './Toast'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createPortal } from 'react-dom'
@@ -20,6 +21,10 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
   const [showToast, setShowToast] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const { session } = useAuth();
+  const userName = session?.user.displayName;
+  const userEmail = session?.user.email;
+  const userInitial = userName[0]?.toUpperCase() || 'U';
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -133,15 +138,15 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
               <div className="flex items-center justify-between rounded-xl p-2 hover:bg-[#2a2a2a] transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#333] text-sm text-[#cfcfcf]">
-                    J
+                    {userInitial}
                   </div>
 
                   <div>
                     <p className="text-[#e4e4e4]">
-                      Jeferson Primer <span className="text-[#8a8a8a]">({t('labels.you')})</span>
+                      { userName } <span className="text-[#8a8a8a]">({t('labels.you')})</span>
                     </p>
                     <p className="text-xs text-[#8a8a8a]">
-                      jefersonprimer@gmail.com
+                       { userEmail }
                     </p>
                   </div>
                 </div>
