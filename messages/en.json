@@ -323,7 +323,12 @@
         "sectionTitle": "Appearance",
         "label": "Appearance",
         "description": "Customize how Cognition looks on your device.",
-        "systemSetting": "Use system setting"
+        "systemSetting": "Use system setting",
+        "options": {
+          "dark": "Dark",
+          "light": "Light",
+          "system": "System"
+        }
       },
       "languageAndTime": {
         "sectionTitle": "Language and time",

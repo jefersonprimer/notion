@@ -1,12 +1,14 @@
+import "./globals.css";
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/context/AuthContext";
 import { LayoutProvider } from "@/context/LayoutContext";
 import { FavoriteProvider } from "@/context/FavoriteContext";
 import { NoteProvider } from "@/context/NoteContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
-import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,18 +34,36 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
+    <html lang={locale} className="dark" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                try {
+                  var theme = localStorage.getItem("cognition-theme") || "dark";
+                  var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                  var shouldUseDark = theme === "dark" || (theme === "system" && prefersDark);
+                  document.documentElement.classList.toggle("dark", shouldUseDark);
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages} locale={locale}>
-          <AuthProvider>
-            <NoteProvider>
-              <FavoriteProvider>
-                <LayoutProvider>{children}</LayoutProvider>
-              </FavoriteProvider>
-            </NoteProvider>
-          </AuthProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <NoteProvider>
+                <FavoriteProvider>
+                  <LayoutProvider>{children}</LayoutProvider>
+                </FavoriteProvider>
+              </NoteProvider>
+            </AuthProvider>
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -7,6 +7,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from "@/context/ThemeContext";
+import type { Theme } from "@/context/ThemeContext";
 
 interface SettingsModalProps {
   open: boolean;
@@ -17,8 +19,10 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
   const t = useTranslations('SettingsModal');
   const [activeTab, setActiveTab] = useState('preferencias');
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const router = useRouter();
   const locale = useLocale();
+  const { theme, setTheme } = useTheme();
   const { session } = useAuth();
   const userName = session?.user.displayName || t('user.fallbackName');
   const userEmail = session?.user.email;
@@ -29,6 +33,13 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
   ];
   const selectedLanguageLabel =
     languageOptions.find((option) => option.value === locale)?.label || t('languageOptions.en');
+  const themeOptions: { value: Theme; label: string }[] = [
+    { value: "dark", label: t("preferences.appearance.options.dark") },
+    { value: "light", label: t("preferences.appearance.options.light") },
+    { value: "system", label: t("preferences.appearance.options.system") },
+  ];
+  const selectedThemeLabel =
+    themeOptions.find((option) => option.value === theme)?.label || themeOptions[0].label;
 
   if (typeof document === 'undefined') return null;
 
@@ -152,7 +163,16 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
 
         <Section title={t('preferences.appearance.sectionTitle')}>
           <Row label={t('preferences.appearance.label')} description={t('preferences.appearance.description')}>
-            <Select value={t('preferences.appearance.systemSetting')} />
+            <ThemeSelect
+              value={selectedThemeLabel}
+              open={themeMenuOpen}
+              options={themeOptions}
+              onToggle={() => setThemeMenuOpen((prev) => !prev)}
+              onSelect={(nextTheme) => {
+                setTheme(nextTheme);
+                setThemeMenuOpen(false);
+              }}
+            />
           </Row>
         </Section>
 
@@ -352,6 +372,46 @@ function LanguageSelect({
   options: { value: string; label: string }[];
   onToggle: () => void;
   onSelect: (value: string) => void;
+}) {
+  return (
+    <div className="relative">
+      <button
+        onClick={onToggle}
+        className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm hover:bg-zinc-700"
+      >
+        {value}
+        <ChevronDown size={14} className="text-zinc-400" />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 z-20 mt-2 min-w-44 rounded-lg border border-zinc-700 bg-zinc-900 p-1 shadow-xl">
+          {options.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => onSelect(option.value)}
+              className="block w-full rounded-md px-2 py-1.5 text-left text-sm text-zinc-200 hover:bg-zinc-800"
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ThemeSelect({
+  value,
+  open,
+  options,
+  onToggle,
+  onSelect,
+}: {
+  value: string;
+  open: boolean;
+  options: { value: Theme; label: string }[];
+  onToggle: () => void;
+  onSelect: (value: Theme) => void;
 }) {
   return (
     <div className="relative">

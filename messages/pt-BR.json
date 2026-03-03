@@ -323,7 +323,12 @@
         "sectionTitle": "Aparência",
         "label": "Aparência",
         "description": "Personalize a aparência do Cognition no seu dispositivo.",
-        "systemSetting": "Usar configuração do sistema"
+        "systemSetting": "Usar configuração do sistema",
+        "options": {
+          "dark": "Escuro",
+          "light": "Claro",
+          "system": "Sistema"
+        }
       },
       "languageAndTime": {
         "sectionTitle": "Idioma e horário",

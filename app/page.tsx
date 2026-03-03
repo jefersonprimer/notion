@@ -103,19 +103,19 @@ export default function Home() {
           {/* Header Skeleton */}
           <div className="h-12 flex items-center justify-between px-4 relative z-20">
             <div className="flex items-center gap-4">
-              {!isSidebarOpen && <div className="w-8 h-8 bg-[#2f2f2f] rounded animate-pulse" />}
+              {!isSidebarOpen && <div className="w-8 h-8 rounded bg-gray-200 dark:bg-[#2f2f2f] animate-pulse" />}
               <div className="flex items-center gap-2">
-                <div className="h-4 w-4 bg-[#2f2f2f] rounded animate-pulse" />
-                <div className="h-4 w-32 bg-[#2f2f2f] rounded animate-pulse" />
+                <div className="h-4 w-4 rounded bg-gray-200 dark:bg-[#2f2f2f] animate-pulse" />
+                <div className="h-4 w-32 rounded bg-gray-200 dark:bg-[#2f2f2f] animate-pulse" />
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="h-7 w-7 bg-[#2f2f2f] rounded animate-pulse" />
+              <div className="h-7 w-7 rounded bg-gray-200 dark:bg-[#2f2f2f] animate-pulse" />
             </div>
           </div>
 
           <div className="flex-1 flex flex-col items-center justify-center p-8 w-full max-w-5xl mx-auto">
-            <div className="w-6 h-6 border-2 border-[#383836] border-t-white/80 rounded-full animate-spin" />
+            <div className="h-6 w-6 rounded-full border-2 border-gray-300 border-t-gray-700 dark:border-[#383836] dark:border-t-white/80 animate-spin" />
           </div>
         </main>
       </div>
@@ -147,13 +147,13 @@ export default function Home() {
                   onClick={() => setIsSidebarOpen(true)}
                   className="p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded transition-colors"
                 >
-                  <Menu size={20} className="md:group-hover:hidden text-[#f0efed]" />
-                  <ChevronsRight size={20} className="hidden md:group-hover:block text-white-500 hover:text-[#e6e5e3s]" />
+                  <Menu size={20} className="md:group-hover:hidden text-gray-700 dark:text-[#f0efed]" />
+                  <ChevronsRight size={20} className="hidden md:group-hover:block text-gray-700 dark:text-[#e6e5e3]" />
                 </button>
 
                 {/* Floating Sidebar */}
                 {isFloatingOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-60 max-h-[80vh] shadow-xl rounded-lg overflow-visible border border-[#2f2f2f] bg-[#202020] animate-in fade-in zoom-in-95 duration-100 origin-top-left">
+                  <div className="absolute top-full left-0 mt-2 w-60 max-h-[80vh] overflow-visible rounded-lg border border-gray-200 bg-white shadow-xl dark:border-[#2f2f2f] dark:bg-[#202020] animate-in fade-in zoom-in-95 duration-100 origin-top-left">
                     <Sidebar isFloating={true} />
                   </div>
                 )}
@@ -164,16 +164,16 @@ export default function Home() {
           <div className="flex items-center gap-2" ref={moreMenuRef}>
             <button
               onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
-              className={`p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded text-[#e6e5e3] transition-colors ${isMoreMenuOpen ? 'bg-[#2f2f2f]' : ''}`}
+              className={`rounded p-1 text-gray-700 transition-colors hover:bg-gray-100 dark:text-[#e6e5e3] dark:hover:bg-[#2f2f2f] ${isMoreMenuOpen ? 'bg-gray-100 dark:bg-[#2f2f2f]' : ''}`}
             >
               <MoreHorizontal size={22} />
             </button>
 
             {isMoreMenuOpen && (
-              <div className="absolute top-full right-3 mt-1 w-72 bg-[#252525] border border-[#3f3f3f] rounded-lg shadow-xl py-1 z-50 text-sm text-[#9b9b9b]">
+              <div className="absolute top-full right-3 z-50 mt-1 w-72 rounded-lg border border-gray-200 bg-white py-1 text-sm text-gray-600 shadow-xl dark:border-[#3f3f3f] dark:bg-[#252525] dark:text-[#9b9b9b]">
                 {/* Option 1: Change homepage */}
                 <div
-                  className="relative px-3 py-1.5 hover:bg-[#3f3f3f] hover:text-white cursor-pointer flex items-center justify-between mx-1 rounded group"
+                  className="relative mx-1 flex cursor-pointer items-center justify-between rounded px-3 py-1.5 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-[#3f3f3f] dark:hover:text-white group"
                   onClick={() => {
                     setShowStartPageSubmenu(!showStartPageSubmenu);
                     setShowWidgetsSubmenu(false);
@@ -187,17 +187,17 @@ export default function Home() {
 
                   {/* Submenu - Left side */}
                   {showStartPageSubmenu && (
-                    <div className="absolute top-0 right-full mr-1 w-64 bg-[#252525] border border-[#3f3f3f] rounded-lg shadow-xl py-1 text-[#9b9b9b] z-50">
-                      <button className="w-full text-left px-3 py-1.5 hover:bg-[#3f3f3f] hover:text-white flex items-center gap-2">
+                    <div className="absolute top-0 right-full z-50 mr-1 w-64 rounded-lg border border-gray-200 bg-white py-1 text-gray-600 shadow-xl dark:border-[#3f3f3f] dark:bg-[#252525] dark:text-[#9b9b9b]">
+                      <button className="flex w-full items-center gap-2 px-3 py-1.5 text-left hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-[#3f3f3f] dark:hover:text-white">
                         <HomeIcon size={16} /> <span>{t('menu.startPageOptions.home')}</span>
                       </button>
-                      <button className="w-full text-left px-3 py-1.5 hover:bg-[#3f3f3f] hover:text-white flex items-center gap-2">
+                      <button className="flex w-full items-center gap-2 px-3 py-1.5 text-left hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-[#3f3f3f] dark:hover:text-white">
                         <Clock size={16} /> <span>{t('menu.startPageOptions.lastVisited')}</span>
                       </button>
-                      <button className="w-full text-left px-3 py-1.5 hover:bg-[#3f3f3f] hover:text-white flex items-center gap-2">
+                      <button className="flex w-full items-center gap-2 px-3 py-1.5 text-left hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-[#3f3f3f] dark:hover:text-white">
                         <ArrowUpCircle size={16} /> <span>{t('menu.startPageOptions.topSidebar')}</span>
                       </button>
-                      <button className="w-full text-left px-3 py-1.5 hover:bg-[#3f3f3f] hover:text-white flex items-center gap-2">
+                      <button className="flex w-full items-center gap-2 px-3 py-1.5 text-left hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-[#3f3f3f] dark:hover:text-white">
                         <Sparkles size={16} /> <span>{t('menu.startPageOptions.ai')}</span>
                       </button>
                     </div>
@@ -206,7 +206,7 @@ export default function Home() {
 
                 {/* Option 2: Mostrar/ocultar widgets */}
                 <div
-                  className="relative px-3 py-1.5 hover:bg-[#3f3f3f] hover:text-white cursor-pointer flex items-center justify-between mx-1 rounded group"
+                  className="relative mx-1 flex cursor-pointer items-center justify-between rounded px-3 py-1.5 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-[#3f3f3f] dark:hover:text-white group"
                   onClick={() => {
                     setShowWidgetsSubmenu(!showWidgetsSubmenu);
                     setShowStartPageSubmenu(false);
@@ -220,7 +220,7 @@ export default function Home() {
 
                   {/* Submenu - Left side for Widgets */}
                   {showWidgetsSubmenu && (
-                    <div className="absolute top-0 right-full mr-1 w-64 bg-[#252525] border border-[#3f3f3f] rounded-lg shadow-xl py-1 text-[#9b9b9b] z-50">
+                    <div className="absolute top-0 right-full z-50 mr-1 w-64 rounded-lg border border-gray-200 bg-white py-1 text-gray-600 shadow-xl dark:border-[#3f3f3f] dark:bg-[#252525] dark:text-[#9b9b9b]">
                       {[
                         t('widgets.greeting'),
                         t('widgets.upcomingEvents'),
@@ -229,7 +229,7 @@ export default function Home() {
                         t('widgets.tips'),
                         t('widgets.featuredTemplates'),
                       ].map((widget) => (
-                        <button key={widget} className="w-full text-left px-3 py-1.5 hover:bg-[#3f3f3f] hover:text-white flex items-center justify-between">
+                        <button key={widget} className="flex w-full items-center justify-between px-3 py-1.5 text-left hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-[#3f3f3f] dark:hover:text-white">
                           <span>{widget}</span>
                           <Check size={16} />
                         </button>
@@ -240,7 +240,7 @@ export default function Home() {
 
                 {/* Option 3: Saiba mais... */}
                 <button
-                  className="w-full text-left px-3 py-1.5 hover:bg-[#3f3f3f] hover:text-white flex items-center gap-2 mx-1 rounded"
+                  className="mx-1 flex w-full items-center gap-2 rounded px-3 py-1.5 text-left hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-[#3f3f3f] dark:hover:text-white"
                   style={{ width: 'calc(100% - 8px)' }}
                   onClick={() => router.push('/help/home-and-my-tasks')}
                 >
