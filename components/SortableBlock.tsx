@@ -383,7 +383,6 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
             <Plus size={16} />
           </button>
           <button
-            tabIndex={-1}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
             {...attributes}
             {...listeners}
@@ -512,7 +511,6 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
             <Plus size={16} />
           </button>
           <button
-            tabIndex={-1}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
             {...attributes}
             {...listeners}
@@ -556,7 +554,6 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
             <Plus size={16} />
           </button>
           <button
-            tabIndex={-1}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
             {...attributes}
             {...listeners}
@@ -633,7 +630,6 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
           <Plus size={18} />
         </button>
         <button
-          tabIndex={-1}
           className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-grab active:cursor-grabbing"
           {...attributes}
           {...listeners}
