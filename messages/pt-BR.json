@@ -149,6 +149,11 @@
     },
     "errors": {
       "invalidCredentials": "Falha no login. Verifique suas credenciais."
+    },
+    "footer": {
+      "help": "Help",
+      "privacy": "Privacy",
+      "terms": "Terms"
     }
   },
   "SignupPage": {
@@ -167,6 +172,11 @@
     },
     "errors": {
       "generic": "Falha no cadastro. Tente novamente."
+    },
+    "footer": {
+      "help": "Help",
+      "privacy": "Privacy",
+      "terms": "Terms"
     }
   },
   "ActionModal": {

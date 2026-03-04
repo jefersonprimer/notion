@@ -149,6 +149,11 @@
     },
     "errors": {
       "invalidCredentials": "Login failed. Please check your credentials."
+    },
+    "footer": {
+      "help": "Help",
+      "privacy": "Privacy",
+      "terms": "Terms"
     }
   },
   "SignupPage": {
@@ -167,6 +172,11 @@
     },
     "errors": {
       "generic": "Signup failed. Please try again."
+    },
+    "footer": {
+      "help": "Help",
+      "privacy": "Privacy",
+      "terms": "Terms"
     }
   },
   "ActionModal": {

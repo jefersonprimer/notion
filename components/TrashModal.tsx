@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Trash2, RotateCcw, FileText, File } from 'lucide-react';
+import { Trash2, RotateCcw, FileText, File, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import api from '@/lib/api';
@@ -106,6 +106,12 @@ export default function TrashModal({ open, onClose }: Props) {
               </button>
             )}
           </div>
+          <button 
+            onClick={onClose}
+            className="p-2 flex md:hidden"
+          >
+              <X size={16}/>
+          </button>
         </div>
 
         {/* Content */}

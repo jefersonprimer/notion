@@ -165,7 +165,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
             className="flex items-center py-1.5 px-2 gap-2 transition-all duration-200 group-hover:opacity-100 flex-1 min-w-0"
           >
             <div className="w-5 h-5 bg-[#fffff315] rounded flex items-center justify-center text-sm font-medium text-[#ada9a3] shrink-0">
-              <span className="leading-none select-none uppercase">c</span>
+              <span className="leading-none select-none uppercase">n</span>
             </div>
             <div className="flex items-center gap-1 min-w-0">
               <span className="text-[#f0efed] text-sm truncate font-medium leading-none">
