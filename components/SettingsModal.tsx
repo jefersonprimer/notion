@@ -237,7 +237,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
           <div className="absolute inset-0" onClick={onClose} />
 
           <motion.div
-            className="relative flex h-full w-full md:h-150 md:w-287.5 overflow-hidden md:rounded-2xl bg-[#202020] md:bg-zinc-900 text-zinc-100 shadow-2xl"
+            className="settings-modal-container relative flex h-full w-full md:h-150 md:w-287.5 overflow-hidden md:rounded-2xl bg-[#202020] md:bg-zinc-900 text-zinc-100 shadow-2xl"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}

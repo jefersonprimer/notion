@@ -61,7 +61,17 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (window.innerWidth < 768 && sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+      const target = event.target;
+      const targetElement = target instanceof Element ? target : null;
+      const clickedInsideSettingsModal = targetElement?.closest('.settings-modal-container');
+
+      if (
+        window.innerWidth < 768 &&
+        sidebarRef.current &&
+        targetElement &&
+        !sidebarRef.current.contains(targetElement) &&
+        !clickedInsideSettingsModal
+      ) {
         setIsSidebarOpen(false);
       }
     };
