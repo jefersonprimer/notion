@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -494,12 +494,88 @@ export default function NotePage() {
     });
   };
 
-  const htmlToPlainText = (html: string) => {
+  const htmlToPlainText = useCallback((html: string) => {
     if (typeof document === 'undefined') return html;
     const el = document.createElement('div');
     el.innerHTML = html;
     return el.innerText;
+  }, []);
+
+  const copyTextToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.top = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
   };
+
+  const handleCopyPageContents = async () => {
+    let numberCount = 1;
+    const lines = blocks.map((block) => {
+      if (block.type === 'page') {
+        const [pageId, ...titleParts] = block.content.split('|');
+        return titleParts.join('|') || updatedTitles[pageId] || childTitles[pageId] || storedDefaultTitle;
+      }
+
+      if (block.type === 'image' || block.type === 'video') {
+        const [url] = block.content.split('|');
+        return url;
+      }
+
+      if (block.type === 'number') {
+        const text = htmlToPlainText(block.content);
+        const line = `${numberCount}. ${text}`;
+        numberCount += 1;
+        return line;
+      }
+
+      if (block.type === 'bullet') {
+        return `- ${htmlToPlainText(block.content)}`;
+      }
+
+      if (block.type === 'todo') {
+        return `[ ] ${htmlToPlainText(block.content)}`;
+      }
+
+      if (block.type === 'todo_checked') {
+        return `[x] ${htmlToPlainText(block.content)}`;
+      }
+
+      if (block.type === 'toggle') {
+        return `> ${htmlToPlainText(block.content)}`;
+      }
+
+      return block.type === 'code' ? block.content : htmlToPlainText(block.content);
+    });
+
+    const cleanTitle = title.trim() || displayDefaultTitle;
+    const pageText = `${cleanTitle}\n\n${lines.join('\n')}`.trimEnd();
+    await copyTextToClipboard(pageText);
+  };
+
+  const getBlockClipboardText = useCallback((block: { id: string; type: string; content: string }) => {
+    if (block.type === 'page') {
+      const [pageId, ...titleParts] = block.content.split('|');
+      return titleParts.join('|') || updatedTitles[pageId] || childTitles[pageId] || storedDefaultTitle;
+    }
+
+    if (block.type === 'image' || block.type === 'video') {
+      const [url] = block.content.split('|');
+      return url;
+    }
+
+    return htmlToPlainText(block.content);
+  }, [updatedTitles, childTitles, storedDefaultTitle, htmlToPlainText]);
 
   useEffect(() => {
     const handleCopy = (e: ClipboardEvent) => {
@@ -510,19 +586,7 @@ export default function NotePage() {
 
       const textToCopy = blocks
         .filter(block => selectedIds.has(block.id))
-        .map(block => {
-          if (block.type === 'page') {
-            const [pageId, ...titleParts] = block.content.split('|');
-            return titleParts.join('|') || updatedTitles[pageId] || childTitles[pageId] || storedDefaultTitle;
-          }
-
-          if (block.type === 'image' || block.type === 'video') {
-            const [url] = block.content.split('|');
-            return url;
-          }
-
-          return htmlToPlainText(block.content);
-        })
+        .map(getBlockClipboardText)
         .join('\n');
       if (!textToCopy.trim()) return;
 
@@ -532,7 +596,7 @@ export default function NotePage() {
 
     window.addEventListener('copy', handleCopy);
     return () => window.removeEventListener('copy', handleCopy);
-  }, [selectedIds, blocks, updatedTitles, childTitles]);
+  }, [selectedIds, blocks, updatedTitles, childTitles, getBlockClipboardText]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -571,6 +635,32 @@ export default function NotePage() {
           setSelectedIds(new Set(blocks.map(block => block.id)));
           return;
         }
+      }
+
+      // Cut selected blocks (when there isn't a native text selection)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'x') {
+        if (selectedIds.size === 0) return;
+
+        const activeEl = document.activeElement as HTMLElement | null;
+        const isEditingTitle = activeEl === titleInputRef.current;
+        if (isEditingTitle) return;
+
+        const selection = window.getSelection();
+        if (selection && !selection.isCollapsed) return;
+
+        e.preventDefault();
+        const textToCut = blocks
+          .filter(block => selectedIds.has(block.id))
+          .map(getBlockClipboardText)
+          .join('\n');
+
+        if (textToCut.trim()) {
+          void copyTextToClipboard(textToCut);
+        }
+
+        updateBlocks(prev => prev.filter(b => !selectedIds.has(b.id)));
+        setSelectedIds(new Set());
+        return;
       }
 
       // Undo/Redo
@@ -625,7 +715,7 @@ export default function NotePage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedIds, blocks]);
+  }, [selectedIds, blocks, childTitles, updatedTitles, getBlockClipboardText]);
 
   // Listen for changeBlockType custom events from FloatingToolbar
   useEffect(() => {
@@ -1199,6 +1289,7 @@ export default function NotePage() {
                   updatedAt={note?.updated_at || note?.updated_at}
                   wordCount={wordCount}
                   onDelete={handleDeleteNote}
+                  onCopyPageContents={handleCopyPageContents}
                 />
               </div>
             </div>

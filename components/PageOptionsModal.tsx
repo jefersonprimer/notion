@@ -33,9 +33,10 @@ interface PageOptionsModalProps {
   updatedAt?: string;
   wordCount: number;
   onDelete?: () => void;
+  onCopyPageContents?: () => void;
 }
 
-export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt, wordCount, onDelete }: PageOptionsModalProps) {
+export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt, wordCount, onDelete, onCopyPageContents }: PageOptionsModalProps) {
   const t = useTranslations('PageOptionsModal')
   const [smallText, setSmallText] = useState(false)
   const [fullWidth, setFullWidth] = useState(false)
@@ -114,7 +115,7 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
             )}
 
             {/* Search */}
-            <div className="flex items-center p-2">
+            <div className="hidden md:flex items-center p-2">
               <div className="flex items-center rounded-md px-2 py-1.5 gap-2 bg-[#ffffff0e]">
               <Search size={20}/>
               <input
@@ -122,6 +123,10 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
                 className="text-sm w-full placeholder:text-[#8a8a8a] outline-none focus:none focus:none"
               />
               </div>
+            </div>
+
+            <div className="md:hidden text-center">
+              <p>Ações</p>
             </div>
 
             <div className={`${isMobile ? 'max-h-[70vh]' : 'max-h-125'}`}>
@@ -134,7 +139,14 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
               </div>
 
               <MenuItem icon={<Link size={18} />} label={t('items.copyLink')} shortcut={!isMobile ? t('shortcuts.copyLink') : undefined} />
-              <MenuItem icon={<Clipboard size={18} />} label={t('items.copyPageContents')} />
+              <MenuItem
+                icon={<Clipboard size={18} />}
+                label={t('items.copyPageContents')}
+                onClick={() => {
+                  onCopyPageContents?.();
+                  onClose();
+                }}
+              />
               <MenuItem icon={<Copy size={18} />} label={t('items.duplicate')} shortcut={!isMobile ? t('shortcuts.duplicate') : undefined} />
               <MenuItem icon={<ArrowRight size={18} />} label={t('items.moveTo')} shortcut={!isMobile ? t('shortcuts.moveTo') : undefined} />
               <MenuItem icon={<Trash2 size={18} />} label={t('items.moveToTrash')} onClick={onDelete} />
