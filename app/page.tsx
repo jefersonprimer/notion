@@ -159,6 +159,10 @@ export default function Home() {
                 )}
               </div>
             )}
+
+            <div className="md:hidden">
+              <p className="text-[#f0efed] text-sm font-medium">{t('title')}</p>
+            </div>
           </div>
 
           <div className="flex items-center gap-2" ref={moreMenuRef}>

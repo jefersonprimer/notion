@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { motion } from 'framer-motion';
 import {
   Search,
   Home,
@@ -62,6 +63,9 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
   const touchStartYRef = useRef<number | null>(null);
   const touchCurrentXRef = useRef<number | null>(null);
   const touchCurrentYRef = useRef<number | null>(null);
+  const [swipeOffsetX, setSwipeOffsetX] = useState(0);
+  const [isSwiping, setIsSwiping] = useState(false);
+  const [isSwipeClosing, setIsSwipeClosing] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -154,17 +158,36 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
   };
 
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (window.innerWidth >= 768 || isFloating) {
+      return;
+    }
+
     const touch = event.touches[0];
     touchStartXRef.current = touch.clientX;
     touchStartYRef.current = touch.clientY;
     touchCurrentXRef.current = touch.clientX;
     touchCurrentYRef.current = touch.clientY;
+    setIsSwiping(true);
+    setIsSwipeClosing(false);
+    setSwipeOffsetX(0);
   };
 
   const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (window.innerWidth >= 768 || isFloating || touchStartXRef.current === null || touchStartYRef.current === null) {
+      return;
+    }
+
     const touch = event.touches[0];
     touchCurrentXRef.current = touch.clientX;
     touchCurrentYRef.current = touch.clientY;
+
+    const deltaX = touch.clientX - touchStartXRef.current;
+    const deltaY = touch.clientY - touchStartYRef.current;
+    const isHorizontalGesture = Math.abs(deltaX) > Math.abs(deltaY) * 1.2;
+
+    if (isHorizontalGesture && deltaX < 0) {
+      setSwipeOffsetX(Math.max(deltaX, -280));
+    }
   };
 
   const handleTouchEnd = () => {
@@ -183,6 +206,8 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
     touchCurrentYRef.current = null;
 
     if (startX === null || startY === null || endX === null || endY === null) {
+      setIsSwiping(false);
+      setSwipeOffsetX(0);
       return;
     }
 
@@ -192,8 +217,15 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
     const isHorizontalGesture = Math.abs(deltaX) > Math.abs(deltaY) * 1.2;
 
     if (isLeftSwipe && isHorizontalGesture) {
-      setIsSidebarOpen(false);
+      setIsSwiping(false);
+      setIsSwipeClosing(true);
+      setSwipeOffsetX(-320);
+      return;
     }
+
+    setIsSwiping(false);
+    setIsSwipeClosing(false);
+    setSwipeOffsetX(0);
   };
 
   return (
@@ -205,12 +237,19 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
-      <div
+      <motion.div
         ref={sidebarRef}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className={`group/sidebar w-70 md:w-60 bg-[#202020] text-[#ada9a3] flex flex-col text-sm select-none ${isFloating ? 'h-full max-h-[70vh]' : 'h-screen border-r border-[#2f2f2f]'} ${!isFloating ? 'fixed inset-y-0 left-0 z-50 md:relative' : ''}`}
+        className={`group/sidebar w-80 md:w-60 bg-[#202020] text-[#ada9a3] flex flex-col text-sm select-none ${isFloating ? 'h-full max-h-[70vh]' : 'h-screen border-r border-[#2f2f2f]'} ${!isFloating ? 'fixed inset-y-0 left-0 z-50 md:relative' : ''}`}
+        animate={!isFloating ? { x: isSwipeClosing ? -320 : swipeOffsetX } : undefined}
+        transition={!isFloating ? (isSwiping ? { duration: 0 } : { duration: 0.2, ease: 'easeOut' }) : undefined}
+        onAnimationComplete={() => {
+          if (isSwipeClosing) {
+            setIsSidebarOpen(false);
+          }
+        }}
       >
         {/* Header */}
         <div
@@ -436,7 +475,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           onClose={() => setIsMoreOptionsModalOpen(false)}
           position={moreOptionsModalPos}
         />
-      </div>
+      </motion.div>
     </>
   );
 }

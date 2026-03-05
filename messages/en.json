@@ -1,6 +1,7 @@
 {
   "Home": {
     "documentTitle": "Home | Nolio",
+    "title": "Home",
     "greeting": {
       "morning": "Good morning",
       "afternoon": "Good afternoon",
