@@ -58,6 +58,10 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
   const [userModalPos, setUserModalPos] = useState({ top: 0, left: 0 });
   const [moreOptionsModalPos, setMoreOptionsModalPos] = useState({ top: 0, left: 0 });
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+  const touchCurrentXRef = useRef<number | null>(null);
+  const touchCurrentYRef = useRef<number | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -149,6 +153,49 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
     setRootNotes(prev => prev.filter(n => n.id !== noteId));
   };
 
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches[0];
+    touchStartXRef.current = touch.clientX;
+    touchStartYRef.current = touch.clientY;
+    touchCurrentXRef.current = touch.clientX;
+    touchCurrentYRef.current = touch.clientY;
+  };
+
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches[0];
+    touchCurrentXRef.current = touch.clientX;
+    touchCurrentYRef.current = touch.clientY;
+  };
+
+  const handleTouchEnd = () => {
+    if (window.innerWidth >= 768 || isFloating) {
+      return;
+    }
+
+    const startX = touchStartXRef.current;
+    const startY = touchStartYRef.current;
+    const endX = touchCurrentXRef.current;
+    const endY = touchCurrentYRef.current;
+
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+    touchCurrentXRef.current = null;
+    touchCurrentYRef.current = null;
+
+    if (startX === null || startY === null || endX === null || endY === null) {
+      return;
+    }
+
+    const deltaX = endX - startX;
+    const deltaY = endY - startY;
+    const isLeftSwipe = deltaX < -60;
+    const isHorizontalGesture = Math.abs(deltaX) > Math.abs(deltaY) * 1.2;
+
+    if (isLeftSwipe && isHorizontalGesture) {
+      setIsSidebarOpen(false);
+    }
+  };
+
   return (
     <>
       {/* Mobile Backdrop */}
@@ -160,7 +207,10 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
       )}
       <div
         ref={sidebarRef}
-        className={`group/sidebar w-60 bg-[#202020] text-[#ada9a3] flex flex-col text-sm select-none ${isFloating ? 'h-full max-h-[70vh]' : 'h-screen border-r border-[#2f2f2f]'} ${!isFloating ? 'fixed inset-y-0 left-0 z-50 md:relative' : ''}`}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className={`group/sidebar w-70 md:w-60 bg-[#202020] text-[#ada9a3] flex flex-col text-sm select-none ${isFloating ? 'h-full max-h-[70vh]' : 'h-screen border-r border-[#2f2f2f]'} ${!isFloating ? 'fixed inset-y-0 left-0 z-50 md:relative' : ''}`}
       >
         {/* Header */}
         <div
