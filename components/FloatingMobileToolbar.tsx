@@ -17,6 +17,20 @@ import {
   X,
 } from "lucide-react";
 import { MENU_ITEMS } from "./SlashMenu";
+import { BACK_COLORS, TEXT_COLORS } from "./ColorModal";
+
+const COLOR_LABELS: Record<string, string> = {
+  "#37352f": "cinza escuro",
+  "#787774": "cinza",
+  "#976d57": "marrom",
+  "#d9730d": "laranja",
+  "#cb912f": "amarelo",
+  "#448361": "verde",
+  "#337ea9": "azul",
+  "#7858cc": "roxo",
+  "#d15796": "rosa",
+  "#df5452": "vermelho",
+};
 
 export default function FloatingMobileToolbar({
   isVisible,
@@ -28,6 +42,8 @@ export default function FloatingMobileToolbar({
   focusedBlockId?: string | null;
 }) {
   const [showSlashModal, setShowSlashModal] = useState(false);
+  const [showColorModal, setShowColorModal] = useState(false);
+  const [savedSelection, setSavedSelection] = useState<Range | null>(null);
 
   if (!isVisible) return null;
 
@@ -50,6 +66,36 @@ export default function FloatingMobileToolbar({
   const style: React.CSSProperties = position
     ? { top: position.top }
     : {};
+
+  const getColorLabel = (color: string, type: "text" | "bg") => {
+    const base = COLOR_LABELS[color] || color;
+    return type === "text" ? `Texto ${base}` : `Fundo ${base}`;
+  };
+
+  const saveCurrentSelection = () => {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      setSavedSelection(selection.getRangeAt(0).cloneRange());
+    }
+  };
+
+  const restoreSavedSelection = () => {
+    if (!savedSelection) return;
+    const selection = window.getSelection();
+    if (!selection) return;
+    selection.removeAllRanges();
+    selection.addRange(savedSelection);
+  };
+
+  const applyColor = (type: "text" | "bg", color: string) => {
+    restoreSavedSelection();
+    if (type === "text") {
+      document.execCommand("foreColor", false, color);
+    } else {
+      document.execCommand("hiliteColor", false, color);
+    }
+    setShowColorModal(false);
+  };
 
   return (
     <>
@@ -125,7 +171,14 @@ export default function FloatingMobileToolbar({
             </ToolbarGroup>
 
             {/* Cor */}
-            <ToolbarButton text>
+            <ToolbarButton
+              text
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                saveCurrentSelection();
+                setShowColorModal(true);
+              }}
+            >
               Cor
               <ChevronDown size={16} />
             </ToolbarButton>
@@ -179,6 +232,77 @@ export default function FloatingMobileToolbar({
           </div>
         </div>
       )}
+
+      {/* Color Full-Screen Modal (Mobile) */}
+      {showColorModal && (
+        <div
+          className="fixed inset-0 z-[110] bg-[#191919] mobile-slash-modal"
+          onClick={() => setShowColorModal(false)}
+        >
+          <div
+            className="h-full w-full overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-4 border-b border-[#3f3f3f] bg-[#191919]">
+              <h2 className="text-base font-semibold text-[#f0efed]">Cor de bloco</h2>
+              <button
+                onClick={() => setShowColorModal(false)}
+                className="text-sm text-gray-300 hover:text-white transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+
+            <div className="px-4 py-4">
+              <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">
+                Cor do texto
+              </div>
+              <div className="flex flex-col divide-y divide-[#2a2a2a] border border-[#2f2f2f] rounded-lg overflow-hidden">
+                {TEXT_COLORS.map((color) => (
+                  <button
+                    key={`mobile-text-${color}`}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyColor("text", color)}
+                    className="w-full flex items-center justify-between px-3 py-3 text-left hover:bg-[#222] active:bg-[#2b2b2b] transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="w-5 h-5 rounded border border-[#3f3f3f]"
+                        style={{ backgroundColor: color }}
+                      />
+                      <span className="text-[15px] text-[#e8e8e8]">{getColorLabel(color, "text")}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="px-4 pb-6">
+              <div className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">
+                Cor de fundo
+              </div>
+              <div className="flex flex-col divide-y divide-[#2a2a2a] border border-[#2f2f2f] rounded-lg overflow-hidden">
+                {BACK_COLORS.map((color) => (
+                  <button
+                    key={`mobile-bg-${color}`}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyColor("bg", color)}
+                    className="w-full flex items-center justify-between px-3 py-3 text-left hover:bg-[#222] active:bg-[#2b2b2b] transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="w-5 h-5 rounded border border-[#3f3f3f]"
+                        style={{ backgroundColor: color }}
+                      />
+                      <span className="text-[15px] text-[#e8e8e8]">{getColorLabel(color, "bg")}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -188,14 +312,17 @@ export default function FloatingMobileToolbar({
 function ToolbarButton({
   children,
   text = false,
+  onMouseDown,
   onClick,
 }: {
   children: React.ReactNode;
   text?: boolean;
+  onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   onClick?: () => void;
 }) {
   return (
     <button
+      onMouseDown={onMouseDown}
       onClick={onClick}
       className={`
       flex items-center justify-center

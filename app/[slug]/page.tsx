@@ -602,9 +602,16 @@ export default function NotePage() {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Node | null;
       if (!target) return;
+      const elementTarget = target instanceof Element ? target : null;
 
       const isInsideEditor = containerRef.current?.contains(target);
+      const isInsideFloatingToolbar = elementTarget?.closest('.floating-toolbar-root');
+      const isInsideMobileToolbar = elementTarget?.closest('.floating-mobile-toolbar');
+      const isInsideMobileModal = elementTarget?.closest('.mobile-slash-modal');
       if (isInsideEditor) return;
+      if (isInsideFloatingToolbar) return;
+      if (isInsideMobileToolbar) return;
+      if (isInsideMobileModal) return;
 
       if (selectedIds.size > 0) {
         setSelectedIds(new Set());

@@ -70,6 +70,21 @@ export default function FloatingToolbar({ userName, updatedAt }: FloatingToolbar
   const [savedSelection, setSavedSelection] = useState<Range | null>(null) // New state to save selection
   const toolbarRef = useRef<HTMLDivElement>(null)
 
+  const saveCurrentSelection = () => {
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0) {
+      setSavedSelection(selection.getRangeAt(0).cloneRange())
+    }
+  }
+
+  const restoreSavedSelection = () => {
+    if (!savedSelection) return
+    const selection = window.getSelection()
+    if (!selection) return
+    selection.removeAllRanges()
+    selection.addRange(savedSelection)
+  }
+
   const updateActiveStates = () => {
     setActiveStates({
       bold: document.queryCommandState('bold'),
@@ -210,10 +225,7 @@ export default function FloatingToolbar({ userName, updatedAt }: FloatingToolbar
         break
       case 'text':
         e?.preventDefault()
-        const selection = window.getSelection()
-        if (selection && selection.rangeCount > 0) {
-          setSavedSelection(selection.getRangeAt(0))
-        }
+        saveCurrentSelection()
         setShowSlashMenu((prev) => !prev)
         break
       case 'bold':
@@ -236,13 +248,12 @@ export default function FloatingToolbar({ userName, updatedAt }: FloatingToolbar
         break
       case 'link':
         e?.preventDefault()
-        const sel = window.getSelection()
-        if (sel && sel.rangeCount > 0) {
-          setSavedSelection(sel.getRangeAt(0))
-        }
+        saveCurrentSelection()
         setShowLinkModal((prev) => !prev)
         break
       case 'palette':
+        e?.preventDefault()
+        saveCurrentSelection()
         setShowColorModal((prev) => !prev)
         break
       case 'more':
@@ -290,7 +301,7 @@ export default function FloatingToolbar({ userName, updatedAt }: FloatingToolbar
           bottom: 20,
           right: 20,
         }}
-        className="fixed z-50"
+        className="fixed z-50 floating-toolbar-root"
       >
         <ActionModal
           onClose={() => {
@@ -314,7 +325,7 @@ export default function FloatingToolbar({ userName, updatedAt }: FloatingToolbar
         left: position.left,
         transform: 'translateX(-50%)',
       }}
-      className="absolute z-50 flex items-center rounded-xl border border-[#2f2f2f] bg-[#1f1f1f] p-1 shadow-2xl text-sm text-[#d4d4d4] outline-none whitespace-nowrap"
+      className="absolute z-50 floating-toolbar-root flex items-center rounded-xl border border-[#2f2f2f] bg-[#1f1f1f] p-1 shadow-2xl text-sm text-[#d4d4d4] outline-none whitespace-nowrap"
     >
       {TOOLBAR_ITEMS.map((item, index) => {
         if (item.type === 'divider' || !item.id) {
@@ -419,6 +430,7 @@ export default function FloatingToolbar({ userName, updatedAt }: FloatingToolbar
         <ColorModal
           onClose={() => setShowColorModal(false)}
           onApplyColor={(type, color) => {
+            restoreSavedSelection()
             if (type === 'text') {
               document.execCommand('foreColor', false, color)
             } else {
@@ -427,6 +439,7 @@ export default function FloatingToolbar({ userName, updatedAt }: FloatingToolbar
             updateActiveStates()
           }}
           onResetColor={(type) => {
+            restoreSavedSelection()
             if (type === 'text') {
               // Save formatting states before removeFormat
               const wasBold = document.queryCommandState('bold')
