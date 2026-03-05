@@ -367,6 +367,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     return (
       <div
         ref={setNodeRef}
+        data-block-id={id}
         style={style}
         onClick={(e) => {
           if (e.shiftKey && onSelect) {
@@ -503,6 +504,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     return (
       <div
         ref={setNodeRef}
+        data-block-id={id}
         style={style}
         className={`group flex items-start -ml-12 pl-2 py-1 relative rounded transition-colors ${getContainerMargins()}`}
       >
@@ -538,6 +540,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
     return (
       <div
         ref={setNodeRef}
+        data-block-id={id}
         style={style}
         onClick={(e) => {
           if (e.shiftKey && onSelect) {
@@ -613,6 +616,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
   return (
     <div
       ref={setNodeRef}
+      data-block-id={id}
       style={style}
       onClick={(e) => {
         if (e.shiftKey && onSelect) {
@@ -659,7 +663,7 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
           id={id}
           contentEditable="true"
           tabIndex={0}
-          className={`w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-300 resize-none focus:outline-none ${getStyles()} ${isContentEmptyAndUnfocused ? 'py-0' : ''}`}
+          className={`w-full bg-transparent border-none outline-none text-gray-800 dark:text-gray-300 resize-none focus:outline-none touch-auto select-text ${getStyles()} ${isContentEmptyAndUnfocused ? 'py-0' : ''}`}
           onInput={handleInput}
           onKeyDown={(e) => {
             if (e.key === 'Tab') {
@@ -690,6 +694,11 @@ export function SortableBlock({ id, type, content, childTitles = {}, onChange, o
           onFocus={handleFocus}
           onBlur={handleBlur}
           data-placeholder={currentPlaceholder}
+          style={{
+            WebkitUserSelect: 'text',
+            userSelect: 'text',
+            WebkitTouchCallout: 'default'
+          }}
           suppressContentEditableWarning={true} // To suppress React warning
         />
 

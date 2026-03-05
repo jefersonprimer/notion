@@ -99,6 +99,7 @@ export default function NotePage() {
   const titleInputRef = useRef<HTMLInputElement>(null);
   const inputRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const shareButtonRef = useRef<HTMLButtonElement>(null);
   const [shareButtonPosition, setShareButtonPosition] = useState<{ top: number; left: number } | null>(null);
 
@@ -177,14 +178,31 @@ export default function NotePage() {
     setBlocks(next);
   };
 
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 8
+    }
+  });
+  const keyboardSensor = useSensor(KeyboardSensor, {
+    coordinateGetter: sortableKeyboardCoordinates,
+  });
   const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+    ...(isMobile ? [keyboardSensor] : [pointerSensor, keyboardSensor])
   );
 
   useEffect(() => {
+    const containerEl = containerRef.current;
+    const scrollEl = scrollAreaRef.current;
+    if (!containerEl || !scrollEl) return;
+
+    const getPointerInScrollArea = (clientX: number, clientY: number) => {
+      const rect = scrollEl.getBoundingClientRect();
+      return {
+        x: clientX - rect.left + scrollEl.scrollLeft,
+        y: clientY - rect.top + scrollEl.scrollTop
+      };
+    };
+
     const handleMouseDown = (e: MouseEvent) => {
       // Start selection only if clicking on the container or empty space, not on inputs/buttons
       const target = e.target as HTMLElement;
@@ -192,28 +210,36 @@ export default function NotePage() {
         return;
       }
 
-      setSelectionBox({ x1: e.clientX, y1: e.clientY, x2: e.clientX, y2: e.clientY });
+      const pos = getPointerInScrollArea(e.clientX, e.clientY);
+      setSelectionBox({ x1: pos.x, y1: pos.y, x2: pos.x, y2: pos.y });
       if (!e.shiftKey) setSelectedIds(new Set());
     };
 
     const handleMouseMove = (e: MouseEvent) => {
       if (!selectionBox) return;
 
-      setSelectionBox(prev => prev ? { ...prev, x2: e.clientX, y2: e.clientY } : null);
+      const pos = getPointerInScrollArea(e.clientX, e.clientY);
+      setSelectionBox(prev => prev ? { ...prev, x2: pos.x, y2: pos.y } : null);
 
       // Collision detection
-      const xMin = Math.min(selectionBox.x1, e.clientX);
-      const xMax = Math.max(selectionBox.x1, e.clientX);
-      const yMin = Math.min(selectionBox.y1, e.clientY);
-      const yMax = Math.max(selectionBox.y1, e.clientY);
+      const xMin = Math.min(selectionBox.x1, pos.x);
+      const xMax = Math.max(selectionBox.x1, pos.x);
+      const yMin = Math.min(selectionBox.y1, pos.y);
+      const yMax = Math.max(selectionBox.y1, pos.y);
 
       const newSelected = new Set(e.shiftKey ? selectedIds : []);
 
       blocks.forEach(block => {
-        const el = inputRefs.current.get(block.id)?.closest('.group');
+        const el = containerEl?.querySelector(`[data-block-id="${block.id}"]`) as HTMLElement | null;
         if (el) {
-          const rect = el.getBoundingClientRect();
-          const isIntersecting = !(rect.right < xMin || rect.left > xMax || rect.bottom < yMin || rect.top > yMax);
+          const blockRect = el.getBoundingClientRect();
+          const scrollRect = scrollEl.getBoundingClientRect();
+          const left = blockRect.left - scrollRect.left + scrollEl.scrollLeft;
+          const right = blockRect.right - scrollRect.left + scrollEl.scrollLeft;
+          const top = blockRect.top - scrollRect.top + scrollEl.scrollTop;
+          const bottom = blockRect.bottom - scrollRect.top + scrollEl.scrollTop;
+
+          const isIntersecting = !(right < xMin || left > xMax || bottom < yMin || top > yMax);
           if (isIntersecting) {
             newSelected.add(block.id);
           }
@@ -231,13 +257,13 @@ export default function NotePage() {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
     } else {
-      containerRef.current?.addEventListener('mousedown', handleMouseDown);
+      containerEl?.addEventListener('mousedown', handleMouseDown);
     }
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
-      containerRef.current?.removeEventListener('mousedown', handleMouseDown);
+      containerEl?.removeEventListener('mousedown', handleMouseDown);
     };
   }, [selectionBox, blocks, selectedIds]);
 
@@ -467,6 +493,68 @@ export default function NotePage() {
       return newSet;
     });
   };
+
+  const htmlToPlainText = (html: string) => {
+    if (typeof document === 'undefined') return html;
+    const el = document.createElement('div');
+    el.innerHTML = html;
+    return el.innerText;
+  };
+
+  useEffect(() => {
+    const handleCopy = (e: ClipboardEvent) => {
+      if (selectedIds.size === 0) return;
+
+      const selection = window.getSelection();
+      if (selection && !selection.isCollapsed) return;
+
+      const textToCopy = blocks
+        .filter(block => selectedIds.has(block.id))
+        .map(block => {
+          if (block.type === 'page') {
+            const [pageId, ...titleParts] = block.content.split('|');
+            return titleParts.join('|') || updatedTitles[pageId] || childTitles[pageId] || storedDefaultTitle;
+          }
+
+          if (block.type === 'image' || block.type === 'video') {
+            const [url] = block.content.split('|');
+            return url;
+          }
+
+          return htmlToPlainText(block.content);
+        })
+        .join('\n');
+      if (!textToCopy.trim()) return;
+
+      e.preventDefault();
+      e.clipboardData?.setData('text/plain', textToCopy);
+    };
+
+    window.addEventListener('copy', handleCopy);
+    return () => window.removeEventListener('copy', handleCopy);
+  }, [selectedIds, blocks, updatedTitles, childTitles]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node | null;
+      if (!target) return;
+
+      const isInsideEditor = containerRef.current?.contains(target);
+      if (isInsideEditor) return;
+
+      if (selectedIds.size > 0) {
+        setSelectedIds(new Set());
+      }
+
+      const selection = window.getSelection();
+      if (selection && !selection.isCollapsed) {
+        selection.removeAllRanges();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside, true);
+    return () => document.removeEventListener('mousedown', handleClickOutside, true);
+  }, [selectedIds]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -939,7 +1027,7 @@ export default function NotePage() {
     return (
       <div className="flex min-h-screen bg-white dark:bg-[#191919]">
         <SidebarElement />
-        <main className="flex-1 flex flex-col h-screen overflow-hidden">
+        <main className="flex-1 flex flex-col min-h-screen md:h-screen md:overflow-hidden">
           {/* Header Skeleton */}
           <div className="h-12 flex items-center justify-between px-4 relative z-20 overflow-hidden">
             <div className="flex items-center gap-2 min-w-0">
@@ -981,7 +1069,7 @@ export default function NotePage() {
       {/* Main Sidebar (when open) */}
       {isSidebarOpen && <Sidebar />}
 
-      <main className="flex-1 flex flex-col h-screen overflow-hidden">
+      <main className="flex-1 flex flex-col min-h-screen md:h-screen md:overflow-hidden">
         {/* Top Bar */}
         <div className="h-12 flex items-center justify-between px-4  relative z-20">
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -1149,7 +1237,7 @@ export default function NotePage() {
         )}
 
         {/* Note Content Area */}
-        <div className="flex-1 overflow-y-auto">
+        <div ref={scrollAreaRef} className="relative md:flex-1 md:overflow-y-auto">
           <div ref={containerRef} className="max-w-4xl mx-auto px-6 md:px-12 py-6 md:py-12">
             {/* Title Input */}
             <div className="group relative">
@@ -1245,6 +1333,18 @@ export default function NotePage() {
               />
             </div>
           </div>
+
+          {selectionBox && (
+            <div
+              className="absolute border border-transparent bg-[#2383e233] pointer-events-none z-50"
+              style={{
+                left: Math.min(selectionBox.x1, selectionBox.x2),
+                top: Math.min(selectionBox.y1, selectionBox.y2),
+                width: Math.abs(selectionBox.x2 - selectionBox.x1),
+                height: Math.abs(selectionBox.y2 - selectionBox.y1),
+              }}
+            />
+          )}
         </div>
       </main>
       {!isMobile && <FloatingToolbar userName={session?.user?.displayName || session?.user?.email} updatedAt={note?.updated_at} />}
@@ -1253,17 +1353,6 @@ export default function NotePage() {
           isVisible={isToolbarVisible}
           position={toolbarPosition}
           focusedBlockId={focusedBlockId}
-        />
-      )}
-      {selectionBox && (
-        <div
-          className="fixed border border-transparent bg-[#2383e233] pointer-events-none z-100"
-          style={{
-            left: Math.min(selectionBox.x1, selectionBox.x2),
-            top: Math.min(selectionBox.y1, selectionBox.y2),
-            width: Math.abs(selectionBox.x2 - selectionBox.x1),
-            height: Math.abs(selectionBox.y2 - selectionBox.y1),
-          }}
         />
       )}
     </div>
