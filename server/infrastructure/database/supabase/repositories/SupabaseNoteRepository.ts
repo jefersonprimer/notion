@@ -3,6 +3,81 @@ import { Note } from "../../../../domain/entities/Note";
 import { supabase } from "../client";
 
 export class SupabaseNoteRepository implements INoteRepository {
+  private normalizeNoteId(id: string): string {
+    return id.replace(/-/g, '').toLowerCase();
+  }
+
+  private stripChildReferencesFromDescription(
+    description: string | null,
+    childNoteIds: string[]
+  ): string | null {
+    if (!description || childNoteIds.length === 0) {
+      return description;
+    }
+
+    const normalizedIds = new Set(childNoteIds.map((id) => this.normalizeNoteId(id)));
+    const lines = description.split('\n');
+    const filteredLines = lines.filter((line) => {
+      const trimmedLine = line.trim();
+      if (!trimmedLine.startsWith('p:')) {
+        return true;
+      }
+
+      const referenceContent = trimmedLine.slice(2).trim();
+      const rawReferenceId = referenceContent.split('|')[0]?.trim();
+      if (!rawReferenceId) {
+        return true;
+      }
+
+      const normalizedReferenceId = this.normalizeNoteId(rawReferenceId);
+      return !normalizedIds.has(normalizedReferenceId);
+    });
+
+    return filteredLines.join('\n');
+  }
+
+  private async removeChildReferenceFromParent(
+    childNoteId: string,
+    parentId: string | null,
+    userId: string
+  ): Promise<void> {
+    if (!parentId) {
+      return;
+    }
+
+    const { data: parentData, error: parentError } = await supabase
+      .from('notes')
+      .select('id, description')
+      .match({ id: parentId, user_id: userId })
+      .single();
+
+    if (parentError && parentError.code !== 'PGRST116') {
+      console.error("Supabase find parent note error:", parentError.message);
+      throw new Error("Could not sync parent note references.");
+    }
+
+    if (!parentData) {
+      return;
+    }
+
+    const nextDescription = this.stripChildReferencesFromDescription(parentData.description, [childNoteId]);
+    if (nextDescription === parentData.description) {
+      return;
+    }
+
+    const { error: updateParentError } = await supabase
+      .from('notes')
+      .update({
+        description: nextDescription,
+        updated_at: new Date().toISOString(),
+      })
+      .match({ id: parentId, user_id: userId });
+
+    if (updateParentError) {
+      console.error("Supabase update parent note error:", updateParentError.message);
+      throw new Error("Could not sync parent note references.");
+    }
+  }
 
   async create(noteData: Omit<Note, 'id' | 'createdAt' | 'is_deleted' | 'deleted_at'> & { parentId?: string | null }): Promise<Note> {
     const { userId, title, description, parentId } = noteData;
@@ -116,6 +191,21 @@ export class SupabaseNoteRepository implements INoteRepository {
   }
 
   async softDelete(id: string, userId: string): Promise<void> {
+    const { data: noteData, error: noteError } = await supabase
+      .from('notes')
+      .select('id, parent_id')
+      .match({ id, user_id: userId })
+      .single();
+
+    if (noteError && noteError.code !== 'PGRST116') {
+      console.error("Supabase find note for soft delete error:", noteError.message);
+      throw new Error("Could not move note to trash.");
+    }
+
+    if (noteData) {
+      await this.removeChildReferenceFromParent(noteData.id, noteData.parent_id, userId);
+    }
+
     const { error } = await supabase
       .from('notes')
       .update({ is_deleted: true, deleted_at: new Date().toISOString() })
@@ -140,6 +230,21 @@ export class SupabaseNoteRepository implements INoteRepository {
   }
 
   async permanentDelete(id: string, userId: string): Promise<void> {
+    const { data: noteData, error: noteError } = await supabase
+      .from('notes')
+      .select('id, parent_id')
+      .match({ id, user_id: userId })
+      .single();
+
+    if (noteError && noteError.code !== 'PGRST116') {
+      console.error("Supabase find note for permanent delete error:", noteError.message);
+      throw new Error("Could not permanently delete note.");
+    }
+
+    if (noteData) {
+      await this.removeChildReferenceFromParent(noteData.id, noteData.parent_id, userId);
+    }
+
     const { error } = await supabase
       .from('notes')
       .delete()
@@ -209,6 +314,60 @@ export class SupabaseNoteRepository implements INoteRepository {
   }
 
   async emptyTrash(userId: string): Promise<void> {
+    const { data: deletedNotes, error: deletedNotesError } = await supabase
+      .from('notes')
+      .select('id, parent_id')
+      .eq('user_id', userId)
+      .eq('is_deleted', true);
+
+    if (deletedNotesError) {
+      console.error("Supabase find deleted notes for cleanup error:", deletedNotesError.message);
+      throw new Error("Could not empty trash.");
+    }
+
+    const childIdsByParent = new Map<string, string[]>();
+    for (const note of deletedNotes ?? []) {
+      if (!note.parent_id) continue;
+      const existing = childIdsByParent.get(note.parent_id) ?? [];
+      existing.push(note.id);
+      childIdsByParent.set(note.parent_id, existing);
+    }
+
+    if (childIdsByParent.size > 0) {
+      const parentIds = Array.from(childIdsByParent.keys());
+      const { data: parentNotes, error: parentNotesError } = await supabase
+        .from('notes')
+        .select('id, description')
+        .eq('user_id', userId)
+        .in('id', parentIds);
+
+      if (parentNotesError) {
+        console.error("Supabase find parent notes for trash cleanup error:", parentNotesError.message);
+        throw new Error("Could not empty trash.");
+      }
+
+      for (const parent of parentNotes ?? []) {
+        const childIds = childIdsByParent.get(parent.id) ?? [];
+        const nextDescription = this.stripChildReferencesFromDescription(parent.description, childIds);
+        if (nextDescription === parent.description) {
+          continue;
+        }
+
+        const { error: updateParentError } = await supabase
+          .from('notes')
+          .update({
+            description: nextDescription,
+            updated_at: new Date().toISOString(),
+          })
+          .match({ id: parent.id, user_id: userId });
+
+        if (updateParentError) {
+          console.error("Supabase update parent during empty trash error:", updateParentError.message);
+          throw new Error("Could not empty trash.");
+        }
+      }
+    }
+
     const { error } = await supabase
       .from('notes')
       .delete()
