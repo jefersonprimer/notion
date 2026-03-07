@@ -1,17 +1,9 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import Sidebar from '@/components/Sidebar';
-import api from '@/lib/api';
-import { Note } from '@/types/note';
-import { useAuth } from '@/context/AuthContext';
-import { useLayout } from '@/context/LayoutContext';
-import { useFavorite } from '@/context/FavoriteContext';
-import { useNote } from '@/context/NoteContext';
-import { extractIdFromSlug, createNoteSlug, isLikelyCode } from '@/lib/utils';
 import {
   MoreHorizontal,
   Menu,
@@ -21,49 +13,22 @@ import {
   Star,
   ChevronRight,
   Share,
-  Smile,
-  Image as ImageIcon,
-  MessageSquareText,
   Trash2,
-  RotateCcw
+  RotateCcw,
 } from 'lucide-react';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy
-} from '@dnd-kit/sortable';
-import { SortableBlock } from '@/components/SortableBlock';
+
+import Sidebar from '@/components/Sidebar';
 import PageOptionsModal from '@/components/PageOptionsModal';
 import ShareModal from '@/components/ShareModal';
+import NoteEditor, { type NoteEditorHandle } from '@/components/NoteEditor';
 import FloatingToolbar from '@/components/FloatingToolbar';
-import FloatingMobileToolbar from '@/components/FloatingMobileToolbar';
-
-const generateId = () => Math.random().toString(36).substr(2, 9);
-
-const PREFIXES: Record<string, string> = {
-  h1: '# ',
-  h2: '## ',
-  h3: '### ',
-  bullet: '- ',
-  number: '1. ',
-  todo: '[] ',
-  todo_checked: '[x] ',
-  toggle: '> ',
-  page: 'p: ',
-  image: 'img: ',
-  video: 'vid: ',
-  code: '``` ',
-};
+import api from '@/lib/api';
+import { Note } from '@/types/note';
+import { useAuth } from '@/context/AuthContext';
+import { useLayout } from '@/context/LayoutContext';
+import { useFavorite } from '@/context/FavoriteContext';
+import { useNote } from '@/context/NoteContext';
+import { createNoteSlug, extractIdFromSlug } from '@/lib/utils';
 
 export default function NotePage() {
   const t = useTranslations('NotePage');
@@ -74,198 +39,37 @@ export default function NotePage() {
   const { isSidebarOpen, setIsSidebarOpen } = useLayout();
   const { favoriteNotes, toggleFavorite, removeNoteFromFavorites } = useFavorite();
   const { updatedTitles, updateNoteTitle, updateNoteHasContent } = useNote();
+
   const [note, setNote] = useState<Note | null>(null);
   const [parentNote, setParentNote] = useState<Note | null>(null);
   const [title, setTitle] = useState('');
-  const [blocks, setBlocks] = useState<{ id: string; type: string; content: string }[]>([]);
-  const [history, setHistory] = useState<{ past: typeof blocks[], future: typeof blocks[] }>({ past: [], future: [] });
-  const [childTitles, setChildTitles] = useState<Record<string, string>>({});
+  const [editorHtml, setEditorHtml] = useState('<p></p>');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFloatingOpen, setIsFloatingOpen] = useState(false);
   const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [selectionBox, setSelectionBox] = useState<{ x1: number, y1: number, x2: number, y2: number } | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
-  const [focusedBlockId, setFocusedBlockId] = useState<string | null>(null);
-  const [toolbarPosition, setToolbarPosition] = useState<{ top: number, left: number } | undefined>(undefined);
-  const [isToolbarVisible, setIsToolbarVisible] = useState(false);
+  const [shareButtonPosition, setShareButtonPosition] = useState<{ top: number; left: number } | null>(null);
+  const [lastSavedTitle, setLastSavedTitle] = useState('');
+  const [lastSavedDescription, setLastSavedDescription] = useState('');
+
+  const titleDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const descriptionDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
+  const shareButtonRef = useRef<HTMLButtonElement>(null);
+  const noteEditorRef = useRef<NoteEditorHandle>(null);
+
   const storedDefaultTitle = 'Nova página';
   const displayDefaultTitle = t('defaultTitle');
 
-  const titleDebounceRef = useRef<NodeJS.Timeout | null>(null);
-  const blocksDebounceRef = useRef<NodeJS.Timeout | null>(null);
-  const titleInputRef = useRef<HTMLInputElement>(null);
-  const inputRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-  const containerRef = useRef<HTMLDivElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const shareButtonRef = useRef<HTMLButtonElement>(null);
-  const [shareButtonPosition, setShareButtonPosition] = useState<{ top: number; left: number } | null>(null);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+  const htmlToPlainText = useCallback((html: string) => {
+    if (typeof document === 'undefined') return html;
+    const el = document.createElement('div');
+    el.innerHTML = html;
+    return (el.innerText || '').trim();
   }, []);
 
-  const handleBlockFocus = (id: string) => {
-    setFocusedBlockId(id);
-    if (window.innerWidth < 768) {
-      setIsToolbarVisible(true);
-      const el = id === 'title' ? titleInputRef.current : inputRefs.current.get(id);
-      if (el) {
-        const rect = el.getBoundingClientRect();
-        setToolbarPosition({
-          top: rect.bottom + 10,
-          left: rect.left
-        });
-      }
-    }
-  };
-
-  const handleBlockBlur = () => {
-    setTimeout(() => {
-      const activeEl = document.activeElement;
-      const isInput = activeEl?.getAttribute('contenteditable') === 'true' ||
-        activeEl?.tagName === 'INPUT' ||
-        activeEl?.tagName === 'TEXTAREA';
-      const isToolbarButton = activeEl?.closest('.floating-mobile-toolbar');
-      const isSlashModal = activeEl?.closest('.mobile-slash-modal') || document.querySelector('.mobile-slash-modal');
-
-      if (!isInput && !isToolbarButton && !isSlashModal) {
-        setIsToolbarVisible(false);
-        setFocusedBlockId(null);
-      }
-    }, 150);
-  };
-
-  // Helper to update blocks with history
-  const updateBlocks = (newBlocks: typeof blocks | ((prev: typeof blocks) => typeof blocks), saveToHistory = true) => {
-    if (saveToHistory) {
-      setHistory(prev => ({
-        past: [blocks, ...prev.past].slice(0, 50), // Limit to 50 steps
-        future: []
-      }));
-    }
-    if (typeof newBlocks === 'function') {
-      setBlocks(newBlocks);
-    } else {
-      setBlocks(newBlocks);
-    }
-  };
-
-  const undo = () => {
-    if (history.past.length === 0) return;
-    const previous = history.past[0];
-    const newPast = history.past.slice(1);
-    setHistory(prev => ({
-      past: newPast,
-      future: [blocks, ...prev.future]
-    }));
-    setBlocks(previous);
-  };
-
-  const redo = () => {
-    if (history.future.length === 0) return;
-    const next = history.future[0];
-    const newFuture = history.future.slice(1);
-    setHistory(prev => ({
-      past: [blocks, ...prev.past],
-      future: newFuture
-    }));
-    setBlocks(next);
-  };
-
-  const pointerSensor = useSensor(PointerSensor, {
-    activationConstraint: {
-      distance: 8
-    }
-  });
-  const keyboardSensor = useSensor(KeyboardSensor, {
-    coordinateGetter: sortableKeyboardCoordinates,
-  });
-  const sensors = useSensors(
-    ...(isMobile ? [keyboardSensor] : [pointerSensor, keyboardSensor])
-  );
-
-  useEffect(() => {
-    const containerEl = containerRef.current;
-    const scrollEl = scrollAreaRef.current;
-    if (!containerEl || !scrollEl) return;
-
-    const getPointerInScrollArea = (clientX: number, clientY: number) => {
-      const rect = scrollEl.getBoundingClientRect();
-      return {
-        x: clientX - rect.left + scrollEl.scrollLeft,
-        y: clientY - rect.top + scrollEl.scrollTop
-      };
-    };
-
-    const handleMouseDown = (e: MouseEvent) => {
-      // Start selection only if clicking on the container or empty space, not on inputs/buttons
-      const target = e.target as HTMLElement;
-      if (target.closest('button') || target.closest('input') || target.closest('[contenteditable="true"]') || target.closest('a')) {
-        return;
-      }
-
-      const pos = getPointerInScrollArea(e.clientX, e.clientY);
-      setSelectionBox({ x1: pos.x, y1: pos.y, x2: pos.x, y2: pos.y });
-      if (!e.shiftKey) setSelectedIds(new Set());
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!selectionBox) return;
-
-      const pos = getPointerInScrollArea(e.clientX, e.clientY);
-      setSelectionBox(prev => prev ? { ...prev, x2: pos.x, y2: pos.y } : null);
-
-      // Collision detection
-      const xMin = Math.min(selectionBox.x1, pos.x);
-      const xMax = Math.max(selectionBox.x1, pos.x);
-      const yMin = Math.min(selectionBox.y1, pos.y);
-      const yMax = Math.max(selectionBox.y1, pos.y);
-
-      const newSelected = new Set(e.shiftKey ? selectedIds : []);
-
-      blocks.forEach(block => {
-        const el = containerEl?.querySelector(`[data-block-id="${block.id}"]`) as HTMLElement | null;
-        if (el) {
-          const blockRect = el.getBoundingClientRect();
-          const scrollRect = scrollEl.getBoundingClientRect();
-          const left = blockRect.left - scrollRect.left + scrollEl.scrollLeft;
-          const right = blockRect.right - scrollRect.left + scrollEl.scrollLeft;
-          const top = blockRect.top - scrollRect.top + scrollEl.scrollTop;
-          const bottom = blockRect.bottom - scrollRect.top + scrollEl.scrollTop;
-
-          const isIntersecting = !(right < xMin || left > xMax || bottom < yMin || top > yMax);
-          if (isIntersecting) {
-            newSelected.add(block.id);
-          }
-        }
-      });
-
-      setSelectedIds(newSelected);
-    };
-
-    const handleMouseUp = () => {
-      setSelectionBox(null);
-    };
-
-    if (selectionBox) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-    } else {
-      containerEl?.addEventListener('mousedown', handleMouseDown);
-    }
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-      containerEl?.removeEventListener('mousedown', handleMouseDown);
-    };
-  }, [selectionBox, blocks, selectedIds]);
+  const descriptionText = useMemo(() => htmlToPlainText(editorHtml), [editorHtml, htmlToPlainText]);
 
   useEffect(() => {
     async function fetchNote() {
@@ -280,81 +84,54 @@ export default function NotePage() {
       if (note && note.id === noteId) return;
 
       try {
-        const [noteResponse, childrenResponse] = await Promise.all([
+        setLoading(true);
+        setError(null);
+
+        const [noteResponse] = await Promise.all([
           api.get(`/notes/${noteId}`, {
-            headers: { Authorization: `Bearer ${session.accessToken}` }
+            headers: { Authorization: `Bearer ${session.accessToken}` },
           }),
-          api.get(`/notes/${noteId}/children`, {
-            headers: { Authorization: `Bearer ${session.accessToken}` }
-          })
         ]);
 
-        const noteData = noteResponse.data;
-        const childrenData = childrenResponse.data;
+        const noteData = noteResponse.data as Note & { parentId?: string | null; parent_id?: string | null };
+        const rawTitle = noteData.title === storedDefaultTitle ? '' : noteData.title;
+        const rawDescription = noteData.description || '<p></p>';
+        const nextHtml = rawDescription.trim() ? rawDescription : '<p></p>';
 
         setNote(noteData);
-        setTitle(noteData.title === storedDefaultTitle ? '' : noteData.title);
+        setTitle(rawTitle);
+        setEditorHtml(nextHtml);
+        setLastSavedTitle(rawTitle);
+        setLastSavedDescription(rawDescription);
 
-        const hasInitialContent = (noteData.title && noteData.title !== storedDefaultTitle && noteData.title.trim() !== '') && (noteData.description && noteData.description.trim() !== '');
-        updateNoteHasContent(noteData.id, !!hasInitialContent);
+        const hasInitialContent =
+          rawTitle.trim() !== '' &&
+          htmlToPlainText(nextHtml).trim() !== '';
+        updateNoteHasContent(noteData.id, hasInitialContent);
 
-        // Fetch parent note if exists
-        if (noteData.parentId) {
+        const parentId = noteData.parentId || noteData.parent_id;
+        if (parentId) {
           try {
-            const parentResponse = await api.get(`/notes/${noteData.parentId}`, {
-              headers: { Authorization: `Bearer ${session.accessToken}` }
+            const parentResponse = await api.get(`/notes/${parentId}`, {
+              headers: { Authorization: `Bearer ${session.accessToken}` },
             });
             setParentNote(parentResponse.data);
-          } catch (err) {
-            console.error("Error fetching parent note:", err);
+          } catch {
+            setParentNote(null);
           }
         } else {
           setParentNote(null);
         }
-
-        const titlesMap: Record<string, string> = {};
-        childrenData.forEach((child: Note) => {
-          const cleanChildId = child.id.replace(/-/g, '');
-          titlesMap[cleanChildId] = child.title;
-        });
-        setChildTitles(titlesMap);
-
-        // Parse description into typed blocks
-        const desc = noteData.description || '';
-        const initialBlocks = desc.split('\n').map((line: string) => {
-          let type = 'text';
-          let content = line;
-
-          for (const [key, prefix] of Object.entries(PREFIXES)) {
-            if (line.startsWith(prefix)) {
-              type = key;
-              content = line.slice(prefix.length);
-              // Decode escaped newlines for code blocks
-              if (key === 'code') {
-                content = content.replace(/\\n/g, '\n');
-              }
-              break;
-            }
-          }
-          return { id: generateId(), type, content };
-        });
-
-        if (initialBlocks.length === 0 || (initialBlocks.length === 1 && initialBlocks[0].content === '')) {
-          setBlocks([{ id: generateId(), type: 'text', content: '' }]);
-        } else {
-          setBlocks(initialBlocks);
-        }
-
-      } catch (error) {
-        console.error('Error fetching note:', error);
+      } catch (loadError) {
+        console.error('Error fetching note:', loadError);
         setError(t('errors.noteNotFound'));
       } finally {
         setLoading(false);
       }
     }
 
-    fetchNote();
-  }, [session, params, storedDefaultTitle, t]);
+    void fetchNote();
+  }, [session, params, note, storedDefaultTitle, t, updateNoteHasContent, htmlToPlainText]);
 
   useEffect(() => {
     if (!loading && searchParams?.get('showMoveTo')) {
@@ -362,144 +139,95 @@ export default function NotePage() {
     }
   }, [loading, searchParams]);
 
-  const handleTitlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    const pastedText = e.clipboardData.getData('text');
-    const lines = pastedText.split('\n');
+  useEffect(() => {
+    if (!note || loading) return;
 
-    if (lines.length > 1) {
-      e.preventDefault();
-      const newTitle = lines[0];
-      const remainingText = lines.slice(1).join('\n');
+    const hasContent =
+      title.trim() !== '' &&
+      title !== storedDefaultTitle &&
+      descriptionText.trim() !== '';
+    updateNoteHasContent(note.id, hasContent);
+  }, [title, descriptionText, note, loading, storedDefaultTitle, updateNoteHasContent]);
 
-      let newContentBlocks;
-      if (isLikelyCode(remainingText)) {
-        newContentBlocks = [{
-          id: generateId(),
-          type: 'code',
-          content: remainingText
-        }];
-      } else {
-        newContentBlocks = lines.slice(1).filter(line => line.trim() !== '').map(line => ({
-          id: generateId(),
-          type: 'text',
-          content: line
-        }));
+  useEffect(() => {
+    if (!note || !session || loading) return;
+    if (title === lastSavedTitle) return;
+
+    if (titleDebounceRef.current) clearTimeout(titleDebounceRef.current);
+
+    titleDebounceRef.current = setTimeout(async () => {
+      try {
+        await api.put(
+          `/notes/${note.id}`,
+          { title },
+          { headers: { Authorization: `Bearer ${session.accessToken}` } }
+        );
+        setLastSavedTitle(title);
+      } catch (saveError) {
+        console.error('Failed to save title', saveError);
       }
+    }, 800);
 
-      setTitle(newTitle);
+    return () => {
+      if (titleDebounceRef.current) clearTimeout(titleDebounceRef.current);
+    };
+  }, [title, note, session, loading, lastSavedTitle]);
 
-      // Insert new content blocks at the beginning of the blocks array
-      setBlocks(prevBlocks => [...newContentBlocks, ...prevBlocks]);
+  useEffect(() => {
+    if (!note || !session || loading) return;
+    if (editorHtml === lastSavedDescription) return;
 
-      // Focus the first new block if any were added
-      if (newContentBlocks.length > 0) {
-        setTimeout(() => {
-          inputRefs.current.get(newContentBlocks[0].id)?.focus();
-        }, 0);
-      } else {
-        // If only title was pasted or only empty lines after title, focus title
-        titleInputRef.current?.focus();
+    if (descriptionDebounceRef.current) clearTimeout(descriptionDebounceRef.current);
+
+    descriptionDebounceRef.current = setTimeout(async () => {
+      try {
+        await api.put(
+          `/notes/${note.id}`,
+          { description: editorHtml },
+          { headers: { Authorization: `Bearer ${session.accessToken}` } }
+        );
+        setLastSavedDescription(editorHtml);
+      } catch (saveError) {
+        console.error('Failed to save description', saveError);
       }
-    }
-  };
+    }, 1000);
+
+    return () => {
+      if (descriptionDebounceRef.current) clearTimeout(descriptionDebounceRef.current);
+    };
+  }, [editorHtml, note, session, loading, lastSavedDescription]);
+
+  useEffect(() => {
+    return () => {
+      if (titleDebounceRef.current) clearTimeout(titleDebounceRef.current);
+      if (descriptionDebounceRef.current) clearTimeout(descriptionDebounceRef.current);
+    };
+  }, []);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
 
-    if (note) {
-      updateNoteTitle(note.id, newTitle);
+    if (!note) return;
 
-      const currentDescription = blocks.map(b => {
-        const prefix = PREFIXES[b.type] || '';
-        const content = b.type === 'code' ? b.content.replace(/\n/g, '\\n') : b.content;
-        return prefix + content;
-      }).join('\n');
-      const hasContent = (newTitle.trim() !== '' && newTitle !== storedDefaultTitle) && currentDescription.trim() !== '';
-      updateNoteHasContent(note.id, hasContent);
+    updateNoteTitle(note.id, newTitle);
 
-      const cleanId = note.id.replace(/-/g, '');
-      let newSlug;
-      if (!newTitle.trim()) {
-        newSlug = cleanId;
-      } else {
-        newSlug = createNoteSlug(newTitle, note.id);
-      }
+    const cleanId = note.id.replace(/-/g, '');
+    const newSlug = newTitle.trim() ? createNoteSlug(newTitle, note.id) : cleanId;
+    const currentSearch = window.location.search;
+    window.history.replaceState(null, '', `/${newSlug}${currentSearch}`);
+  };
 
-      const searchParams = window.location.search;
-      window.history.replaceState(null, '', `/${newSlug}${searchParams}`);
-
-      if (titleDebounceRef.current) clearTimeout(titleDebounceRef.current);
-      titleDebounceRef.current = setTimeout(async () => {
-        if (!session) return;
-        try {
-          await api.put(`/notes/${note.id}`, { title: newTitle }, {
-            headers: { Authorization: `Bearer ${session.accessToken}` }
-          });
-        } catch (err) {
-          console.error("Failed to save title", err);
-        }
-      }, 800);
+  const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== 'Enter' || e.nativeEvent.isComposing) return;
+    e.preventDefault();
+    const editor = noteEditorRef.current?.getEditor();
+    if (editor) {
+      editor.commands.focus('start');
+      return;
     }
+    noteEditorRef.current?.focus();
   };
-
-  // Save blocks when they change
-  useEffect(() => {
-    if (!note || loading) return;
-
-    if (blocksDebounceRef.current) clearTimeout(blocksDebounceRef.current);
-    blocksDebounceRef.current = setTimeout(async () => {
-      if (!session) return;
-      // Join blocks back with prefixes
-      const description = blocks.map(b => {
-        const prefix = PREFIXES[b.type] || '';
-        // Encode newlines in code blocks so they stay as a single line in storage
-        const content = b.type === 'code' ? b.content.replace(/\n/g, '\\n') : b.content;
-        return prefix + content;
-      }).join('\n');
-
-      const hasContent = (title.trim() !== '' && title !== storedDefaultTitle) && description.trim() !== '';
-      updateNoteHasContent(note.id, hasContent);
-
-      try {
-        await api.put(`/notes/${note.id}`, { description }, {
-          headers: { Authorization: `Bearer ${session.accessToken}` }
-        });
-      } catch (err) {
-        console.error("Failed to save description", err);
-      }
-    }, 1000);
-  }, [blocks, note, session, loading, title, storedDefaultTitle, updateNoteHasContent]);
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (active.id !== over?.id) {
-      updateBlocks((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over?.id);
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
-  };
-
-  const handleSelect = (id: string, multi: boolean) => {
-    setSelectedIds(prev => {
-      const newSet = new Set(multi ? prev : []);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
-  };
-
-  const htmlToPlainText = useCallback((html: string) => {
-    if (typeof document === 'undefined') return html;
-    const el = document.createElement('div');
-    el.innerHTML = html;
-    return el.innerText;
-  }, []);
 
   const copyTextToClipboard = async (text: string) => {
     try {
@@ -520,548 +248,19 @@ export default function NotePage() {
   };
 
   const handleCopyPageContents = async () => {
-    let numberCount = 1;
-    const lines = blocks.map((block) => {
-      if (block.type === 'page') {
-        const [pageId, ...titleParts] = block.content.split('|');
-        return titleParts.join('|') || updatedTitles[pageId] || childTitles[pageId] || storedDefaultTitle;
-      }
-
-      if (block.type === 'image' || block.type === 'video') {
-        const [url] = block.content.split('|');
-        return url;
-      }
-
-      if (block.type === 'number') {
-        const text = htmlToPlainText(block.content);
-        const line = `${numberCount}. ${text}`;
-        numberCount += 1;
-        return line;
-      }
-
-      if (block.type === 'bullet') {
-        return `- ${htmlToPlainText(block.content)}`;
-      }
-
-      if (block.type === 'todo') {
-        return `[ ] ${htmlToPlainText(block.content)}`;
-      }
-
-      if (block.type === 'todo_checked') {
-        return `[x] ${htmlToPlainText(block.content)}`;
-      }
-
-      if (block.type === 'toggle') {
-        return `> ${htmlToPlainText(block.content)}`;
-      }
-
-      return block.type === 'code' ? block.content : htmlToPlainText(block.content);
-    });
-
     const cleanTitle = title.trim() || displayDefaultTitle;
-    const pageText = `${cleanTitle}\n\n${lines.join('\n')}`.trimEnd();
+    const bodyText = htmlToPlainText(editorHtml);
+    const pageText = `${cleanTitle}\n\n${bodyText}`.trimEnd();
     await copyTextToClipboard(pageText);
   };
-
-  const getBlockClipboardText = useCallback((block: { id: string; type: string; content: string }) => {
-    if (block.type === 'page') {
-      const [pageId, ...titleParts] = block.content.split('|');
-      return titleParts.join('|') || updatedTitles[pageId] || childTitles[pageId] || storedDefaultTitle;
-    }
-
-    if (block.type === 'image' || block.type === 'video') {
-      const [url] = block.content.split('|');
-      return url;
-    }
-
-    return htmlToPlainText(block.content);
-  }, [updatedTitles, childTitles, storedDefaultTitle, htmlToPlainText]);
-
-  useEffect(() => {
-    const handleCopy = (e: ClipboardEvent) => {
-      if (selectedIds.size === 0) return;
-
-      const selection = window.getSelection();
-      if (selection && !selection.isCollapsed) return;
-
-      const textToCopy = blocks
-        .filter(block => selectedIds.has(block.id))
-        .map(getBlockClipboardText)
-        .join('\n');
-      if (!textToCopy.trim()) return;
-
-      e.preventDefault();
-      e.clipboardData?.setData('text/plain', textToCopy);
-    };
-
-    window.addEventListener('copy', handleCopy);
-    return () => window.removeEventListener('copy', handleCopy);
-  }, [selectedIds, blocks, updatedTitles, childTitles, getBlockClipboardText]);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as Node | null;
-      if (!target) return;
-      const elementTarget = target instanceof Element ? target : null;
-
-      const isInsideEditor = containerRef.current?.contains(target);
-      const isInsideFloatingToolbar = elementTarget?.closest('.floating-toolbar-root');
-      const isInsideMobileToolbar = elementTarget?.closest('.floating-mobile-toolbar');
-      const isInsideMobileModal = elementTarget?.closest('.mobile-slash-modal');
-      if (isInsideEditor) return;
-      if (isInsideFloatingToolbar) return;
-      if (isInsideMobileToolbar) return;
-      if (isInsideMobileModal) return;
-
-      if (selectedIds.size > 0) {
-        setSelectedIds(new Set());
-      }
-
-      const selection = window.getSelection();
-      if (selection && !selection.isCollapsed) {
-        selection.removeAllRanges();
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside, true);
-    return () => document.removeEventListener('mousedown', handleClickOutside, true);
-  }, [selectedIds]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
-        const activeEl = document.activeElement as HTMLElement | null;
-        const isEditingBlock = activeEl?.getAttribute('contenteditable') === 'true';
-        const isEditingTitle = activeEl === titleInputRef.current;
-        const blockText = isEditingBlock ? (activeEl?.innerText || '').trim() : '';
-
-        // If focus is outside editor content or on an empty block, select all blocks.
-        // If typing in a non-empty line or title input, keep native Ctrl/Cmd+A behavior.
-        if (!isEditingTitle && (!isEditingBlock || blockText === '')) {
-          e.preventDefault();
-          setSelectedIds(new Set(blocks.map(block => block.id)));
-          return;
-        }
-      }
-
-      // Cut selected blocks (when there isn't a native text selection)
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'x') {
-        if (selectedIds.size === 0) return;
-
-        const activeEl = document.activeElement as HTMLElement | null;
-        const isEditingTitle = activeEl === titleInputRef.current;
-        if (isEditingTitle) return;
-
-        const selection = window.getSelection();
-        if (selection && !selection.isCollapsed) return;
-
-        e.preventDefault();
-        const textToCut = blocks
-          .filter(block => selectedIds.has(block.id))
-          .map(getBlockClipboardText)
-          .join('\n');
-
-        if (textToCut.trim()) {
-          void copyTextToClipboard(textToCut);
-        }
-
-        updateBlocks(prev => prev.filter(b => !selectedIds.has(b.id)));
-        setSelectedIds(new Set());
-        return;
-      }
-
-      // Undo/Redo
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-        if (e.shiftKey) {
-          e.preventDefault();
-          redo();
-        } else {
-          e.preventDefault();
-          undo();
-        }
-      }
-      if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
-        e.preventDefault();
-        redo();
-      }
-
-      if ((e.key === 'Backspace' || e.key === 'Delete') && selectedIds.size > 0) {
-        const activeEl = document.activeElement;
-        const isEditingTitle = activeEl === titleInputRef.current;
-
-        // Se estiver editando o título, não apaga os blocos selecionados
-        if (isEditingTitle) return;
-
-        // Se houver mais de um bloco selecionado, OU se o bloco focado for um dos selecionados
-        // e o cursor estiver no início (para Backspace) ou apenas se for Delete
-        const isEditingBlock = activeEl?.getAttribute('contenteditable') === 'true';
-        const focusedBlockId = activeEl?.id;
-
-        // Check if any selected block is an image or other non-contenteditable block
-        const hasNonEditableSelected = Array.from(selectedIds).some(id => {
-          const block = blocks.find(b => b.id === id);
-          return block && (block.type === 'image' || block.type === 'page' || block.type === 'code');
-        });
-
-        if (selectedIds.size > 1 || hasNonEditableSelected || !isEditingBlock || (focusedBlockId && selectedIds.has(focusedBlockId))) {
-          // Se houver texto selecionado DENTRO do bloco (seleção nativa), deixamos o comportamento padrão
-          const selection = window.getSelection();
-          if (selection && !selection.isCollapsed && isEditingBlock && selectedIds.size === 1) {
-            return;
-          }
-
-          e.preventDefault();
-          updateBlocks(prev => prev.filter(b => !selectedIds.has(b.id)));
-          setSelectedIds(new Set());
-        }
-      }
-      if (e.key === 'Escape') {
-        setSelectedIds(new Set());
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedIds, blocks, childTitles, updatedTitles, getBlockClipboardText]);
-
-  // Listen for changeBlockType custom events from FloatingToolbar
-  useEffect(() => {
-    const handleChangeBlockType = (e: Event) => {
-      const { blockId, newType } = (e as CustomEvent).detail;
-      if (blockId && newType) {
-        const block = blocks.find(b => b.id === blockId);
-        if (block) {
-          handleBlockChange(blockId, block.content, newType);
-        }
-      }
-    };
-    document.addEventListener('changeBlockType', handleChangeBlockType);
-    return () => document.removeEventListener('changeBlockType', handleChangeBlockType);
-  }, [blocks]);
-
-  const handleBlockChange = async (id: string, newContent: string, newType?: string) => {
-    if (newType === 'page') {
-      if (!session || !note) return;
-      try {
-        const response = await api.post('/notes', { title: storedDefaultTitle, parentId: note.id }, {
-          headers: { Authorization: `Bearer ${session.accessToken}` }
-        });
-        const newNote = response.data;
-        const cleanId = newNote.id.replace(/-/g, '');
-
-        // Add the block to current page content
-        const newBlock = {
-          id: generateId(),
-          type: 'page',
-          content: `${cleanId}|${newNote.title || storedDefaultTitle}`
-        };
-
-        const updatedBlocks = blocks.map(b => b.id === id ? newBlock : b);
-        setBlocks(updatedBlocks);
-
-        // Save explicitly before navigating
-        const description = updatedBlocks.map(b => {
-          const prefix = PREFIXES[b.type] || '';
-          const content = b.type === 'code' ? b.content.replace(/\n/g, '\\n') : b.content;
-          return prefix + content;
-        }).join('\n');
-
-        await api.put(`/notes/${note.id}`, { description }, {
-          headers: { Authorization: `Bearer ${session.accessToken}` }
-        });
-
-        router.push(`/${cleanId}?showMoveTo=true&saveParent=true`);
-      } catch (error) {
-        console.error('Error creating child note from slash menu:', error);
-      }
-      return;
-    }
-    updateBlocks(prev => prev.map(b =>
-      b.id === id ? { ...b, content: newContent, type: newType ?? b.type } : b
-    ), false); // Pass false for content changes as contentEditable has its own undo
-  };
-
-  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      if (blocks.length > 0) {
-        inputRefs.current.get(blocks[0].id)?.focus();
-      }
-    } else if (e.key === 'Tab') {
-      e.preventDefault();
-      if (blocks.length > 0) {
-        inputRefs.current.get(blocks[0].id)?.focus();
-      } else {
-        const newBlock = { id: generateId(), type: 'text', content: '' };
-        updateBlocks([newBlock]);
-        setTimeout(() => {
-          inputRefs.current.get(newBlock.id)?.focus();
-        }, 0);
-      }
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      const newBlock = { id: generateId(), type: 'text', content: '' };
-      updateBlocks([newBlock, ...blocks]);
-      setTimeout(() => {
-        inputRefs.current.get(newBlock.id)?.focus();
-      }, 0);
-    }
-  };
-
-  const setCursor = (el: HTMLDivElement, position: number) => {
-    const selection = window.getSelection();
-    if (!selection) return;
-
-    // Convert a plain-text offset into a DOM position inside contentEditable.
-    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-    let currentNode = walker.nextNode();
-    let remaining = position;
-
-    while (currentNode) {
-      const textLength = currentNode.textContent?.length ?? 0;
-      if (remaining <= textLength) {
-        const range = document.createRange();
-        range.setStart(currentNode, remaining);
-        range.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(range);
-        return;
-      }
-      remaining -= textLength;
-      currentNode = walker.nextNode();
-    }
-
-    // Fallback to end when there is no text node (or offset is beyond length).
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    range.collapse(false);
-    selection.removeAllRanges();
-    selection.addRange(range);
-  };
-
-  const getCaretOffset = (el: HTMLDivElement) => {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return 0;
-
-    const range = selection.getRangeAt(0);
-    const preCaretRange = range.cloneRange();
-    preCaretRange.selectNodeContents(el);
-    preCaretRange.setEnd(range.endContainer, range.endOffset);
-    return preCaretRange.toString().length;
-  };
-
-  const handleBlockKeyDown = (e: React.KeyboardEvent, id: string) => {
-    const index = blocks.findIndex(b => b.id === id);
-    const el = inputRefs.current.get(id);
-
-    if (e.key === 'ArrowUp') {
-      if (index > 0) {
-        e.preventDefault();
-        const prevId = blocks[index - 1].id;
-        inputRefs.current.get(prevId)?.focus();
-      } else {
-        e.preventDefault();
-        titleInputRef.current?.focus();
-      }
-    } else if (e.key === 'ArrowDown') {
-      if (index < blocks.length - 1) {
-        e.preventDefault();
-        const nextId = blocks[index + 1].id;
-        inputRefs.current.get(nextId)?.focus();
-      }
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      const selection = window.getSelection();
-      const isAtStart = selection?.anchorOffset === 0;
-      const currentBlock = blocks[index];
-
-      let nextType = 'text';
-      if (['bullet', 'number', 'todo', 'toggle'].includes(currentBlock.type)) {
-        nextType = currentBlock.type;
-      }
-
-      const newBlock = { id: generateId(), type: nextType, content: '' };
-      const newBlocks = [...blocks];
-
-      if (isAtStart && currentBlock.content.length > 0) {
-        // Insert above
-        newBlocks.splice(index, 0, newBlock);
-        updateBlocks(newBlocks);
-        // Focus remains same or we focus the new one above
-        setTimeout(() => {
-          inputRefs.current.get(currentBlock.id)?.focus();
-        }, 0);
-      } else {
-        // Default: insert below
-        newBlocks.splice(index + 1, 0, newBlock);
-        updateBlocks(newBlocks);
-        setTimeout(() => {
-          inputRefs.current.get(newBlock.id)?.focus();
-        }, 0);
-      }
-
-    } else if (e.key === 'Backspace') {
-      if (!el) return;
-      const selection = window.getSelection();
-      if (!selection || !selection.anchorNode) return;
-
-      const isAtStart = selection.isCollapsed && getCaretOffset(el) === 0;
-      const prefixedTypes = ['bullet', 'number', 'todo', 'toggle'];
-      const isPrefixedType = prefixedTypes.includes(blocks[index].type);
-
-      if (isAtStart) {
-        if (blocks[index].content.length === 0) {
-          e.preventDefault();
-          const newBlocks = blocks.filter(b => b.id !== id);
-          updateBlocks(newBlocks);
-
-          setTimeout(() => {
-            if (index > 0) {
-              const prevBlock = blocks[index - 1];
-              const prevInput = inputRefs.current.get(prevBlock.id);
-              if (prevInput) {
-                prevInput.focus();
-                setCursor(prevInput, prevBlock.content.length);
-              }
-            } else {
-              titleInputRef.current?.focus();
-            }
-          }, 0);
-        } else if (isPrefixedType) {
-          e.preventDefault();
-          setBlocks(prev => prev.map(b =>
-            b.id === id ? { ...b, type: 'text' } : b
-          ));
-        } else if (index > 0) {
-          e.preventDefault();
-          const prevBlock = blocks[index - 1];
-          const currentBlock = blocks[index];
-
-          const cursorPosition = prevBlock.content.length;
-
-          const updatedPrevBlock = {
-            ...prevBlock,
-            content: prevBlock.content + currentBlock.content
-          };
-
-          const newBlocks = blocks.filter(b => b.id !== id);
-          newBlocks[index - 1] = updatedPrevBlock;
-          setBlocks(newBlocks);
-
-          setTimeout(() => {
-            const prevInput = inputRefs.current.get(prevBlock.id);
-            if (prevInput) {
-              prevInput.focus();
-              setCursor(prevInput, cursorPosition);
-            }
-          }, 0);
-        } else {
-          e.preventDefault();
-          titleInputRef.current?.focus();
-        }
-      }
-    } else if (e.key === 'Delete') {
-      if (!el) return;
-      const selection = window.getSelection();
-      if (!selection || !selection.anchorNode) return;
-
-      const isAtEnd = selection.isCollapsed && getCaretOffset(el) === el.innerText.length;
-
-      if (isAtEnd) {
-        const nextBlock = blocks[index + 1];
-        if (nextBlock) {
-          e.preventDefault();
-          const currentBlock = blocks[index];
-          const cursorPosition = currentBlock.content.length;
-
-          const updatedBlock = {
-            ...currentBlock,
-            content: currentBlock.content + nextBlock.content
-          };
-
-          const newBlocks = [...blocks];
-          newBlocks[index] = updatedBlock;
-          newBlocks.splice(index + 1, 1);
-          setBlocks(newBlocks);
-
-          setTimeout(() => {
-            const currentInput = inputRefs.current.get(id);
-            if (currentInput) {
-              currentInput.focus();
-              setCursor(currentInput, cursorPosition);
-            }
-          }, 0);
-        }
-      }
-    }
-  };
-
-  const handlePasteMultiLine = (id: string, newLines: string[], isCode = false) => {
-    setBlocks(prevBlocks => {
-      const index = prevBlocks.findIndex(b => b.id === id);
-      if (index === -1) return prevBlocks;
-
-      const updatedBlocks = [...prevBlocks];
-      const currentBlock = updatedBlocks[index];
-
-      if (isCode) {
-        const codeContent = newLines.join('\n');
-        const newBlock = { id: generateId(), type: 'code', content: codeContent };
-
-        if (currentBlock.content === '') {
-          updatedBlocks[index] = newBlock;
-        } else {
-          updatedBlocks.splice(index + 1, 0, newBlock);
-        }
-
-        setTimeout(() => {
-          inputRefs.current.get(newBlock.id)?.focus();
-        }, 0);
-
-        return updatedBlocks;
-      }
-
-      // Update current block with the first line
-      updatedBlocks[index] = { ...currentBlock, content: currentBlock.content + newLines[0] };
-
-      // Add remaining lines as new blocks
-      const newBlockElements = newLines.slice(1).map(line => ({
-        id: generateId(),
-        type: 'text', // New blocks are text by default
-        content: line
-      }));
-
-      updatedBlocks.splice(index + 1, 0, ...newBlockElements);
-
-      // Focus the last new block if any were added
-      if (newBlockElements.length > 0) {
-        setTimeout(() => {
-          inputRefs.current.get(newBlockElements[newBlockElements.length - 1].id)?.focus();
-        }, 0);
-      }
-
-      return updatedBlocks;
-    });
-  };
-
-  const isFavorite = note ? favoriteNotes.some(n => n.id === note.id) : false;
-
-  const calculateWordCount = () => {
-    const titleText = title || '';
-    const blocksText = blocks.map(b => b.content).join(' ');
-    const fullText = `${titleText} ${blocksText}`.trim();
-    return fullText ? fullText.split(/\s+/).length : 0;
-  };
-
-  const wordCount = calculateWordCount();
 
   const handleRestore = async () => {
     if (!note || !session) return;
     try {
       await api.patch(`/notes/trash/${note.id}`);
-      setNote(prev => prev ? { ...prev, is_deleted: false, deleted_at: null } : null);
-    } catch (error) {
-      console.error('Failed to restore note:', error);
+      setNote((prev) => (prev ? { ...prev, is_deleted: false, deleted_at: null } : null));
+    } catch (restoreError) {
+      console.error('Failed to restore note:', restoreError);
     }
   };
 
@@ -1070,8 +269,8 @@ export default function NotePage() {
     try {
       await api.delete(`/notes/trash/${note.id}`);
       router.push('/');
-    } catch (error) {
-      console.error('Failed to permanently delete note:', error);
+    } catch (deleteError) {
+      console.error('Failed to permanently delete note:', deleteError);
     }
   };
 
@@ -1084,19 +283,10 @@ export default function NotePage() {
     return minutes > 0 ? minutes : 0;
   };
 
-  useEffect(() => {
-    if (title) {
-      document.title = `${title}`;
-    } else if (note) {
-      document.title = displayDefaultTitle;
-    }
-  }, [title, note, displayDefaultTitle]);
-
   const handleToggleFavorite = () => {
     if (!note) return;
     toggleFavorite(note);
-    // Optimistically update local note state as well so the UI reflects it immediately if it depends on note state
-    setNote(prev => prev ? { ...prev, is_favorite: !prev.is_favorite } : null);
+    setNote((prev) => (prev ? { ...prev, is_favorite: !prev.is_favorite } : null));
   };
 
   const handleDeleteNote = async () => {
@@ -1104,28 +294,77 @@ export default function NotePage() {
 
     try {
       await api.delete(`/notes/${note.id}`, {
-        headers: { Authorization: `Bearer ${session.accessToken}` }
+        headers: { Authorization: `Bearer ${session.accessToken}` },
       });
       removeNoteFromFavorites(note.id);
       setIsOptionsModalOpen(false);
       router.push('/');
-    } catch (error) {
-      console.error('Error deleting note:', error);
+    } catch (deleteError) {
+      console.error('Error deleting note:', deleteError);
       alert(t('errors.deleteNote'));
     }
   };
 
-  // Helper for Sidebar logic in Loading/Error states
-  const SidebarElement = () => (
-    isSidebarOpen ? <Sidebar /> : null
-  );
+  const handleCreatePageFromEditor = useCallback(async () => {
+    if (!note || !session) return;
+
+    try {
+      const response = await api.post(
+        '/notes',
+        { title: storedDefaultTitle, parentId: note.id },
+        { headers: { Authorization: `Bearer ${session.accessToken}` } }
+      );
+
+      const newNote = response.data as Note;
+      const cleanId = newNote.id.replace(/-/g, '');
+      const displayTitle = newNote.title || storedDefaultTitle;
+
+      const editor = noteEditorRef.current?.getEditor();
+      if (editor) {
+        editor
+          .chain()
+          .focus()
+          .insertContent(`<div data-type="pageLink" data-page-id="${cleanId}" data-title="${displayTitle}"></div><p></p>`)
+          .run();
+
+        const currentHtml = editor.getHTML();
+        await api.put(
+          `/notes/${note.id}`,
+          { description: currentHtml },
+          { headers: { Authorization: `Bearer ${session.accessToken}` } }
+        );
+        setLastSavedDescription(currentHtml);
+      }
+
+      router.push(`/${cleanId}?showMoveTo=true&saveParent=true`);
+    } catch (createError) {
+      console.error('Error creating child note from slash menu:', createError);
+    }
+  }, [note, session, storedDefaultTitle, router]);
+
+  const isFavorite = note ? favoriteNotes.some((item) => item.id === note.id) : false;
+
+  const wordCount = useMemo(() => {
+    const titleText = title || '';
+    const fullText = `${titleText} ${descriptionText}`.trim();
+    return fullText ? fullText.split(/\s+/).length : 0;
+  }, [title, descriptionText]);
+
+  useEffect(() => {
+    if (title) {
+      document.title = title;
+    } else if (note) {
+      document.title = displayDefaultTitle;
+    }
+  }, [title, note, displayDefaultTitle]);
+
+  const SidebarElement = () => (isSidebarOpen ? <Sidebar /> : null);
 
   if (loading) {
     return (
       <div className="flex min-h-screen bg-white dark:bg-[#191919]">
         <SidebarElement />
         <main className="flex-1 flex flex-col min-h-screen md:h-screen md:overflow-hidden">
-          {/* Header Skeleton */}
           <div className="h-12 flex items-center justify-between px-4 relative z-20 overflow-hidden">
             <div className="flex items-center gap-2 min-w-0">
               {!isSidebarOpen && <div className="w-8 h-8 bg-[#2f2f2f] rounded animate-pulse shrink-0" />}
@@ -1163,15 +402,11 @@ export default function NotePage() {
 
   return (
     <div className="flex min-h-screen bg-white dark:bg-[#191919]">
-      {/* Main Sidebar (when open) */}
       {isSidebarOpen && <Sidebar />}
 
       <main className="flex-1 flex flex-col min-h-screen md:h-screen md:overflow-hidden">
-        {/* Top Bar */}
-        <div className="h-12 flex items-center justify-between px-4  relative z-20">
+        <div className="h-12 flex items-center justify-between px-4 relative z-20">
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-
-            {/* Menu / Floating Sidebar Trigger */}
             {!isSidebarOpen && (
               <div
                 className="relative group"
@@ -1190,7 +425,6 @@ export default function NotePage() {
                   <ChevronsRight size={20} className="hidden md:group-hover:block" />
                 </button>
 
-                {/* Floating Sidebar */}
                 {isFloatingOpen && (
                   <div className="absolute top-full left-0 mt-2 w-60 max-h-[80vh] shadow-xl rounded-lg overflow-visible border border-[#2f2f2f] bg-[#202020] animate-in fade-in zoom-in-95 duration-100 origin-top-left">
                     <Sidebar isFloating={true} />
@@ -1212,16 +446,12 @@ export default function NotePage() {
                 </>
               )}
 
-              <button
-                className="text-sm text-[#f0efed] font-normal truncate max-w-60 hover:bg-[#fffff315] px-2 py-1 rounded-md"
-              >
+              <button className="text-sm text-[#f0efed] font-normal truncate max-w-60 hover:bg-[#fffff315] px-2 py-1 rounded-md">
                 {title.trim() || displayDefaultTitle}
               </button>
 
               <div className="hidden md:flex relative group/particular">
-                <button
-                  className="flex items-center justify-center text-sm font-normal text-[#7d7a75] hover:text-[#f0efed] gap-2 hover:bg-[#202020] px-2 py-1 rounded-md"
-                >
+                <button className="flex items-center justify-center text-sm font-normal text-[#7d7a75] hover:text-[#f0efed] gap-2 hover:bg-[#202020] px-2 py-1 rounded-md">
                   <LockKeyhole size={14} />
                   {t('privacy.private')}
                   <ChevronDown size={14} />
@@ -1257,53 +487,51 @@ export default function NotePage() {
                 {t('privacy.onlyYouCanAccess')}
               </div>
 
-              <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} buttonPosition={shareButtonPosition} />
+              <ShareModal
+                isOpen={isShareModalOpen}
+                onClose={() => setIsShareModalOpen(false)}
+                buttonPosition={shareButtonPosition}
+              />
             </div>
 
+            <div className="relative group/favorite">
+              <button
+                onClick={handleToggleFavorite}
+                className={`p-1.5 hover:bg-gray-100 dark:hover:bg-[#fffff315] rounded-md transition-colors ${isFavorite ? 'text-[#ca984d]' : 'text-[#f0efed]'}`}
+              >
+                <Star size={18} fill={isFavorite ? 'currentColor' : 'none'} />
+              </button>
 
-            <div className="flex items-center gap-2">
-              <div className="relative group/favorite">
-                <button
-                  onClick={handleToggleFavorite}
-                  className={`p-1.5 hover:bg-gray-100 dark:hover:bg-[#fffff315] rounded-md transition-colors ${isFavorite ? 'text-[#ca984d]' : 'text-[#f0efed]'}`}
-                >
-                  <Star size={18} fill={isFavorite ? "currentColor" : "none"} />
-                </button>
-
-                <div className="absolute top-full right-[-28] mt-2 hidden group-hover/favorite:block bg-[#2f2f2f] text-[#f0efed] text-xs p-2 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
-                  {isFavorite ? t('favorites.removeFromFavorites') : t('favorites.addToFavorites')}
-                </div>
+              <div className="absolute top-full right-[-28] mt-2 hidden group-hover/favorite:block bg-[#2f2f2f] text-[#f0efed] text-xs p-2 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
+                {isFavorite ? t('favorites.removeFromFavorites') : t('favorites.addToFavorites')}
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <div className="relative group/more">
-                <button
-                  onClick={() => setIsOptionsModalOpen(!isOptionsModalOpen)}
-                  className={`p-1.5 text-[#f0efed] rounded-md transition-colors ${isOptionsModalOpen ? 'bg-[#fffff315]' : 'hover:bg-gray-100 dark:hover:bg-[#fffff315]'}`}
-                >
-                  <MoreHorizontal size={20} />
-                </button>
+            <div className="relative group/more">
+              <button
+                onClick={() => setIsOptionsModalOpen(!isOptionsModalOpen)}
+                className={`p-1.5 text-[#f0efed] rounded-md transition-colors ${isOptionsModalOpen ? 'bg-[#fffff315]' : 'hover:bg-gray-100 dark:hover:bg-[#fffff315]'}`}
+              >
+                <MoreHorizontal size={20} />
+              </button>
 
-                <div className="absolute top-full right-0 mt-2 hidden group-hover/more:block bg-[#2f2f2f] text-[#f0efed] text-xs p-2 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
-                  {t('actions.moreOptionsTooltip')}
-                </div>
-
-                <PageOptionsModal
-                  isOpen={isOptionsModalOpen}
-                  onClose={() => setIsOptionsModalOpen(false)}
-                  userName={session?.user?.displayName || session?.user?.displayName || session?.user?.email}
-                  updatedAt={note?.updated_at || note?.updated_at}
-                  wordCount={wordCount}
-                  onDelete={handleDeleteNote}
-                  onCopyPageContents={handleCopyPageContents}
-                />
+              <div className="absolute top-full right-0 mt-2 hidden group-hover/more:block bg-[#2f2f2f] text-[#f0efed] text-xs p-2 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
+                {t('actions.moreOptionsTooltip')}
               </div>
+
+              <PageOptionsModal
+                isOpen={isOptionsModalOpen}
+                onClose={() => setIsOptionsModalOpen(false)}
+                userName={session?.user?.displayName || session?.user?.displayName || session?.user?.email}
+                updatedAt={note?.updated_at || note?.updated_at}
+                wordCount={wordCount}
+                onDelete={handleDeleteNote}
+                onCopyPageContents={handleCopyPageContents}
+              />
             </div>
           </div>
         </div>
 
-        {/* Flash Message for Deleted Note */}
         {note?.is_deleted && (
           <div className="bg-[#eb5757] text-[#f0efed] hover:text-white px-4 py-2 flex items-center justify-center md:justify-between text-sm">
             <div className="hidden md:flex items-center gap-2">
@@ -1311,7 +539,7 @@ export default function NotePage() {
                 {t('trashBanner.deletedMessage', {
                   user: session?.user?.displayName || session?.user?.email || t('user.fallbackName'),
                   minutes: getMinutesSinceDeletion(),
-                  days: 30
+                  days: 30,
                 })}
               </span>
             </div>
@@ -1334,125 +562,36 @@ export default function NotePage() {
           </div>
         )}
 
-        {/* Note Content Area */}
-        <div ref={scrollAreaRef} className="relative md:flex-1 md:overflow-y-auto">
-          <div ref={containerRef} className="max-w-4xl mx-auto px-6 md:px-12 py-6 md:py-12">
-            {/* Title Input */}
+        <div className="relative md:flex-1 md:overflow-y-auto">
+          <div className="max-w-4xl mx-auto px-6 md:px-12 py-6 md:py-12">
             <div className="group relative">
-              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity h-10">
-                <button className="flex items-center gap-1 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
-                  <Smile size={16} />
-                  {t('titleActions.addIcon')}
-                </button>
-                <button className="flex items-center gap-1 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
-                  <ImageIcon size={16} />
-                  {t('titleActions.addCover')}
-                </button>
-                <button className="flex items-center gap-1 p-1.5 rounded-md text-[#7d7a75] hover:bg-[#fffff315] hover:text-[#f0efed] transition-colors text-sm leading-none font-normal">
-                  <MessageSquareText size={16} />
-                  {t('titleActions.addComment')}
-                </button>
-              </div>
-
               <input
                 ref={titleInputRef}
                 type="text"
                 value={title}
                 onChange={handleTitleChange}
                 onKeyDown={handleTitleKeyDown}
-                onPaste={handleTitlePaste} // Add onPaste handler here
-                onFocus={() => handleBlockFocus('title')}
-                onBlur={handleBlockBlur}
                 placeholder={displayDefaultTitle}
                 className="w-full text-[40px] font-bold text-gray-900 dark:text-gray-100 mb-3 bg-transparent border-none outline-none placeholder:text-gray-300 dark:placeholder:text-[#373737]"
               />
             </div>
 
-            {/* Blocks List */}
             <div className="pb-40">
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={blocks.map(b => b.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {blocks.map((block, i) => {
-                    let listNumber = undefined;
-                    if (block.type === 'number') {
-                      // Find previous number block to determine sequence
-                      let currentNumber = 1;
-                      for (let j = 0; j < i; j++) {
-                        if (blocks[j].type === 'number') {
-                          currentNumber++;
-                        }
-                      }
-                      listNumber = currentNumber;
-                    }
-                    return (
-                      <SortableBlock
-                        key={block.id}
-                        id={block.id}
-                        type={block.type}
-                        content={block.content}
-                        childTitles={childTitles}
-                        onChange={handleBlockChange}
-                        onKeyDown={handleBlockKeyDown}
-                        isSelected={selectedIds.has(block.id)}
-                        onSelect={handleSelect}
-                        inputRef={(el) => {
-                          if (el) inputRefs.current.set(block.id, el);
-                          else inputRefs.current.delete(block.id);
-                        }}
-                        onPasteMultiLine={handlePasteMultiLine}
-                        listNumber={listNumber}
-                        onFocus={() => handleBlockFocus(block.id)}
-                        onBlur={handleBlockBlur}
-                      />
-                    );
-                  })}
-                </SortableContext>
-              </DndContext>
-
-              {/* Add block at bottom if empty list (though we initialize with one) or just click area */}
-              <div
-                className="h-20 cursor-text"
-                onClick={() => {
-                  if (selectedIds.size > 0) {
-                    setSelectedIds(new Set());
-                    return;
-                  }
-                  const newBlock = { id: generateId(), type: 'text', content: '' };
-                  setBlocks(prev => [...prev, newBlock]);
-                  setTimeout(() => inputRefs.current.get(newBlock.id)?.focus(), 0);
-                }}
+              <NoteEditor
+                key={note.id}
+                ref={noteEditorRef}
+                initialContent={editorHtml}
+                onChange={setEditorHtml}
+                onPageCreate={handleCreatePageFromEditor}
+              />
+              <FloatingToolbar
+                userName={session?.user?.displayName || session?.user?.email}
+                updatedAt={note?.updated_at}
               />
             </div>
           </div>
-
-          {selectionBox && (
-            <div
-              className="absolute border border-transparent bg-[#2383e233] pointer-events-none z-50"
-              style={{
-                left: Math.min(selectionBox.x1, selectionBox.x2),
-                top: Math.min(selectionBox.y1, selectionBox.y2),
-                width: Math.abs(selectionBox.x2 - selectionBox.x1),
-                height: Math.abs(selectionBox.y2 - selectionBox.y1),
-              }}
-            />
-          )}
         </div>
       </main>
-      {!isMobile && <FloatingToolbar userName={session?.user?.displayName || session?.user?.email} updatedAt={note?.updated_at} />}
-      {isMobile && (
-        <FloatingMobileToolbar
-          isVisible={isToolbarVisible}
-          position={toolbarPosition}
-          focusedBlockId={focusedBlockId}
-        />
-      )}
     </div>
   );
 }

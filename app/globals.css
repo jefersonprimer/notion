@@ -93,3 +93,295 @@ button {
 .mobile-toolbar-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #777;
 }
+
+/* ─── Tiptap / ProseMirror Editor ─────────────────────────────────────────── */
+
+.ProseMirror:focus {
+  outline: none;
+}
+
+.ProseMirror {
+  color: #d4d4d4;
+  font-size: 16px;
+  line-height: 1.6;
+  caret-color: #fff;
+}
+
+/* ── Placeholders ────────────────────────────────────────────────────────── */
+
+.ProseMirror p.is-editor-empty:first-child::before,
+.ProseMirror .is-empty::before {
+  content: attr(data-placeholder);
+  color: #5c5c5c;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* ── Headings ────────────────────────────────────────────────────────────── */
+
+.ProseMirror h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #e6e5e3;
+  line-height: 1.2;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #e6e5e3;
+  line-height: 1.25;
+}
+
+.ProseMirror h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+  color: #e6e5e3;
+  line-height: 1.3;
+}
+
+/* ── Paragraphs ──────────────────────────────────────────────────────────── */
+
+.ProseMirror p {
+  margin: 0 0 2px 0;
+}
+
+/* ── Lists ───────────────────────────────────────────────────────────────── */
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5rem;
+  margin: 0;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+}
+
+.ProseMirror li {
+  margin: 2px 0;
+}
+
+.ProseMirror li p {
+  margin: 0;
+}
+
+/* ── Task Lists ──────────────────────────────────────────────────────────── */
+
+.ProseMirror ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.ProseMirror ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 2px 0;
+}
+
+.ProseMirror ul[data-type="taskList"] li > label {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.ProseMirror ul[data-type="taskList"] li > label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #2383e2;
+  cursor: pointer;
+}
+
+.ProseMirror ul[data-type="taskList"] li > div {
+  flex: 1;
+}
+
+.ProseMirror ul[data-type="taskList"] li[data-checked="true"] > div p {
+  text-decoration: line-through;
+  color: #7d7a75;
+}
+
+/* ── Blockquotes ─────────────────────────────────────────────────────────── */
+
+.ProseMirror blockquote {
+  border-left: 3px solid #555;
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+  color: #999;
+  font-style: italic;
+}
+
+/* ── Code Blocks ─────────────────────────────────────────────────────────── */
+
+.ProseMirror pre {
+  background: #202020;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 1rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #d4d4d4;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+}
+
+.ProseMirror pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* Highlight.js tokens styled to mimic VS Code Dark+ */
+.ProseMirror pre code.hljs {
+  background: transparent;
+}
+
+.ProseMirror pre .hljs-comment,
+.ProseMirror pre .hljs-quote {
+  color: #6a9955;
+}
+
+.ProseMirror pre .hljs-keyword,
+.ProseMirror pre .hljs-selector-tag,
+.ProseMirror pre .hljs-literal,
+.ProseMirror pre .hljs-built_in,
+.ProseMirror pre .hljs-name {
+  color: #569cd6;
+}
+
+.ProseMirror pre .hljs-type,
+.ProseMirror pre .hljs-class .hljs-title,
+.ProseMirror pre .hljs-title.class_ {
+  color: #4ec9b0;
+}
+
+.ProseMirror pre .hljs-title,
+.ProseMirror pre .hljs-title.function_,
+.ProseMirror pre .hljs-function .hljs-title {
+  color: #dcdcaa;
+}
+
+.ProseMirror pre .hljs-string,
+.ProseMirror pre .hljs-meta .hljs-string {
+  color: #ce9178;
+}
+
+.ProseMirror pre .hljs-number,
+.ProseMirror pre .hljs-symbol,
+.ProseMirror pre .hljs-bullet {
+  color: #b5cea8;
+}
+
+.ProseMirror pre .hljs-variable,
+.ProseMirror pre .hljs-template-variable,
+.ProseMirror pre .hljs-attr,
+.ProseMirror pre .hljs-attribute {
+  color: #9cdcfe;
+}
+
+.ProseMirror pre .hljs-regexp,
+.ProseMirror pre .hljs-link {
+  color: #d16969;
+}
+
+.ProseMirror pre .hljs-meta {
+  color: #9b9b9b;
+}
+
+.ProseMirror pre .hljs-tag {
+  color: #569cd6;
+}
+
+.ProseMirror pre .hljs-tag .hljs-name {
+  color: #4ec9b0;
+}
+
+/* ── Inline Code ─────────────────────────────────────────────────────────── */
+
+.ProseMirror code {
+  background: #2f2f2f;
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #eb5757;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ── Images ──────────────────────────────────────────────────────────────── */
+
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 0.5rem auto;
+  display: block;
+}
+
+.ProseMirror img.ProseMirror-selectednode {
+  outline: 2px solid #2383e2;
+  border-radius: 4px;
+}
+
+/* ── Horizontal Rule ─────────────────────────────────────────────────────── */
+
+.ProseMirror hr {
+  border: none;
+  border-top: 1px solid #383836;
+  margin: 1rem 0;
+}
+
+/* ── Links ────────────────────────────────────────────────────────────────── */
+
+.ProseMirror a {
+  color: #2383e2;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.ProseMirror a:hover {
+  color: #4ba3f5;
+}
+
+/* ── Mark: Bold / Italic / Strike ────────────────────────────────────────── */
+
+.ProseMirror strong {
+  font-weight: 700;
+  color: #f0efed;
+}
+
+.ProseMirror em {
+  font-style: italic;
+}
+
+.ProseMirror s {
+  text-decoration: line-through;
+  color: #7d7a75;
+}
+
+/* ── Selection ───────────────────────────────────────────────────────────── */
+
+.ProseMirror ::selection {
+  background: #2383e266;
+}
+
+/* ── Note Editor Container ───────────────────────────────────────────────── */
+
+.note-editor-content {
+  min-height: 200px;
+  cursor: text;
+}

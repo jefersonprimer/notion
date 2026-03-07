@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 export const TEXT_COLORS = [
     '#37352f', '#787774', '#976d57', '#d9730d', '#cb912f',
@@ -17,38 +17,19 @@ interface ColorModalProps {
     onClose: () => void
     onApplyColor: (type: 'text' | 'bg', color: string) => void
     onResetColor: (type: 'text' | 'bg') => void
+    position?: { top: number; left: number }
 }
 
 export default function ColorModal({
     onClose,
     onApplyColor,
-    onResetColor
+    onResetColor,
+    position
 }: ColorModalProps) {
     const modalRef = useRef<HTMLDivElement>(null)
-    const [flipAbove, setFlipAbove] = useState(false)
-    const [adjustedLeft, setAdjustedLeft] = useState<number | null>(null)
     const t = useTranslations('ColorModal');
 
     useEffect(() => {
-        if (modalRef.current) {
-            const rect = modalRef.current.getBoundingClientRect()
-            const padding = 8
-
-            // Vertical flip
-            if (rect.bottom > window.innerHeight) {
-                setFlipAbove(true)
-            }
-
-            // Horizontal clamp
-            if (rect.right > window.innerWidth - padding) {
-                const overflow = rect.right - window.innerWidth + padding
-                setAdjustedLeft(-overflow)
-            } else if (rect.left < padding) {
-                const overflow = padding - rect.left
-                setAdjustedLeft(overflow)
-            }
-        }
-
         // Close when clicking outside
         function handleClickOutside(event: MouseEvent) {
             if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
@@ -57,14 +38,21 @@ export default function ColorModal({
         }
         document.addEventListener('mousedown', handleClickOutside)
         return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [onClose])
+    }, [onClose, position])
+
+    const style = position
+        ? {
+            top: position.top,
+            left: position.left,
+            transform: 'translateX(-50%)',
+        }
+        : undefined
 
     return (
         <div
             ref={modalRef}
-            style={adjustedLeft !== null ? { marginLeft: adjustedLeft } : undefined}
-            className={`absolute left-[calc(50%+400px)] -translate-x-1/2 z-60 w-64 bg-[#1f1f1f] border border-[#2f2f2f] rounded-lg shadow-2xl p-3 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-100 ${flipAbove ? 'bottom-full mb-3' : 'top-full mt-3'
-                }`}
+            style={style}
+            className={`${position ? 'fixed' : 'absolute left-[calc(50%+400px)] -translate-x-1/2 top-full mt-3'} z-60 w-64 bg-[#1f1f1f] border border-[#2f2f2f] rounded-lg shadow-2xl p-3 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-100`}
             onMouseDown={(e) => e.preventDefault()}
         >
             <div>
