@@ -238,6 +238,31 @@ function processNode(node: Node, lines: string[]) {
           });
         }
         break;
+      case 'A':
+        {
+          const href = el.getAttribute('href') || '';
+          const isNolioPageLink =
+            el.classList.contains('nolio-page-link') || href.startsWith('nolio-page://');
+          if (isNolioPageLink) {
+            let pageId = el.getAttribute('data-page-id') || '';
+            let title = el.getAttribute('data-page-title') || el.textContent || 'Nova página';
+            if (!pageId && href.startsWith('nolio-page://')) {
+              try {
+                const parsed = new URL(href);
+                pageId = decodeURIComponent(parsed.hostname || '');
+                if (!title || title === 'Nova página') {
+                  title = decodeURIComponent(parsed.searchParams.get('title') || '') || 'Nova página';
+                }
+              } catch { /* ignore */ }
+            }
+            lines.push(`p: ${pageId}|${title}`);
+          } else {
+            // Regular link — keep the text content
+            const text = el.textContent?.trim();
+            if (text) lines.push(text);
+          }
+        }
+        break;
       case 'IMG':
         {
           const src = el.getAttribute('src') || '';

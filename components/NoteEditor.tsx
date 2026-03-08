@@ -122,6 +122,56 @@ function toEmbedUrl(url: string) {
     return url;
 }
 
+/**
+ * Convert nolio-style <a> page links into cognition-style <div data-type="pageLink">
+ * so Tiptap's PageLink block node can parse them correctly.
+ */
+function migrateNolioPageLinksToDiv(html: string): string {
+    if (!html) return html;
+    // Match <a> tags with nolio-page-link class or nolio-page:// href (including when wrapped in <p>)
+    return html.replace(
+        /<p>\s*<a\b([^>]*)>([\s\S]*?)<\/a>\s*<\/p>|<a\b([^>]*)>([\s\S]*?)<\/a>/gi,
+        (match, attrsInP, textInP, attrsStandalone, textStandalone) => {
+            const attrs = attrsInP || attrsStandalone || '';
+            const text = textInP || textStandalone || '';
+
+            const isNolioLink =
+                /class="[^"]*nolio-page-link[^"]*"/i.test(attrs) ||
+                /href="nolio-page:\/\//i.test(attrs);
+            if (!isNolioLink) return match;
+
+            // Extract pageId from data-page-id or href
+            let pageId = '';
+            let title = text.trim() || 'Nova página';
+
+            const dataIdMatch = attrs.match(/data-page-id="([^"]*)"/i);
+            if (dataIdMatch) pageId = dataIdMatch[1];
+
+            const dataTitleMatch = attrs.match(/data-page-title="([^"]*)"/i);
+            if (dataTitleMatch && dataTitleMatch[1]) title = dataTitleMatch[1];
+
+            if (!pageId) {
+                const hrefMatch = attrs.match(/href="([^"]*)"/i);
+                const href = hrefMatch?.[1]?.replace(/&amp;/g, '&') || '';
+                if (href.startsWith('nolio-page://')) {
+                    try {
+                        const parsed = new URL(href);
+                        pageId = decodeURIComponent(parsed.hostname || '');
+                        if (!title || title === 'Nova página') {
+                            title = decodeURIComponent(parsed.searchParams.get('title') || '') || title;
+                        }
+                    } catch { /* ignore */ }
+                }
+            }
+
+            if (!pageId) return match;
+
+            const escAttr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+            return `<div data-type="pageLink" data-page-id="${escAttr(pageId)}" data-title="${escAttr(title)}"></div>`;
+        }
+    );
+}
+
 // ─── Component ──────────────────────────────────────────────────────────────────
 
 const NoteEditor = forwardRef<NoteEditorHandle, NoteEditorProps>(
@@ -182,7 +232,7 @@ const NoteEditor = forwardRef<NoteEditorHandle, NoteEditorProps>(
                     },
                 }),
             ],
-            content: initialContent,
+            content: migrateNolioPageLinksToDiv(initialContent),
             editable,
             editorProps: {
                 attributes: {
@@ -414,7 +464,7 @@ const NoteEditor = forwardRef<NoteEditorHandle, NoteEditorProps>(
         useEffect(() => {
             if (!editor || hasInitialisedRef.current) return;
             if (initialContent) {
-                editor.commands.setContent(initialContent, { emitUpdate: false });
+                editor.commands.setContent(migrateNolioPageLinksToDiv(initialContent), { emitUpdate: false });
                 hasInitialisedRef.current = true;
             }
         }, [editor, initialContent]);
