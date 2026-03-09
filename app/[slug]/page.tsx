@@ -55,7 +55,7 @@ export default function NotePage() {
 
   const titleDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const descriptionDebounceRef = useRef<NodeJS.Timeout | null>(null);
-  const titleInputRef = useRef<HTMLInputElement>(null);
+  const titleInputRef = useRef<HTMLTextAreaElement>(null);
   const shareButtonRef = useRef<HTMLButtonElement>(null);
   const noteEditorRef = useRef<NoteEditorHandle>(null);
 
@@ -70,6 +70,14 @@ export default function NotePage() {
   }, []);
 
   const descriptionText = useMemo(() => htmlToPlainText(editorHtml), [editorHtml, htmlToPlainText]);
+
+  useEffect(() => {
+    const textarea = titleInputRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, [title]);
 
   useEffect(() => {
     async function fetchNote() {
@@ -204,7 +212,7 @@ export default function NotePage() {
     };
   }, []);
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTitleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
 
@@ -218,7 +226,7 @@ export default function NotePage() {
     window.history.replaceState(null, '', `/${newSlug}${currentSearch}`);
   };
 
-  const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== 'Enter' || e.nativeEvent.isComposing) return;
     e.preventDefault();
     const editor = noteEditorRef.current?.getEditor();
@@ -438,7 +446,7 @@ export default function NotePage() {
                 <>
                   <Link
                     href={`/${createNoteSlug(updatedTitles[parentNote.id] || parentNote.title, parentNote.id)}`}
-                    className="text-sm text-[#ada9a3] hover:text-[#f0efed] truncate max-w-37.5 hover:bg-[#fffff315] px-2 py-1 rounded-md transition-colors"
+                    className="text-sm text-[#ada9a3] hover:text-[#f0efed] truncate max-w-[120px] md:max-w-[200px] hover:bg-[#fffff315] px-2 py-1 rounded-md transition-colors"
                   >
                     {updatedTitles[parentNote.id] || parentNote.title || displayDefaultTitle}
                   </Link>
@@ -446,7 +454,7 @@ export default function NotePage() {
                 </>
               )}
 
-              <button className="text-sm text-[#f0efed] font-normal truncate max-w-60 hover:bg-[#fffff315] px-2 py-1 rounded-md">
+              <button className="text-sm text-[#f0efed] font-normal truncate max-w-[150px] md:max-w-[300px] hover:bg-[#fffff315] px-2 py-1 rounded-md">
                 {title.trim() || displayDefaultTitle}
               </button>
 
@@ -565,14 +573,14 @@ export default function NotePage() {
         <div className="relative md:flex-1 md:overflow-y-auto">
           <div className="max-w-4xl mx-auto px-6 md:px-12 py-6 md:py-12">
             <div className="group relative">
-              <input
+              <textarea
                 ref={titleInputRef}
-                type="text"
                 value={title}
                 onChange={handleTitleChange}
                 onKeyDown={handleTitleKeyDown}
                 placeholder={displayDefaultTitle}
-                className="w-full text-[40px] font-bold text-gray-900 dark:text-gray-100 mb-3 bg-transparent border-none outline-none placeholder:text-gray-300 dark:placeholder:text-[#373737]"
+                rows={1}
+                className="w-full text-[40px] font-bold text-gray-900 dark:text-gray-100 mb-3 bg-transparent border-none outline-none placeholder:text-gray-300 dark:placeholder:text-[#373737] resize-none overflow-hidden block break-words"
               />
             </div>
 
