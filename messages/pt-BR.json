@@ -126,7 +126,7 @@
       "addAnotherAccount": "Adicionar outra conta",
       "signOut": "Sair",
       "getMacApp": "Obter App Mac",
-      "getMobileApp": "Obter App IOS e Android"
+      "downloadAndroid": "Baixar Nolio para Android"
     },
     "signOutConfirm": {
       "title": "Fazer logout da sua conta?",

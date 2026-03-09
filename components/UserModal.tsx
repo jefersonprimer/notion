@@ -132,8 +132,14 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
         <div className="px-2 mx-1 py-1 hover:bg-[#2f2f2f] rounded-md flex items-center gap-2 text-sm transition-colors">{t('actions.getMacApp')}
         </div>
         
-        <div className="px-2 mx-1 py-1 hover:bg-[#2f2f2f] rounded-md flex items-center gap-2 text-sm transition-colors">{t('actions.getMobileApp')}
-        </div>
+        <a 
+          href="https://github.com/jefersonprimer/nolio/releases/latest/download/nolio.apk"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-2 mx-1 py-1 hover:bg-[#2f2f2f] rounded-md flex items-center gap-2 text-sm transition-colors"
+        >
+          {t('actions.downloadAndroid')}
+        </a>
 
       {isSignOutConfirmOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
