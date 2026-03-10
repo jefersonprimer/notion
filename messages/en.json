@@ -164,8 +164,8 @@
     "submit": "Sign up",
     "submitting": "Creating account...",
     "fields": {
-      "displayNameLabel": "Display Name",
-      "displayNamePlaceholder": "Enter your name",
+      "nameLabel": "Name",
+      "namePlaceholder": "Enter your name",
       "emailLabel": "Email",
       "emailPlaceholder": "Enter your email address...",
       "passwordLabel": "Password",

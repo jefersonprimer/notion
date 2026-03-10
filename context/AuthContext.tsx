@@ -2,13 +2,12 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import api from '../lib/api';
 
 // --- Types ---
 export type User = {
   id: string;
   email: string;
-  displayName: string | null;
+  name: string | null;
 };
 
 export type Session = {

@@ -6,7 +6,7 @@ export class CreateUserUseCase {
   // Usamos Injeção de Dependência para desacoplar o caso de uso do banco de dados
   constructor(private userRepository: IUserRepository) {}
 
-  async execute({ email, password, displayName }: CreateUserInputDTO): Promise<CreateUserOutputDTO> {
+  async execute({ email, password, name }: CreateUserInputDTO): Promise<CreateUserOutputDTO> {
     // 1. Verificar se o usuário já existe
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
@@ -20,7 +20,7 @@ export class CreateUserUseCase {
     const newUser = await this.userRepository.create({ 
       email, 
       password: passwordHash, 
-      displayName 
+      name
     });
 
     return {

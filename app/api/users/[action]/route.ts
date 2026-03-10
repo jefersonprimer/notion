@@ -15,7 +15,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ act
     
     if (action === 'signup') {
       const { name, email, password } = body;
-      const user = await createUserUseCase.execute({ displayName: name, email, password });
+      const user = await createUserUseCase.execute({ name, email, password });
       return NextResponse.json(user, { status: 201 });
     }
 

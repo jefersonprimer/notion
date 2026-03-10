@@ -20,7 +20,7 @@ CREATE TABLE public.users (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   email text NOT NULL UNIQUE,
   password_hash text NOT NULL,
-  display_name text,
+  name text,
   avatar_url text,
   reset_password_token text,
   reset_password_expires timestamp with time zone,

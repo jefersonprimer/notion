@@ -44,7 +44,7 @@ export class LoginUserCase {
       user: {
         id: user.id,
         email: user.email,
-        displayName: user.displayName,
+        name: user.name,
         avatarUrl: user.avatarUrl,
       },
       accessToken: token,

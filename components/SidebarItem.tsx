@@ -416,7 +416,7 @@ export default function SidebarItem({
 
                       {/* Footer */}
                       <div className="mt-2 pt-2 border-t border-[#3a3a3a] px-3 text-xs text-[#7a7a7a]">
-                        {t('menu.lastEditedBy', { name: session?.user?.displayName || t('user.fallbackName') })} <br />
+                        {t('menu.lastEditedBy', { name: session?.user?.name || t('user.fallbackName') })} <br />
                         {formatRelativeDate(new Date(note.updated_at))}
                       </div>
                     </motion.div>

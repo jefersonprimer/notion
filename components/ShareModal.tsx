@@ -22,9 +22,9 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
   const modalRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
   const { session } = useAuth();
-  const userName = session?.user.displayName;
-  const userEmail = session?.user.email;
-  const userInitial = userName?.[0]?.toUpperCase() || 'U';
+  const userName = session?.user?.name?.trim();
+  const userEmail = session?.user?.email;
+  const userInitial = (userName?.trim().charAt(0) || 'U').toUpperCase();
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);

@@ -42,6 +42,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
   const { favoriteNotes, isLoading: isLoadingFavorites } = useFavorite();
   const router = useRouter();
   const pathname = usePathname();
+  const userName = session?.user?.name?.trim() || t('user.fallbackName');
   const [rootNotes, setRootNotes] = useState<Note[]>([]);
   const [loadingRootNotes, setLoadingRootNotes] = useState(true);
   const [expandedSections, setExpandedSections] = useState({
@@ -268,7 +269,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
             </div>
             <div className="flex items-center gap-1 min-w-0">
               <span className="text-[#f0efed] text-sm truncate font-medium leading-none">
-                {session?.user.displayName || t('user.fallbackName')}
+                {userName}
               </span>
               <div className="hidden group-hover:flex items-center text-[#ada9a3] hover:text-white">
                 <ChevronDown size={14} />

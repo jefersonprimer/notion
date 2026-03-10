@@ -4,6 +4,6 @@ export type User = {
   password?: string; // Hashed password
   resetPasswordToken?: string | null;
   resetPasswordExpires?: Date | null;
-  displayName: string | null;
+  name: string | null;
   avatarUrl: string | null;
 };

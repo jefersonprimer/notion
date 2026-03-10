@@ -24,9 +24,10 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
   const locale = useLocale();
   const { theme, setTheme } = useTheme();
   const { session } = useAuth();
-  const userName = session?.user.displayName || t('user.fallbackName');
-  const userEmail = session?.user.email;
-  const userInitial = userName[0]?.toUpperCase() || t('user.fallbackInitial');
+  const userName = session?.user?.name?.trim() || t('user.fallbackName');
+  const userEmail = session?.user?.email;
+  const userInitial =
+    (userName.trim().charAt(0) || t('user.fallbackInitial') || 'U').toUpperCase();
   const languageOptions = [
     { value: 'pt-BR', label: t('languageOptions.ptBR') },
     { value: 'en', label: t('languageOptions.en') },
@@ -150,14 +151,14 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
             >
               {userInitial}
             </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-[#f0efed]">
-                {session?.user.displayName || t('user.fallbackName')}
-              </span>
-              <span className="text-xs text-[#7d7a75]">
-                {userEmail}
-              </span>
-            </div>
+	            <div className="flex flex-col">
+	              <span className="text-sm font-medium text-[#f0efed]">
+	                {userName}
+	              </span>
+	              <span className="text-xs text-[#7d7a75]">
+	                {userEmail}
+	              </span>
+	            </div>
           </div>
         </div>
 
@@ -266,10 +267,10 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
                 >
                   {userInitial}
                 </div>
-                <span className="text-sm text-[#bcbab6]">
-                  {session?.user.displayName || t('user.fallbackName')}
-                </span>
-              </div>
+	                <span className="text-sm text-[#bcbab6]">
+	                  {userName}
+	                </span>
+	              </div>
 
               <nav className="space-y-0.5">
                 <SidebarItem 

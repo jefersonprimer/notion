@@ -7,7 +7,7 @@ export type LoginOutputDTO = {
   user: {
     id: string;
     email: string;
-    displayName: string | null;
+    name: string | null;
     avatarUrl: string | null;
   };
   accessToken: string;

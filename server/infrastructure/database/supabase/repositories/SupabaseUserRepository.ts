@@ -7,7 +7,7 @@ export class SupabaseUserRepository implements IUserRepository {
     return {
       id: data.id,
       email: data.email,
-      displayName: data.display_name,
+      name: data.name,
       avatarUrl: data.avatar_url,
       password: data.password_hash,
       resetPasswordToken: data.reset_password_token,
@@ -32,7 +32,7 @@ export class SupabaseUserRepository implements IUserRepository {
     return this.mapToUser(data);
   }
 
-  async create(data: { email: string; password: string; displayName: string }): Promise<User> {
+  async create(data: { email: string; password: string; name: string }): Promise<User> {
     console.log("Attempting to create user in public.users table...");
     
     const { data: newUser, error } = await supabase
@@ -40,7 +40,7 @@ export class SupabaseUserRepository implements IUserRepository {
       .insert({
         email: data.email,
         password_hash: data.password, 
-        display_name: data.displayName
+        name: data.name
       })
       .select()
       .single();
@@ -91,7 +91,7 @@ export class SupabaseUserRepository implements IUserRepository {
       const { error } = await supabase
         .from('users')
         .update({
-            display_name: user.displayName,
+            name: user.name,
             avatar_url: user.avatarUrl,
             password_hash: user.password,
             reset_password_token: user.resetPasswordToken,

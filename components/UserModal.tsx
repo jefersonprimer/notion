@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { Ellipsis, Settings, Users, Check, Plus } from 'lucide-react';
@@ -15,11 +15,18 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
   const { session, signOut } = useAuth();
   const modalRef = useRef<HTMLDivElement>(null);
   const [isSignOutConfirmOpen, setIsSignOutConfirmOpen] = useState(false);
+  const userName = session?.user?.name?.trim() || t('user.fallbackName');
+  const avatarInitial = (userName.trim().charAt(0) || 'N').toUpperCase();
+
+  const handleClose = useCallback(() => {
+    setIsSignOutConfirmOpen(false);
+    onClose();
+  }, [onClose]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        onClose();
+        handleClose();
       }
     }
 
@@ -29,13 +36,7 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen, isSignOutConfirmOpen, onClose]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      setIsSignOutConfirmOpen(false);
-    }
-  }, [isOpen]);
+  }, [isOpen, isSignOutConfirmOpen, handleClose]);
 
   if (!isOpen) return null;
 
@@ -48,12 +49,12 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
       <div className='border-b border-[#3f3f3f] bg-[#252525]'>
         <div className="flex items-center p-3 gap-2 ">
           <div className="w-9 h-9 bg-[#2f2f2f] rounded flex items-center justify-center text-2xl font-medium text-[#ada9a3] shrink-0 leading-none uppercase">
-            n
+            {avatarInitial}
           </div>
 
           <div className='flex flex-col min-w-0'>
             <div className="flex items-center text-sm text-[#f0efed] font-medium truncate">
-              {t('workspaceTitle', { name: session?.user.displayName || t('user.fallbackName') })}
+              {t('workspaceTitle', { name: userName })}
             </div>
             <div className="text-xs text-[#ada9a3]">{t('freeAccount')}</div>
           </div>
@@ -63,7 +64,7 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
           <button
             onClick={() => {
               onOpenSettings?.();
-              onClose();
+              handleClose();
             }}
             className="rounded-md border border-[#3f3f3f] px-2 py-1  hover:bg-[#2f2f2f] flex items-center gap-2 text-xs font-medium transition-colors"
           >
@@ -89,11 +90,11 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
 
         <div className='flex items-center px-2 mx-1 py-1.5 hover:bg-[#3f3f3f] rounded-md transition-colors'>
           <div className="w-6 h-6 bg-[#2f2f2f] rounded flex items-center justify-center text-base font-medium text-neutral-400 shrink-0 leading-none uppercase">
-            n
+            {avatarInitial}
           </div>
 
           <div className='flex items-center justify-between flex-1 px-2 text-white min-w-0'>
-            <span className="text-sm truncate">{t('workspaceTitle', { name: session?.user.displayName || t('user.fallbackName') })}</span>
+            <span className="text-sm truncate">{t('workspaceTitle', { name: userName })}</span>
             <Check size={16} className="shrink-0" />
           </div>
         </div>
@@ -154,7 +155,7 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
                 onClick={() => {
                   signOut();
                   setIsSignOutConfirmOpen(false);
-                  onClose();
+                  handleClose();
                 }}
                 className="w-full rounded-md bg-red-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600"
               >

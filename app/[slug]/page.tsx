@@ -530,7 +530,7 @@ export default function NotePage() {
               <PageOptionsModal
                 isOpen={isOptionsModalOpen}
                 onClose={() => setIsOptionsModalOpen(false)}
-                userName={session?.user?.displayName || session?.user?.displayName || session?.user?.email}
+                userName={session?.user?.name || session?.user?.name || session?.user?.email}
                 updatedAt={note?.updated_at || note?.updated_at}
                 wordCount={wordCount}
                 onDelete={handleDeleteNote}
@@ -545,7 +545,7 @@ export default function NotePage() {
             <div className="hidden md:flex items-center gap-2">
               <span>
                 {t('trashBanner.deletedMessage', {
-                  user: session?.user?.displayName || session?.user?.email || t('user.fallbackName'),
+                  user: session?.user?.name || session?.user?.email || t('user.fallbackName'),
                   minutes: getMinutesSinceDeletion(),
                   days: 30,
                 })}
@@ -593,7 +593,7 @@ export default function NotePage() {
                 onPageCreate={handleCreatePageFromEditor}
               />
               <FloatingToolbar
-                userName={session?.user?.displayName || session?.user?.email}
+                userName={session?.user?.name || session?.user?.email}
                 updatedAt={note?.updated_at}
               />
             </div>

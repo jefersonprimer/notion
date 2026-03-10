@@ -26,8 +26,8 @@ export function NoteCardSkeleton() {
 export default function NoteCard({ note }: NoteCardProps) {
   const { session } = useAuth();
   const noteSlug = createNoteSlug(note.title, note.id);
-  const userName = session?.user.displayName || 'Usuário';
-  const userInitial = userName[0]?.toUpperCase() || 'U';
+  const userName = session?.user?.name?.trim() || 'Usuário';
+  const userInitial = (userName.trim().charAt(0) || 'U').toUpperCase();
   const updatedDate = new Date(note.updated_at);
 
   return (
@@ -89,4 +89,3 @@ export default function NoteCard({ note }: NoteCardProps) {
     </Link>
   );
 }
-

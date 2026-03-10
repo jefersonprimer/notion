@@ -164,8 +164,8 @@
     "submit": "Cadastrar",
     "submitting": "Criando conta...",
     "fields": {
-      "displayNameLabel": "Nome",
-      "displayNamePlaceholder": "Insira o seu nome",
+      "nameLabel": "Nome",
+      "namePlaceholder": "Insira o seu nome",
       "emailLabel": "E-mail",
       "emailPlaceholder": "Insita seu endereço de e-mail...",
       "passwordLabel": "Senha",
