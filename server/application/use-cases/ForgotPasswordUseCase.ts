@@ -14,7 +14,7 @@ export class ForgotPasswordUseCase {
     }
 
     // Basic email validation
-    const emailRegex = /^[\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       throw new Error('Invalid email format.');
     }
@@ -35,7 +35,13 @@ export class ForgotPasswordUseCase {
 
     await this.userRepository.update(user);
 
-    const resetLink = `http://localhost:8081/reset-password?token=${token}`;
+    const appUrl =
+      process.env.APP_URL ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      'http://localhost:3000';
+    const resetUrl = new URL('/reset-password', appUrl);
+    resetUrl.searchParams.set('token', token);
+    const resetLink = resetUrl.toString();
 
     await this.emailService.sendMail({
       to: email,

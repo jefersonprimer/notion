@@ -42,6 +42,7 @@ JWT_SECRET=
 Variáveis opcionais (necessárias para envio de e-mail de recuperação de senha):
 
 ```env
+APP_URL=http://localhost:3000
 SMTP_HOST=
 SMTP_PORT=587
 SMTP_USER=

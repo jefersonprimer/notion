@@ -180,6 +180,41 @@
       "terms": "Terms"
     }
   },
+  "ForgotPasswordPage": {
+    "title": "Reset your password",
+    "submit": "Send magic link",
+    "submitting": "Sending...",
+    "success": "If an account exists for this email, we sent a magic link to reset your password. Check your inbox and spam folder.",
+    "backToLogin": "Back to login",
+    "fields": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter your email..."
+    },
+    "errors": {
+      "generic": "Could not send the email. Please try again."
+    }
+  },
+  "ResetPasswordPage": {
+    "title": "Create a new password",
+    "submit": "Update password",
+    "submitting": "Updating...",
+    "validating": "Validating link...",
+    "success": "Password updated. Redirecting to login...",
+    "requestNewLink": "Request a new link",
+    "backToLogin": "Back to login",
+    "fields": {
+      "passwordLabel": "New password",
+      "passwordPlaceholder": "••••••••",
+      "confirmPasswordLabel": "Confirm password",
+      "confirmPasswordPlaceholder": "••••••••"
+    },
+    "errors": {
+      "invalidToken": "Invalid or expired link.",
+      "passwordTooShort": "Password must be at least 6 characters long.",
+      "passwordMismatch": "Passwords do not match.",
+      "generic": "Could not update password. Please try again."
+    }
+  },
   "ActionModal": {
     "user": {
       "fallbackName": "User"

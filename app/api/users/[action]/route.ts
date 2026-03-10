@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { loginUseCase, createUserUseCase } from '@/server/main/factories/userFactory';
+import { 
+  loginUseCase,
+  createUserUseCase,
+  forgotPasswordUseCase,
+  resetPasswordUseCase,
+  validateResetTokenUseCase
+} from '@/server/main/factories/userFactory';
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return 'Unknown error';
+}
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ action: string }> }) {
   const { action } = await params;
@@ -19,8 +30,38 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ act
       return NextResponse.json(user, { status: 201 });
     }
 
+    if (action === 'forgot-password') {
+      const { email } = body;
+      await forgotPasswordUseCase.execute(email);
+      return NextResponse.json({
+        message: 'If an account exists for this email, a reset link has been sent.'
+      });
+    }
+
+    if (action === 'reset-password') {
+      const { token, newPassword } = body;
+      await resetPasswordUseCase.execute(token, newPassword);
+      return NextResponse.json({ message: 'Password updated successfully.' });
+    }
+
     return NextResponse.json({ message: 'Invalid action' }, { status: 404 });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 400 });
+  } catch (error: unknown) {
+    return NextResponse.json({ message: getErrorMessage(error) }, { status: 400 });
+  }
+}
+
+export async function GET(req: NextRequest, { params }: { params: Promise<{ action: string }> }) {
+  const { action } = await params;
+
+  try {
+    if (action === 'validate-reset-token') {
+      const token = req.nextUrl.searchParams.get('token') ?? '';
+      await validateResetTokenUseCase.execute(token);
+      return NextResponse.json({ valid: true });
+    }
+
+    return NextResponse.json({ message: 'Invalid action' }, { status: 404 });
+  } catch (error: unknown) {
+    return NextResponse.json({ message: getErrorMessage(error) }, { status: 400 });
   }
 }

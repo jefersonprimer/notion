@@ -122,7 +122,7 @@ export default function LoginPage() {
 
             <div className="flex items-center justify-center gap-2">
               <button className="text-sm">
-                <Link href="#" className="font-medium uppercase text-blue-600 hover:text-blue-500 dark:text-blue-400">
+                <Link href="/forgot-password" className="font-medium uppercase text-blue-600 hover:text-blue-500 dark:text-blue-400">
                   {t("forgotPassword")}
                 </Link>
               </button>

@@ -2,6 +2,7 @@ import { CreateUserUseCase } from "../../application/use-cases/CreateUserUseCase
 import { LoginUserCase } from "../../application/use-cases/LoginUserCase";
 import { ForgotPasswordUseCase } from "../../application/use-cases/ForgotPasswordUseCase";
 import { ResetPasswordUseCase } from "../../application/use-cases/ResetPasswordUseCase";
+import { ValidateResetTokenUseCase } from "../../application/use-cases/ValidateResetTokenUseCase";
 import { DeleteUserUseCase } from "../../application/use-cases/DeleteUserUseCase";
 import { SupabaseUserRepository } from "../../infrastructure/database/supabase/repositories/SupabaseUserRepository";
 import { SupabaseNoteRepository } from "../../infrastructure/database/supabase/repositories/SupabaseNoteRepository";
@@ -17,6 +18,7 @@ const createUserUseCase = new CreateUserUseCase(supabaseUserRepository);
 const loginUseCase = new LoginUserCase(supabaseUserRepository);
 const forgotPasswordUseCase = new ForgotPasswordUseCase(supabaseUserRepository, emailService);
 const resetPasswordUseCase = new ResetPasswordUseCase(supabaseUserRepository);
+const validateResetTokenUseCase = new ValidateResetTokenUseCase(supabaseUserRepository);
 const deleteUserUseCase = new DeleteUserUseCase(
   supabaseUserRepository,
   supabaseNoteRepository
@@ -27,5 +29,6 @@ export {
   loginUseCase,
   forgotPasswordUseCase,
   resetPasswordUseCase,
+  validateResetTokenUseCase,
   deleteUserUseCase
 };
