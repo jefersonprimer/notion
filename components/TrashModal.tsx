@@ -89,9 +89,9 @@ export default function TrashModal({ open, onClose }: Props) {
       />
       
       {/* Modal Container: Full-screen on mobile, floating on desktop */}
-      <div className="absolute inset-0 md:inset-auto md:bottom-2 md:left-55 pointer-events-auto w-full h-full md:w-103.5 md:h-81.75 bg-[#252525] md:border border-[#3f3f3f] md:rounded-lg shadow-2xl flex flex-col overflow-hidden text-[#9b9b9b]">
+      <div className="absolute inset-0 md:inset-auto md:bottom-2 md:left-55 pointer-events-auto w-full h-full md:w-103.5 md:h-81.75 bg-white md:border border-gray-200 md:rounded-lg shadow-2xl flex flex-col overflow-hidden text-gray-600 dark:bg-[#252525] dark:border-[#3f3f3f] dark:text-[#9b9b9b]">
         {/* Header */}
-        <div className="flex items-center justify-between px-3 py-2 border-b border-[#3f3f3f] bg-[#2f2f2f] text-white shrink-0">
+        <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 bg-gray-50 text-gray-900 shrink-0 dark:border-[#3f3f3f] dark:bg-[#2f2f2f] dark:text-white">
           <span className="text-sm font-medium flex items-center gap-2">
             <Trash2 size={16} />
             {t('title')}
@@ -100,7 +100,7 @@ export default function TrashModal({ open, onClose }: Props) {
             {notes.length > 0 && (
               <button 
                 onClick={handleEmptyTrash}
-                className="text-xs text-[#ff5f5f] hover:text-[#ff8f8f] px-2 py-1 rounded hover:bg-[#3f3f3f] transition-colors"
+                className="text-xs text-red-600 hover:text-red-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors dark:text-[#ff5f5f] dark:hover:text-[#ff8f8f] dark:hover:bg-[#3f3f3f]"
               >
                 {t('actions.emptyTrashNow')}
               </button>
@@ -126,7 +126,7 @@ export default function TrashModal({ open, onClose }: Props) {
             notes.map(note => (
               <div 
                 key={note.id} 
-                className="group flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-[#2f2f2f] text-[#f0efed] transition-colors"
+                className="group flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-gray-100 text-gray-900 transition-colors dark:hover:bg-[#2f2f2f] dark:text-[#f0efed]"
               >
                 <Link 
                   href={`/${createNoteSlug((updatedTitles[note.id] !== undefined ? updatedTitles[note.id] : note.title) || t('defaultNoteTitle'), note.id)}`}
@@ -148,14 +148,14 @@ export default function TrashModal({ open, onClose }: Props) {
                 <div className="flex items-center gap-1 shrink-0">
                   <button 
                     onClick={() => handleRestore(note.id)}
-                    className="p-1 hover:bg-[#3f3f3f] rounded text-[#ada9a3] hover:text-white"
+                    className="p-1 hover:bg-gray-200 rounded text-gray-600 hover:text-gray-900 dark:hover:bg-[#3f3f3f] dark:text-[#ada9a3] dark:hover:text-white"
                     title={t('actions.restore')}
                   >
                     <RotateCcw size={16} />
                   </button>
                   <button 
                     onClick={() => handlePermanentDelete(note.id)}
-                    className="p-1 hover:bg-[#3f3f3f] rounded text-[#ada9a3] hover:text-[#ff8f8f]"
+                    className="p-1 hover:bg-gray-200 rounded text-gray-600 hover:text-red-700 dark:hover:bg-[#3f3f3f] dark:text-[#ada9a3] dark:hover:text-[#ff8f8f]"
                     title={t('actions.deletePermanently')}
                   >
                     <Trash2 size={16} />

@@ -87,8 +87,8 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
             />
           )}
 
-          <motion.div 
-            ref={modalRef}
+	          <motion.div 
+	            ref={modalRef}
             initial={isMobile ? { y: "100%" } : { opacity: 0, scale: 0.95 }}
             animate={isMobile ? { y: 0 } : { opacity: 1, scale: 1 }}
             exit={isMobile ? { y: "100%" } : { opacity: 0, scale: 0.95 }}
@@ -101,29 +101,29 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
                 onClose();
               }
             }}
-            className={`fixed z-9999 bg-[#252525] border-[#2f2f2f] shadow-2xl text-base text-[#d4d4d4] overflow-y-auto p-1 ${
-              isMobile 
-                ? 'inset-x-0 bottom-0 rounded-t-2xl border-t' 
-                : 'right-5 top-12.5 w-64 rounded-xl border'
-            }`}
-          >
+	            className={`fixed z-9999 bg-white dark:bg-[#252525] border-gray-200 dark:border-[#2f2f2f] shadow-2xl text-base text-gray-700 dark:text-[#d4d4d4] overflow-y-auto p-1 ${
+	              isMobile 
+	                ? 'inset-x-0 bottom-0 rounded-t-2xl border-t' 
+	                : 'right-5 top-12.5 w-64 rounded-xl border'
+	            }`}
+	          >
             {/* Mobile Handle */}
-            {isMobile && (
-              <div className="flex justify-center pt-3 pb-1">
-                <div className="w-10 h-1 rounded-full bg-[#3f3f3f]" />
-              </div>
-            )}
+	            {isMobile && (
+	              <div className="flex justify-center pt-3 pb-1">
+	                <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-[#3f3f3f]" />
+	              </div>
+	            )}
 
             {/* Search */}
-            <div className="hidden md:flex items-center p-2">
-              <div className="flex items-center rounded-md px-2 py-1.5 gap-2 bg-[#ffffff0e]">
-              <Search size={20}/>
-              <input
-                placeholder={t('searchPlaceholder')}
-                className="text-sm w-full placeholder:text-[#8a8a8a] outline-none focus:none focus:none"
-              />
-              </div>
-            </div>
+	            <div className="hidden md:flex items-center p-2">
+	              <div className="flex items-center rounded-md px-2 py-1.5 gap-2 bg-gray-100 dark:bg-[#ffffff0e] text-gray-600 dark:text-[#d4d4d4]">
+	              <Search size={20} />
+	              <input
+	                placeholder={t('searchPlaceholder')}
+	                className="text-sm w-full bg-transparent text-gray-700 dark:text-[#d4d4d4] placeholder:text-gray-400 dark:placeholder:text-[#8a8a8a] outline-none"
+	              />
+	              </div>
+	            </div>
 
             <div className="md:hidden text-center">
               <p>Ações</p>
@@ -201,13 +201,13 @@ export default function PageOptionsModal({ isOpen, onClose, userName, updatedAt,
 
               <MenuItem icon={<GitBranch size={18} />} label={t('items.connections')} shortcut={!isMobile ? t('shortcuts.none') : undefined} hasArrow />
 
-              <div className="px-4 py-2 text-xs text-[#7a7a7a] border-t border-[#2a2a2a] space-y-1">
-                <p>{t('wordCount', { count: wordCount })}</p>
-                <div className="mt-1">
-                  {t('lastEditedBy', { name: userName || t('user.fallbackName') })} <br />
-                  {formattedDate}
-                </div>
-              </div>
+	              <div className="px-4 py-2 text-xs text-gray-500 dark:text-[#7a7a7a] border-t border-gray-200 dark:border-[#2a2a2a] space-y-1">
+	                <p>{t('wordCount', { count: wordCount })}</p>
+	                <div className="mt-1">
+	                  {t('lastEditedBy', { name: userName || t('user.fallbackName') })} <br />
+	                  {formattedDate}
+	                </div>
+	              </div>
             </div>
           </motion.div>
         </>
@@ -232,22 +232,22 @@ function MenuItem({
   hasArrow?: boolean
   onClick?: () => void
 }) {
-  return (
-    <div 
-      className="flex items-center rounded-md justify-between px-2 py-1.5 hover:bg-[#2a2a2a] cursor-pointer transition-colors"
-      onClick={onClick}
-    >
-      <div className="flex items-center gap-2">
-        <span className="text-[#bdbdbd] flex items-center justify-center">{icon}</span>
-        <span className="leading-none text-sm">{label}</span>
-      </div>
+	  return (
+	    <div 
+	      className="flex items-center rounded-md justify-between px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] cursor-pointer transition-colors"
+	      onClick={onClick}
+	    >
+	      <div className="flex items-center gap-2">
+	        <span className="text-gray-500 dark:text-[#bdbdbd] flex items-center justify-center">{icon}</span>
+	        <span className="leading-none text-sm">{label}</span>
+	      </div>
 
-      <div className="flex items-center gap-2 text-sm text-[#8a8a8a]">
-        {shortcut && <span className="leading-none">{shortcut}</span>}
-        {hasArrow && <span className="leading-none text-lg">›</span>}
-      </div>
-    </div>
-  )
+	      <div className="flex items-center gap-2 text-sm text-gray-400 dark:text-[#8a8a8a]">
+	        {shortcut && <span className="leading-none">{shortcut}</span>}
+	        {hasArrow && <span className="leading-none text-lg">›</span>}
+	      </div>
+	    </div>
+	  )
 }
 
 function ToggleItem({
@@ -255,52 +255,52 @@ function ToggleItem({
   label,
   checked,
   onChange,
-}: {
-  icon: React.ReactNode
-  label: string
-  checked: boolean
-  onChange: () => void
-}) {
-  return (
-    <div className="flex items-center justify-between px-2 py-1.5 hover:bg-[#2a2a2a] cursor-pointer transition-colors">
-      <div className="flex items-center gap-3">
-        <span className="text-[#bdbdbd] flex items-center justify-center">{icon}</span>
-        <span className="leading-none text-sm">{label}</span>
-      </div>
+	}: {
+	  icon: React.ReactNode
+	  label: string
+	  checked: boolean
+	  onChange: () => void
+	}) {
+	  return (
+	    <div className="flex items-center justify-between px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] cursor-pointer transition-colors">
+	      <div className="flex items-center gap-3">
+	        <span className="text-gray-500 dark:text-[#bdbdbd] flex items-center justify-center">{icon}</span>
+	        <span className="leading-none text-sm">{label}</span>
+	      </div>
 
       <button
-        onClick={onChange}
-        className={`relative h-5 w-9 rounded-full transition-colors ${
-          checked ? 'bg-blue-500' : 'bg-[#3a3a3a]'
-        }`}
-      >
-        <span
-          className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
-            checked ? 'translate-x-4' : 'translate-x-0.5'
-          }`}
-        />
-      </button>
-    </div>
-  )
+	        onClick={onChange}
+	        className={`relative h-5 w-9 rounded-full transition-colors ${
+	          checked ? 'bg-blue-500' : 'bg-gray-300 dark:bg-[#3a3a3a]'
+	        }`}
+	      >
+	        <span
+	          className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
+	            checked ? 'translate-x-4' : 'translate-x-0.5'
+	          }`}
+	        />
+	      </button>
+	    </div>
+	  )
 }
 
 function Divider() {
-  return <div className="my-1 h-px bg-[#2a2a2a]" />
+	  return <div className="my-1 h-px bg-gray-200 dark:bg-[#2a2a2a]" />
 }
 
 function FontOption({ label, active }: { label: string; active?: boolean }) {
-  return (
-    <div className="flex flex-col items-center cursor-pointer group w-24 h-16  px-3 py-2 rounded hover:bg-[#ffffff0e]">
-      <span
-        className={`text-2xl ${
-          active ? 'text-blue-400' : 'text-[#d4d4d4]'
-        }`}
-      >
-        Ag
-      </span>
-      <span className="text-sm text-[#8a8a8a] group-hover:text-[#d4d4d4]">
-        {label}
-      </span>
-    </div>
-  )
+	  return (
+	    <div className="flex flex-col items-center cursor-pointer group w-24 h-16 px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-[#ffffff0e]">
+	      <span
+	        className={`text-2xl ${
+	          active ? 'text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-[#d4d4d4]'
+	        }`}
+	      >
+	        Ag
+	      </span>
+	      <span className="text-sm text-gray-500 group-hover:text-gray-900 dark:text-[#8a8a8a] dark:group-hover:text-[#d4d4d4]">
+	        {label}
+	      </span>
+	    </div>
+	  )
 }

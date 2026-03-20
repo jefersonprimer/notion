@@ -49,80 +49,80 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
       return (
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-200">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-base text-[#f0efed] font-medium">{t('account.title')}</h2>
+            <h2 className="text-base text-gray-900 dark:text-[#f0efed] font-medium">{t('account.title')}</h2>
           </div>
 
-          <div className="mb-2 h-px w-full bg-[#fffff315]" />
+          <div className="mb-2 h-px w-full bg-gray-200 dark:bg-[#fffff315]" />
 
           <div className="mb-8">
             <div className="flex items-center gap-4 mb-4">
               <div
                 className="
                   w-16 h-16 rounded-full
-                  bg-[#ffffff0e]
+                  bg-gray-100 dark:bg-[#ffffff0e]
                   flex items-center justify-center
-                  text-2xl text-[#e6e5e3] font-medium
+                  text-2xl text-gray-700 dark:text-[#e6e5e3] font-medium
                 "
               >
                 {userInitial}
               </div>
               
               <div className="flex flex-col">
-                <div className="text-xs font-medium text-[#bcbab6] mb-1">{t('account.name')}</div>
-                <div className="px-2 py-1 text-sm rounded-lg bg-[#ffffff0e] border border-zinc-800 text-[#f0efed]">
+                <div className="text-xs font-medium text-gray-500 dark:text-[#bcbab6] mb-1">{t('account.name')}</div>
+                <div className="px-2 py-1 text-sm rounded-lg bg-gray-100 border border-gray-200 text-gray-900 dark:bg-[#ffffff0e] dark:border-zinc-800 dark:text-[#f0efed]">
                   {userName}
                 </div>
               </div>            
             </div>
             
-            <p className="text-sm text-[#7d7a75]">
-              <a href="#" className="text-[#2783de]">{t('account.addPhoto')}</a> 
+            <p className="text-sm text-gray-600 dark:text-[#7d7a75]">
+              <a href="#" className="text-[#2783de]">{t('account.addPhoto')}</a>
               {t('account.or')}
-              <a href="#" className="text-[#2783de]"> {t('account.createAvatarWithFace')}</a> 
+              <a href="#" className="text-[#2783de]"> {t('account.createAvatarWithFace')}</a>
             </p>
           </div>
 
           <div>
-            <h2 className="text-base text-[#f0efed] font-medium">{t('security.title')}</h2>
-            <div className="my-2 h-px w-full bg-[#fffff315]" />
+            <h2 className="text-base text-gray-900 dark:text-[#f0efed] font-medium">{t('security.title')}</h2>
+            <div className="my-2 h-px w-full bg-gray-200 dark:bg-[#fffff315]" />
 
 
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-2">
-                <p className="text-[#f0efed] text-sm font-medium">{t('security.email')}</p>
-                <p className="text-[#ada9a3] text-xs font-normal">{userEmail}</p>
+                <p className="text-gray-900 dark:text-[#f0efed] text-sm font-medium">{t('security.email')}</p>
+                <p className="text-gray-600 dark:text-[#ada9a3] text-xs font-normal">{userEmail}</p>
               </div>
-              <button className="px-2 py-1 border text-sm border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
+              <button className="px-2 py-1 border text-sm border-gray-200 hover:bg-gray-100 rounded-md dark:border-[#ffffeb1a] dark:hover:bg-[#fffff315]">
                 {t('security.manageEmails')}
               </button>
             </div>
 
             <div className="flex items-center justify-between my-6">
               <div className="flex flex-col gap-2">
-                <p className="text-[#f0efed] text-sm font-medium">{t('security.password')}</p>
-                <p className="text-[#ada9a3] text-xs font-normal">{t('security.setPasswordDescription')}</p>
+                <p className="text-gray-900 dark:text-[#f0efed] text-sm font-medium">{t('security.password')}</p>
+                <p className="text-gray-600 dark:text-[#ada9a3] text-xs font-normal">{t('security.setPasswordDescription')}</p>
               </div>
-              <button className="px-2 py-1 text-sm border border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
+              <button className="px-2 py-1 text-sm border border-gray-200 hover:bg-gray-100 rounded-md dark:border-[#ffffeb1a] dark:hover:bg-[#fffff315]">
                 {t('security.addPassword')}
               </button>
             </div>
 
             <div className="flex items-center justify-between my-6">
               <div className="flex flex-col gap-2">
-                <p className="text-[#f0efed] text-sm font-medium">{t('security.twoStepVerification')}</p>
-                <p className="text-[#ada9a3] text-xs font-normal">{t('security.twoStepVerificationDescription')}</p>
+                <p className="text-gray-900 dark:text-[#f0efed] text-sm font-medium">{t('security.twoStepVerification')}</p>
+                <p className="text-gray-600 dark:text-[#ada9a3] text-xs font-normal">{t('security.twoStepVerificationDescription')}</p>
               </div>
-              <button className="px-2 text-sm py-1 border border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
+              <button className="px-2 text-sm py-1 border border-gray-200 hover:bg-gray-100 rounded-md dark:border-[#ffffeb1a] dark:hover:bg-[#fffff315]">
                 {t('security.addVerificationMethod')}
               </button>
             </div>
 
             <div className="flex items-center justify-between my-6">
               <div className="flex flex-col gap-2">
-                <p className="text-[#f0efed] text-sm font-medium">{t('security.passkey')}</p>
-                <p className="text-[#ada9a3] text-xs font-normal">{t('security.passkeyDescription')}</p>
+                <p className="text-gray-900 dark:text-[#f0efed] text-sm font-medium">{t('security.passkey')}</p>
+                <p className="text-gray-600 dark:text-[#ada9a3] text-xs font-normal">{t('security.passkeyDescription')}</p>
               </div>
-              <button className="px-2 text-sm py-1 border border-[#ffffeb1a] hover:bg-[#fffff315] rounded-md">
+              <button className="px-2 text-sm py-1 border border-gray-200 hover:bg-gray-100 rounded-md dark:border-[#ffffeb1a] dark:hover:bg-[#fffff315]">
                 {t('security.addPasskey')}
               </button>
             </div>
@@ -139,23 +139,23 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
 
         {/* Account Section - Visible on mobile only since it's in the sidebar on desktop */}
         <div className="md:hidden mb-8" onClick={() => setActiveTab('minha-conta')}>
-          <div className="mb-4 text-sm text-[#7d7a75] font-medium uppercase tracking-wider">{t('account.title')}</div>
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-800/50 border border-zinc-800">
+          <div className="mb-4 text-sm text-gray-500 dark:text-[#7d7a75] font-medium uppercase tracking-wider">{t('account.title')}</div>
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-200 dark:bg-zinc-800/50 dark:border-zinc-800">
             <div
               className="
                 w-10 h-10 rounded-full
                 border border-gray-300 dark:border-[#7d7a75]
                 flex items-center justify-center
-                text-lg text-[#7d7a75] font-medium leading-none
+                text-lg text-gray-600 dark:text-[#7d7a75] font-medium leading-none
               "
             >
               {userInitial}
             </div>
 	            <div className="flex flex-col">
-	              <span className="text-sm font-medium text-[#f0efed]">
+	              <span className="text-sm font-medium text-gray-900 dark:text-[#f0efed]">
 	                {userName}
 	              </span>
-	              <span className="text-xs text-[#7d7a75]">
+	              <span className="text-xs text-gray-600 dark:text-[#7d7a75]">
 	                {userEmail}
 	              </span>
 	            </div>
@@ -213,10 +213,10 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
           </Section>
 
           <Section title={t('security.title')}>
-            <button className="w-full text-left px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition text-sm">
+            <button className="w-full text-left px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition text-sm dark:bg-zinc-800 dark:hover:bg-zinc-700">
               {t('preferences.security.changePassword')}
             </button>
-            <button className="w-full text-left px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition text-sm text-red-400">
+            <button className="w-full text-left px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition text-sm text-red-600 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-red-400">
               {t('preferences.security.signOutAllSessions')}
             </button>
           </Section>
@@ -238,7 +238,7 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
           <div className="absolute inset-0" onClick={onClose} />
 
           <motion.div
-            className="settings-modal-container relative flex h-full w-full md:h-150 md:w-287.5 overflow-hidden md:rounded-2xl bg-[#202020] md:bg-zinc-900 text-zinc-100 shadow-2xl"
+            className="settings-modal-container relative flex h-full w-full md:h-150 md:w-287.5 overflow-hidden md:rounded-2xl bg-white text-gray-900 shadow-2xl dark:bg-[#202020] md:dark:bg-zinc-900 dark:text-zinc-100"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
@@ -246,28 +246,28 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
           >
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 rounded-lg p-1 hover:bg-zinc-800 text-[#bcbab6]"
+              className="absolute top-4 right-4 z-10 rounded-lg p-1 hover:bg-gray-100 text-gray-600 dark:hover:bg-zinc-800 dark:text-[#bcbab6]"
             >
               <X size={18} />
             </button>
             {/* Sidebar - Hidden on mobile */}
-            <aside className="hidden md:block w-64 border-r border-zinc-800 overflow-y-auto p-3 text-sm bg-[#272727]">
-              <div className="mb-2 px-2 text-sm text-[#7d7a75] font-medium">{t('account.title')}</div>
+            <aside className="hidden md:block w-64 border-r border-gray-200 overflow-y-auto p-3 text-sm bg-gray-50 dark:border-zinc-800 dark:bg-[#272727]">
+              <div className="mb-2 px-2 text-sm text-gray-500 dark:text-[#7d7a75] font-medium">{t('account.title')}</div>
               <div 
-                className={`mb-0.5 flex items-center gap-2 rounded-lg px-2 py-1.5 cursor-pointer hover:bg-[#ffffff0e] transition-colors ${activeTab === 'minha-conta' ? 'bg-[#ffffff0e]' : ''}`}
+                className={`mb-0.5 flex items-center gap-2 rounded-lg px-2 py-1.5 cursor-pointer hover:bg-gray-100 transition-colors dark:hover:bg-[#ffffff0e] ${activeTab === 'minha-conta' ? 'bg-gray-100 dark:bg-[#ffffff0e]' : ''}`}
                 onClick={() => setActiveTab('minha-conta')}
               >
                 <div
                   className="
                     w-5 h-5 rounded-full
-                    border border-gray-300 dark:border-[#7d7a75] bg-[#252525]
+                    border border-gray-300 dark:border-[#7d7a75] bg-gray-100 dark:bg-[#252525]
                     flex items-center justify-center
-                    text-xs text-[#ada9a3] font-medium leading-none
+                    text-xs text-gray-700 dark:text-[#ada9a3] font-medium leading-none
                   "
                 >
                   {userInitial}
                 </div>
-	                <span className="text-sm text-[#bcbab6]">
+	                <span className="text-sm text-gray-700 dark:text-[#bcbab6]">
 	                  {userName}
 	                </span>
 	              </div>
@@ -282,29 +282,29 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
                 <SidebarItem icon={Bell} label={t('sidebar.notifications')} />
                 <SidebarItem icon={Link2} label={t('sidebar.connections')} />
 
-                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">{t('sidebar.workspaceSection')}</div>
+                <div className="mt-4 px-2 text-xs text-gray-500 dark:text-[#7d7a75] font-medium">{t('sidebar.workspaceSection')}</div>
                 <SidebarItem icon={Settings} label={t('sidebar.general')} />
                 <SidebarItem icon={Users} label={t('sidebar.people')} />
                 <SidebarItem icon={Download} label={t('sidebar.imports')} />
                 
-                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">{t('sidebar.featuresSection')}</div>
+                <div className="mt-4 px-2 text-xs text-gray-500 dark:text-[#7d7a75] font-medium">{t('sidebar.featuresSection')}</div>
                 <SidebarItem icon={Sparkles} label={t('sidebar.NolioAI')} />
                 <SidebarItem icon={Globe} label={t('sidebar.publicPages')} />
                 <SidebarItem icon={Smile} label={t('sidebar.emoji')} />
                 
-                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">{t('sidebar.integrationsSection')}</div>
+                <div className="mt-4 px-2 text-xs text-gray-500 dark:text-[#7d7a75] font-medium">{t('sidebar.integrationsSection')}</div>
                 <SidebarItem icon={Link2} label={t('sidebar.connections')} />
                 
-                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">{t('sidebar.adminSection')}</div>
+                <div className="mt-4 px-2 text-xs text-gray-500 dark:text-[#7d7a75] font-medium">{t('sidebar.adminSection')}</div>
                 <SidebarItem icon={Building2} label={t('sidebar.teamspaces')} />
 
-                <div className="mt-4 px-2 text-xs text-[#7d7a75] font-medium">{t('sidebar.accessAndBillingSection')}</div>
+                <div className="mt-4 px-2 text-xs text-gray-500 dark:text-[#7d7a75] font-medium">{t('sidebar.accessAndBillingSection')}</div>
                 <SidebarItem icon={CircleArrowUp} label={t('sidebar.upgradePlan')} />
               </nav>
             </aside>
 
             {/* Content */}
-            <main className="flex-1 overflow-y-auto bg-[#202020] p-4 md:p-6">
+            <main className="flex-1 overflow-y-auto bg-white p-4 md:p-6 dark:bg-[#202020]">
               {renderContent()}
             </main>
           </motion.div>
@@ -319,8 +319,8 @@ function SidebarItem({ icon: Icon, label, active, onClick }: { icon: React.Compo
   return (
     <div
       onClick={onClick}
-      className={`flex cursor-pointer items-center text-sm text-[#bcbab6] hover:text-[#f0efed] font-medium gap-2 rounded-lg px-2 py-1.5 hover:bg-[#ffffff0e] transition-colors ${
-        active ? "bg-[#ffffff0e] text-[#f0efed]" : ""
+      className={`flex cursor-pointer items-center text-sm text-gray-700 hover:text-gray-900 font-medium gap-2 rounded-lg px-2 py-1.5 hover:bg-gray-100 transition-colors dark:text-[#bcbab6] dark:hover:text-[#f0efed] dark:hover:bg-[#ffffff0e] ${
+        active ? "bg-gray-100 text-gray-900 dark:bg-[#ffffff0e] dark:text-[#f0efed]" : ""
       }`}
     >
       <Icon size={20} />
@@ -332,7 +332,7 @@ function SidebarItem({ icon: Icon, label, active, onClick }: { icon: React.Compo
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mb-8">
-      <h3 className="mb-4 border-b border-zinc-800 pb-2 text-sm font-semibold text-zinc-300">
+      <h3 className="mb-4 border-b border-gray-200 pb-2 text-sm font-semibold text-gray-600 dark:border-zinc-800 dark:text-zinc-300">
         {title}
       </h3>
       <div className="space-y-4">{children}</div>
@@ -345,7 +345,7 @@ function Row({ label, description, children }: { label: string; description?: st
     <div className="flex items-center justify-between gap-4">
       <div>
         <div className="text-sm">{label}</div>
-        {description && <div className="text-sm text-zinc-400">{description}</div>}
+        {description && <div className="text-sm text-gray-500 dark:text-zinc-400">{description}</div>}
       </div>
       {children}
     </div>
@@ -354,9 +354,9 @@ function Row({ label, description, children }: { label: string; description?: st
 
 function Select({ value }: { value: string }) {
   return (
-    <button className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm hover:bg-zinc-700">
+    <button className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm hover:bg-gray-100 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-700">
       {value}
-      <ChevronDown size={14} className="text-zinc-400" />
+      <ChevronDown size={14} className="text-gray-500 dark:text-zinc-400" />
     </button>
   );
 }
@@ -378,19 +378,19 @@ function LanguageSelect({
     <div className="relative">
       <button
         onClick={onToggle}
-        className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm hover:bg-zinc-700"
+        className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm hover:bg-gray-100 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-700"
       >
         {value}
-        <ChevronDown size={14} className="text-zinc-400" />
+        <ChevronDown size={14} className="text-gray-500 dark:text-zinc-400" />
       </button>
 
       {open && (
-        <div className="absolute right-0 z-20 mt-2 min-w-44 rounded-lg border border-zinc-700 bg-zinc-900 p-1 shadow-xl">
+        <div className="absolute right-0 z-20 mt-2 min-w-44 rounded-lg border border-gray-200 bg-white p-1 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
           {options.map((option) => (
             <button
               key={option.value}
               onClick={() => onSelect(option.value)}
-              className="block w-full rounded-md px-2 py-1.5 text-left text-sm text-zinc-200 hover:bg-zinc-800"
+              className="block w-full rounded-md px-2 py-1.5 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
             >
               {option.label}
             </button>
@@ -418,19 +418,19 @@ function ThemeSelect({
     <div className="relative">
       <button
         onClick={onToggle}
-        className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm hover:bg-zinc-700"
+        className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm hover:bg-gray-100 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-700"
       >
         {value}
-        <ChevronDown size={14} className="text-zinc-400" />
+        <ChevronDown size={14} className="text-gray-500 dark:text-zinc-400" />
       </button>
 
       {open && (
-        <div className="absolute right-0 z-20 mt-2 min-w-44 rounded-lg border border-zinc-700 bg-zinc-900 p-1 shadow-xl">
+        <div className="absolute right-0 z-20 mt-2 min-w-44 rounded-lg border border-gray-200 bg-white p-1 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
           {options.map((option) => (
             <button
               key={option.value}
               onClick={() => onSelect(option.value)}
-              className="block w-full rounded-md px-2 py-1.5 text-left text-sm text-zinc-200 hover:bg-zinc-800"
+              className="block w-full rounded-md px-2 py-1.5 text-left text-sm text-gray-700 hover:bg-gray-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
             >
               {option.label}
             </button>
@@ -447,7 +447,7 @@ function Toggle({ label, checked }: { label: string; checked?: boolean }) {
       <span className="text-sm">{label}</span>
       <button
         className={`h-5 w-9 rounded-full p-0.5 transition ${
-          checked ? "bg-blue-600" : "bg-zinc-700"
+          checked ? "bg-blue-600" : "bg-gray-300 dark:bg-zinc-700"
         }`}
       >
         <span

@@ -243,7 +243,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className={`group/sidebar w-80 md:w-60 bg-[#202020] text-[#ada9a3] flex flex-col text-sm select-none ${isFloating ? 'h-full max-h-[70vh]' : 'h-screen border-r border-[#2f2f2f]'} ${!isFloating ? 'fixed inset-y-0 left-0 z-50 md:relative' : ''}`}
+        className={`group/sidebar w-80 md:w-60 bg-white text-gray-700 dark:bg-[#202020] dark:text-[#ada9a3] flex flex-col text-sm select-none ${isFloating ? 'h-full max-h-[70vh]' : 'h-screen border-r border-gray-200 dark:border-[#2f2f2f]'} ${!isFloating ? 'fixed inset-y-0 left-0 z-50 md:relative' : ''}`}
         animate={!isFloating ? { x: isSwipeClosing ? -320 : swipeOffsetX } : undefined}
         transition={!isFloating ? (isSwiping ? { duration: 0 } : { duration: 0.2, ease: 'easeOut' }) : undefined}
         onAnimationComplete={() => {
@@ -254,7 +254,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
       >
         {/* Header */}
         <div
-          className={`group relative flex items-center justify-between mt-1.5 mx-2 rounded-md transition-colors cursor-pointer hover:bg-[#252525] ${isUserModalOpen ? 'bg-[#252525]' : ''}`}
+          className={`group relative flex items-center justify-between mt-1.5 mx-2 rounded-md transition-colors cursor-pointer hover:bg-gray-100 dark:hover:bg-[#252525] ${isUserModalOpen ? 'bg-gray-100 dark:bg-[#252525]' : ''}`}
         >
           <div
             onClick={(e) => {
@@ -264,14 +264,14 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
             }}
             className="flex items-center py-1.5 px-2 gap-2 transition-all duration-200 group-hover:opacity-100 flex-1 min-w-0"
           >
-            <div className="w-5 h-5 bg-[#fffff315] rounded flex items-center justify-center text-sm font-medium text-[#ada9a3] shrink-0">
+            <div className="w-5 h-5 bg-gray-200 dark:bg-[#fffff315] rounded flex items-center justify-center text-sm font-medium text-gray-700 dark:text-[#ada9a3] shrink-0">
               <span className="leading-none select-none uppercase">n</span>
             </div>
             <div className="flex items-center gap-1 min-w-0">
-              <span className="text-[#f0efed] text-sm truncate font-medium leading-none">
+              <span className="text-gray-900 dark:text-[#f0efed] text-sm truncate font-medium leading-none">
                 {userName}
               </span>
-              <div className="hidden group-hover:flex items-center text-[#ada9a3] hover:text-white">
+              <div className="hidden group-hover:flex items-center text-gray-500 hover:text-gray-900 dark:text-[#ada9a3] dark:hover:text-white">
                 <ChevronDown size={14} />
               </div>
             </div>
@@ -283,7 +283,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
             {!isFloating && (
               <button
                 onClick={(e) => { e.stopPropagation(); setIsSidebarOpen(false); }}
-                className="hidden group-hover/sidebar:flex items-center justify-center w-7 h-7 hover:bg-[#3f3f3f] rounded text-[#ada9a3] hover:text-white"
+                className="hidden group-hover/sidebar:flex items-center justify-center w-7 h-7 hover:bg-gray-200 rounded text-gray-600 hover:text-gray-900 dark:hover:bg-[#3f3f3f] dark:text-[#ada9a3] dark:hover:text-white"
                 title={t('actions.closeSidebarTitle')}
               >
                 <ChevronsLeft size={20} />
@@ -293,7 +293,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
             {/* Default Icons */}
             <button
               onClick={(e) => { e.stopPropagation(); handleCreateNote(); }}
-              className="flex items-center justify-center w-7 h-7 text-[#ada9a3] hover:text-white hover:bg-[#2f2f2f] rounded transition-colors"
+              className="flex items-center justify-center w-7 h-7 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors dark:text-[#ada9a3] dark:hover:text-white dark:hover:bg-[#2f2f2f]"
               title={t('actions.createPageTitle')}
             >
               <SquarePen size={18} />
@@ -306,7 +306,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
                 setMoreOptionsModalPos({ top: rect.bottom + 5, left: rect.left - 40 });
                 setIsMoreOptionsModalOpen(true);
               }}
-              className={`flex items-center justify-center w-5 h-7 hover:bg-[#3f3f3f] rounded hover:text-white ${isMoreOptionsModalOpen ? 'bg-[#3f3f3f] text-white' : 'text-[#ada9a3]'}`}
+              className={`flex items-center justify-center w-5 h-7 hover:bg-gray-200 rounded hover:text-gray-900 dark:hover:bg-[#3f3f3f] dark:hover:text-white ${isMoreOptionsModalOpen ? 'bg-gray-200 text-gray-900 dark:bg-[#3f3f3f] dark:text-white' : 'text-gray-600 dark:text-[#ada9a3]'}`}
               title={t('actions.moreOptionsTitle')}
             >
               <ChevronDown size={14} />
@@ -346,7 +346,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           {/* Favorites Section */}
           {(isLoadingFavorites || favoriteNotes.length > 0) && (
             <div className="mt-4 px-2">
-              <div className="px-2 py-1 text-xs font-medium text-[#9b9b9b]">
+              <div className="px-2 py-1 text-xs font-medium text-gray-500 dark:text-[#9b9b9b]">
                 {t('sections.favorites')}
               </div>
               {expandedSections.favoritos && (
@@ -379,7 +379,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
           <div className="mt-4 px-2">
             <button
               onClick={() => toggleSection('particular')}
-              className="w-full flex items-center justify-between px-2 py-1 text-xs font-medium text-[#9b9b9b] hover:bg-[#2f2f2f] hover:text-[#ada9a3] transition-colors group"
+              className="w-full flex items-center justify-between px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors group dark:text-[#9b9b9b] dark:hover:bg-[#2f2f2f] dark:hover:text-[#ada9a3]"
             >
               <span>{t('sections.private')}</span>
               <Plus size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -393,8 +393,8 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
                       <SidebarItemSkeleton key={i} />
                     ))}
                   </div>
-                ) : rootNotes.length === 0 ? (
-                  <div className="px-2 py-1 text-xs text-[#555]">{t('sections.noNotes')}</div>
+                  ) : rootNotes.length === 0 ? (
+                  <div className="px-2 py-1 text-xs text-gray-400 dark:text-[#555]">{t('sections.noNotes')}</div>
                 ) : (
                   rootNotes.map(note => (
                     <SidebarItem
@@ -414,11 +414,11 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
 
           {/* Compartilhado Section */}
           <div className="mt-4 px-2">
-            <div className="px-2 py-1 text-xs font-medium text-[#9b9b9b]">
+            <div className="px-2 py-1 text-xs font-medium text-gray-500 dark:text-[#9b9b9b]">
               {t('sections.shared')}
             </div>
             <div className=" py-1">
-              <button className="flex items-center text-sm gap-2 px-2 py-1.5 hover:bg-[#2f2f2f] rounded w-full text-left transition-colors">
+              <button className="flex items-center text-sm gap-2 px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded w-full text-left transition-colors">
                 <Plus size={16} />
                 <span>{t('sections.startCollaborating')}</span>
               </button>
@@ -427,7 +427,7 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
 
           {/* Aplicativos do Nolio */}
           <div className="mt-4 px-2">
-            <div className="px-2 py-1 text-xs font-medium text-[#9b9b9b]">
+            <div className="px-2 py-1 text-xs font-medium text-gray-500 dark:text-[#9b9b9b]">
               {t('sections.apps')}
             </div>
             <div className="py-1">
@@ -445,9 +445,9 @@ export default function Sidebar({ isFloating = false }: { isFloating?: boolean }
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-[#2f2f2f]">
+        <div className="border-t border-gray-200 dark:border-[#2f2f2f]">
           <div className="px-2 py-1.5">
-            <button className="hover:bg-[#2f2f2f] p-1.5 rounded flex items-center transition-colors text-[#ada9a3] hover:text-white">
+            <button className="hover:bg-gray-100 p-1.5 rounded flex items-center transition-colors text-gray-600 hover:text-gray-900 dark:hover:bg-[#2f2f2f] dark:text-[#ada9a3] dark:hover:text-white">
               <HelpCircle size={20} />
             </button>
           </div>
@@ -503,12 +503,18 @@ function NavItem({
   hoverIcon?: LucideIcon;
 }) {
   const content = (
-    <div className={`flex items-center gap-2 px-2 py-1.5 rounded-md w-full text-left transition-colors truncate ${isActive ? 'bg-[#2f2f2f] text-white' : 'hover:bg-[#2f2f2f] text-[#ada9a3] hover:text-white'}`}>
+    <div
+      className={`flex items-center gap-2 px-2 py-1.5 rounded-md w-full text-left transition-colors truncate ${
+        isActive
+          ? 'bg-gray-100 text-gray-900 dark:bg-[#2f2f2f] dark:text-white'
+          : 'hover:bg-gray-100 text-gray-700 hover:text-gray-900 dark:hover:bg-[#2f2f2f] dark:text-[#ada9a3] dark:hover:text-white'
+      }`}
+    >
       <span className="shrink-0">{icon}</span>
       <span className="truncate text-sm font-medium flex-1">{label}</span>
       {onHoverClick && (
         <div
-          className="hidden group-hover/navitem:flex items-center justify-center w-5 h-5 hover:bg-[#4a4a4a] rounded text-sm text-[#ada9a3] hover:text-white"
+          className="hidden group-hover/navitem:flex items-center justify-center w-5 h-5 hover:bg-gray-200 rounded text-sm text-gray-500 hover:text-gray-900 dark:hover:bg-[#4a4a4a] dark:text-[#ada9a3] dark:hover:text-white"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -524,25 +530,17 @@ function NavItem({
 
   const containerClasses = "group/navitem relative block w-full";
 
-  const tooltip = title ? (
-    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 hidden group-hover/navitem:block bg-[#2f2f2f] text-[#ada9a3]text-sm px-2 py-1.5 rounded-md shadow-lg whitespace-nowrap z-50">
-      {title}
-    </div>
-  ) : null;
-
   if (href) {
     return (
-      <Link href={href} className={containerClasses}>
+      <Link href={href} className={containerClasses} title={title}>
         {content}
-        {tooltip}
       </Link>
     );
   }
 
   return (
-    <button className={containerClasses} onClick={onClick}>
+    <button className={containerClasses} onClick={onClick} title={title}>
       {content}
-      {tooltip}
     </button>
   );
 }

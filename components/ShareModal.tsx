@@ -62,7 +62,7 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
         <>
           {/* Mobile Overlay */}
           {isMobile && (
-            <motion.div
+	          <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -90,25 +90,25 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
               left: buttonPosition.left - 80, 
               top: buttonPosition.top + 10 
             } : undefined}
-            className={`${
-              isMobile 
-                ? 'fixed inset-x-0 bottom-0 rounded-t-2xl border-t border-[#2f2f2f]' 
-                : 'fixed left-1/2 -translate-x-1/2 top-20 rounded-2xl border border-[#2f2f2f] w-114'
-            } z-9999 bg-[#1f1f1f] shadow-2xl text-sm text-[#d4d4d4] overflow-hidden`}
-          >
+	            className={`${
+	              isMobile
+	                ? 'fixed inset-x-0 bottom-0 rounded-t-2xl border-t border-gray-200 dark:border-[#2f2f2f]'
+	                : 'fixed left-1/2 -translate-x-1/2 top-20 rounded-2xl border border-gray-200 dark:border-[#2f2f2f] w-114'
+	            } z-9999 bg-white dark:bg-[#1f1f1f] shadow-2xl text-sm text-gray-700 dark:text-[#d4d4d4] overflow-hidden`}
+	          >
             {/* Mobile Handle */}
-            {isMobile && (
-              <div className="flex justify-center pt-3 pb-1">
-                <div className="w-10 h-1 rounded-full bg-[#3f3f3f]" />
-              </div>
-            )}
+	            {isMobile && (
+	              <div className="flex justify-center pt-3 pb-1">
+	                <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-[#3f3f3f]" />
+	              </div>
+	            )}
 
-            {/* Tabs */}
-            <div className="flex px-6 pt-4 border-b border-[#2a2a2a]">
-              <Tab
-                label={t('tabs.share')}
-                active={activeTab === 'share'}
-                onClick={() => setActiveTab('share')}
+	            {/* Tabs */}
+	            <div className="flex px-6 pt-4 border-b border-gray-200 dark:border-[#2a2a2a]">
+	              <Tab
+	                label={t('tabs.share')}
+	                active={activeTab === 'share'}
+	                onClick={() => setActiveTab('share')}
               />
               <Tab
                 label={t('tabs.publish')}
@@ -118,16 +118,16 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
             </div>
 
             {/* Content */}
-            <div className={`p-3 space-y-2 ${isMobile ? 'max-h-[70vh]' : ''} overflow-y-auto`}>
+	            <div className={`p-3 space-y-2 ${isMobile ? 'max-h-[70vh]' : ''} overflow-y-auto`}>
               
               {/* Invite Input */}
-              <div className="flex gap-2">
-                <input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={t('input.placeholder')}
-                  className="flex-1 rounded-lg bg-[#1f1f1f] border border-[#3a3a3a] px-3 py-2 text-sm placeholder:text-[#8a8a8a] outline-none focus:border-[#4c8bf5] focus:ring-1 focus:ring-[#4c8bf5]"
-                />
+	              <div className="flex gap-2">
+	                <input
+	                  value={email}
+	                  onChange={(e) => setEmail(e.target.value)}
+	                  placeholder={t('input.placeholder')}
+	                  className="flex-1 rounded-lg bg-white dark:bg-[#1f1f1f] border border-gray-300 dark:border-[#3a3a3a] px-3 py-2 text-sm placeholder:text-gray-400 dark:placeholder:text-[#8a8a8a] outline-none focus:border-[#4c8bf5] focus:ring-1 focus:ring-[#4c8bf5]"
+	                />
 
                 <button className="rounded-md bg-[#4c8bf5] hover:bg-[#3f7ae0] px-2 font-medium text-white transition-colors">
                   {t('actions.invite')}
@@ -135,59 +135,59 @@ export default function ShareModal({ isOpen, onClose, buttonPosition }: ShareMod
               </div>
 
               {/* User Row */}
-              <div className="flex items-center justify-between rounded-xl p-2 hover:bg-[#2a2a2a] transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#333] text-sm text-[#cfcfcf]">
-                    {userInitial}
-                  </div>
+	              <div className="flex items-center justify-between rounded-xl p-2 hover:bg-gray-100 dark:hover:bg-[#2a2a2a] transition-colors">
+	                <div className="flex items-center gap-3">
+	                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 dark:bg-[#333] text-sm text-gray-700 dark:text-[#cfcfcf]">
+	                    {userInitial}
+	                  </div>
 
-                  <div>
-                    <p className="text-[#e4e4e4]">
-                      { userName } <span className="text-[#8a8a8a]">({t('labels.you')})</span>
-                    </p>
-                    <p className="text-xs text-[#8a8a8a]">
-                       { userEmail }
-                    </p>
-                  </div>
-                </div>
+	                  <div>
+	                    <p className="text-gray-900 dark:text-[#e4e4e4]">
+	                      { userName } <span className="text-gray-500 dark:text-[#8a8a8a]">({t('labels.you')})</span>
+	                    </p>
+	                    <p className="text-xs text-gray-500 dark:text-[#8a8a8a]">
+	                       { userEmail }
+	                    </p>
+	                  </div>
+	                </div>
 
-                <button className="text-[#bdbdbd] hover:text-white transition-colors flex items-center gap-1">
-                  {t('labels.fullAccess')} <ChevronDown size={14} />
-                </button>
-              </div>
+	                <button className="text-gray-600 hover:text-gray-900 dark:text-[#bdbdbd] dark:hover:text-white transition-colors flex items-center gap-1">
+	                  {t('labels.fullAccess')} <ChevronDown size={14} />
+	                </button>
+	              </div>
 
               {/* General Access */}
-              <div className="space-y-2">
-                <p className="text-xs text-[#8a8a8a]">{t('labels.generalAccess')}</p>
+	              <div className="space-y-2">
+	                <p className="text-xs text-gray-500 dark:text-[#8a8a8a]">{t('labels.generalAccess')}</p>
 
-                <div className="flex items-center justify-between py-2 cursor-pointer">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#333]">
-                      <Lock size={16} className="text-[#bdbdbd]" />
-                    </div>
+	                <div className="flex items-center justify-between py-2 cursor-pointer">
+	                  <div className="flex items-center gap-2">
+	                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-200 dark:bg-[#333]">
+	                      <Lock size={16} className="text-gray-600 dark:text-[#bdbdbd]" />
+	                    </div>
 
-                    <span>{t('labels.onlyPeopleInvited')}</span>
-                  </div>
+	                    <span>{t('labels.onlyPeopleInvited')}</span>
+	                  </div>
 
-                  <ChevronDown size={14} className="text-[#bdbdbd]" />
-                </div>
-              </div>
+	                  <ChevronDown size={14} className="text-gray-600 dark:text-[#bdbdbd]" />
+	                </div>
+	              </div>
 
-              {/* Bottom */}
-              <div className="flex items-center justify-between pt-3 border-t border-[#2a2a2a]">
-                <button className="flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-[#8a8a8a] hover:text-[#d4d4d4] hover:bg-[#fffff315] transition-colors">
-                  <HelpCircle size={16}/>
-                  {t('actions.learnAboutSharing')}
-                </button>
+	              {/* Bottom */}
+	              <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-[#2a2a2a]">
+	                <button className="flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-[#8a8a8a] dark:hover:text-[#d4d4d4] dark:hover:bg-[#fffff315] transition-colors">
+	                  <HelpCircle size={16}/>
+	                  {t('actions.learnAboutSharing')}
+	                </button>
 
-                <button 
-                  onClick={handleCopyLink}
-                  className="flex items-center gap-2 text-sm text-[#f0efed] font-medium rounded-md border border-[#ffffeb1a] hover:bg-[#fffff315] bg-[#191919] px-2 py-1.5 transition-colors"
-                >
-                  <Link size={16} />
-                  {t('actions.copyLink')}
-                </button>
-              </div>
+	                <button 
+	                  onClick={handleCopyLink}
+	                  className="flex items-center gap-2 text-sm text-gray-900 dark:text-[#f0efed] font-medium rounded-md border border-gray-200 dark:border-[#ffffeb1a] hover:bg-gray-100 dark:hover:bg-[#fffff315] bg-white dark:bg-[#191919] px-2 py-1.5 transition-colors"
+	                >
+	                  <Link size={16} />
+	                  {t('actions.copyLink')}
+	                </button>
+	              </div>
             </div>
           </motion.div>
           {showToast && (
@@ -214,20 +214,20 @@ function Tab({
   active?: boolean
   onClick: () => void
 }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`relative pb-3 mr-6 transition-colors ${
-        active
-          ? 'text-white'
-          : 'text-[#8a8a8a] hover:text-[#d4d4d4]'
-      }`}
-    >
-      {label}
+	  return (
+	    <button
+	      onClick={onClick}
+	      className={`relative pb-3 mr-6 transition-colors ${
+	        active
+	          ? 'text-gray-900 dark:text-white'
+	          : 'text-gray-500 hover:text-gray-900 dark:text-[#8a8a8a] dark:hover:text-[#d4d4d4]'
+	      }`}
+	    >
+	      {label}
 
-      {active && (
-        <span className="absolute bottom-0 left-0 h-[2px] w-full bg-white rounded-full" />
-      )}
-    </button>
-  )
+	      {active && (
+	        <span className="absolute bottom-0 left-0 h-[2px] w-full bg-gray-900 dark:bg-white rounded-full" />
+	      )}
+	    </button>
+	  )
 }

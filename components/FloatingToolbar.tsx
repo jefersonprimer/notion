@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Code, Link2, MessageSquareText, MoreHorizontal, SmilePlus, Underline } from 'lucide-react'
 
 import { SlashMenu } from './SlashMenu'
@@ -26,12 +26,55 @@ export default function FloatingToolbar({ userName, updatedAt }: FloatingToolbar
   const [activeStates, setActiveStates] = useState<Record<string, boolean>>({})
   const [showColorModal, setShowColorModal] = useState(false)
   const [showSlashMenu, setShowSlashMenu] = useState(false)
-  const [showLinkModal, setShowLinkModal] = useState(false)
-  const [showActionModal, setShowActionModal] = useState(false)
-  const [slashMenuPosition, setSlashMenuPosition] = useState<Position | null>(null)
-  const [colorModalPosition, setColorModalPosition] = useState<Position | null>(null)
-  const [savedSelection, setSavedSelection] = useState<Range | null>(null)
-  const toolbarRef = useRef<HTMLDivElement>(null)
+	const [showLinkModal, setShowLinkModal] = useState(false)
+	const [showActionModal, setShowActionModal] = useState(false)
+	const [slashMenuPosition, setSlashMenuPosition] = useState<Position | null>(null)
+	const [colorModalPosition, setColorModalPosition] = useState<Position | null>(null)
+	const [actionModalPosition, setActionModalPosition] = useState<Position | null>(null)
+	const [savedSelection, setSavedSelection] = useState<Range | null>(null)
+	const toolbarRef = useRef<HTMLDivElement>(null)
+  const lastSelectionRectRef = useRef<DOMRect | null>(null)
+
+  const calculateToolbarPosition = ({
+    selectionRect,
+    toolbarWidth,
+    toolbarHeight,
+  }: {
+    selectionRect: DOMRect
+    toolbarWidth: number
+    toolbarHeight: number
+  }): Position => {
+    const toolbarGap = 16
+    const toolbarNudgeX = 120
+    const padding = 8
+
+    const viewportWidth = window.innerWidth
+    const viewportTop = 0
+    const viewportBottom = window.innerHeight
+
+    const halfWidth = toolbarWidth / 2
+
+    let calculatedLeft = selectionRect.left + selectionRect.width / 2 + toolbarNudgeX
+    let calculatedTop = selectionRect.bottom + toolbarGap
+
+    // Clamp horizontally (left is the anchor point because we translateX(-50%))
+    if (calculatedLeft + halfWidth > viewportWidth - padding) {
+      calculatedLeft = viewportWidth - halfWidth - padding
+    }
+    if (calculatedLeft - halfWidth < padding) {
+      calculatedLeft = halfWidth + padding
+    }
+
+    // Flip vertically when there's no room below
+    if (calculatedTop + toolbarHeight > viewportBottom - padding) {
+      calculatedTop = selectionRect.top - toolbarHeight - toolbarGap
+    }
+    if (calculatedTop < viewportTop + padding) {
+      calculatedTop = viewportTop + padding
+    }
+
+    return { top: calculatedTop, left: calculatedLeft }
+  }
 
   const saveCurrentSelection = () => {
     const selection = window.getSelection()
@@ -75,6 +118,7 @@ export default function FloatingToolbar({ userName, updatedAt }: FloatingToolbar
 
       const range = selection.getRangeAt(0)
       const rect = range.getBoundingClientRect()
+      lastSelectionRectRef.current = rect
 
       const anchorElement = selection.anchorNode instanceof Element ? selection.anchorNode : selection.anchorNode?.parentElement
       const focusElement = selection.focusNode instanceof Element ? selection.focusNode : selection.focusNode?.parentElement
@@ -85,36 +129,20 @@ export default function FloatingToolbar({ userName, updatedAt }: FloatingToolbar
         return
       }
 
-      let calculatedLeft = rect.left + window.scrollX + rect.width / 2
-      let calculatedTop = rect.bottom + window.scrollY + 8
-      if (toolbarRef.current) {
-        const toolbarWidth = toolbarRef.current.offsetWidth
-        const toolbarHeight = toolbarRef.current.offsetHeight
-        const halfWidth = toolbarWidth / 2
-        const viewportWidth = window.innerWidth
-        const viewportTop = window.scrollY
-        const viewportBottom = window.scrollY + window.innerHeight
-        const padding = 8
+      // On first render `toolbarRef` might be null, so use a safe estimate
+      // and then refine after mount via `useLayoutEffect`.
+      const estimatedWidth = 200
+      const estimatedHeight = 240
+      const toolbarWidth = toolbarRef.current?.offsetWidth ?? estimatedWidth
+      const toolbarHeight = toolbarRef.current?.offsetHeight ?? estimatedHeight
 
-        if (calculatedLeft + halfWidth > viewportWidth - padding) {
-          calculatedLeft = viewportWidth - halfWidth - padding
-        }
-        if (calculatedLeft - halfWidth < padding) {
-          calculatedLeft = halfWidth + padding
-        }
-
-        if (calculatedTop + toolbarHeight > viewportBottom - padding) {
-          calculatedTop = rect.top + window.scrollY - toolbarHeight - 8
-        }
-        if (calculatedTop < viewportTop + padding) {
-          calculatedTop = viewportTop + padding
-        }
-      }
-
-      setPosition({
-        top: calculatedTop,
-        left: calculatedLeft,
-      })
+      setPosition(
+        calculateToolbarPosition({
+          selectionRect: rect,
+          toolbarWidth,
+          toolbarHeight,
+        })
+      )
 
       updateActiveStates()
       setVisible(true)
@@ -128,6 +156,22 @@ export default function FloatingToolbar({ userName, updatedAt }: FloatingToolbar
       document.removeEventListener('keyup', handleSelection)
     }
   }, [showColorModal, showSlashMenu, showLinkModal, showActionModal])
+
+  useLayoutEffect(() => {
+    if (!visible) return
+    const selectionRect = lastSelectionRectRef.current
+    const el = toolbarRef.current
+    if (!selectionRect || !el) return
+
+    // Recalculate with real rendered size to ensure "flip" works near viewport edges.
+    const next = calculateToolbarPosition({
+      selectionRect,
+      toolbarWidth: el.offsetWidth || 200,
+      toolbarHeight: el.offsetHeight || 240,
+    })
+
+    setPosition((prev) => (prev.top === next.top && prev.left === next.left ? prev : next))
+  }, [visible, showColorModal, showSlashMenu, showLinkModal, showActionModal])
 
   const execInline = (command: string, value?: string) => {
     document.execCommand(command, false, value)
@@ -155,27 +199,28 @@ export default function FloatingToolbar({ userName, updatedAt }: FloatingToolbar
 
   if (!visible) return null
 
-  if (showActionModal) {
-    return (
-      <div
-        ref={toolbarRef}
-        style={{
-          bottom: 20,
-          right: 20,
-        }}
-        className="fixed z-50 floating-toolbar-root"
-      >
-        <ActionModal
-          onClose={() => {
-            setShowActionModal(false)
-            setVisible(false)
-          }}
-          userName={userName}
-          updatedAt={updatedAt}
-        />
-      </div>
-    )
-  }
+	if (showActionModal) {
+	    return (
+	      <div
+	        ref={toolbarRef}
+	        style={{
+	          top: actionModalPosition?.top ?? 20,
+	          left: actionModalPosition?.left ?? 20,
+	        }}
+	        className="fixed z-50 floating-toolbar-root"
+	      >
+	        <ActionModal
+	          onClose={() => {
+	            setShowActionModal(false)
+	            setActionModalPosition(null)
+	            setVisible(false)
+	          }}
+	          userName={userName}
+	          updatedAt={updatedAt}
+	        />
+	      </div>
+	    )
+	  }
 
   return (
     <>
@@ -186,7 +231,7 @@ export default function FloatingToolbar({ userName, updatedAt }: FloatingToolbar
           left: position.left,
           transform: 'translateX(-50%)',
         }}
-        className="absolute z-50 floating-toolbar-root w-[200px] max-h-[70vh] overflow-y-auto rounded-xl border border-[#2f2f2f] bg-[#1f1f1f] p-2 shadow-2xl text-sm text-[#d4d4d4]"
+        className="fixed z-50 floating-toolbar-root w-[200px] max-h-[70vh] overflow-y-auto rounded-xl border border-[#2f2f2f] bg-[#1f1f1f] p-2 shadow-2xl text-sm text-[#d4d4d4]"
       >
       <div className="flex items-center gap-1 pb-2 border-b border-[#2a2a2a]">
         <button
@@ -276,17 +321,29 @@ export default function FloatingToolbar({ userName, updatedAt }: FloatingToolbar
         <button className="px-2 py-1 rounded-md hover:bg-[#2a2a2a] transition-colors flex items-center gap-1">
           <SquareRootSmallIcon size={14} />
         </button>
-        <button
-          onMouseDown={(e) => {
-            e.preventDefault()
-            setShowColorModal(false)
-            setShowLinkModal(false)
-            setShowSlashMenu(false)
-            setShowActionModal((prev) => !prev)
-          }}
-          className={`ml-auto p-1.5 rounded-md transition-colors ${showActionModal ? 'bg-[#2a2a2a] text-white' : 'hover:bg-[#2a2a2a]'}`}
-          aria-label="Mais"
-        >
+	        <button
+	          onMouseDown={(e) => {
+	            e.preventDefault()
+	            setShowColorModal(false)
+	            setShowLinkModal(false)
+	            setShowSlashMenu(false)
+	            const rect = toolbarRef.current?.getBoundingClientRect()
+	            if (rect) {
+	              const padding = 8
+	              const modalWidth = 280
+	              const desiredLeft = rect.right + 8
+	              const hasRoomOnRight = desiredLeft + modalWidth <= window.innerWidth - padding
+
+	              setActionModalPosition({
+	                top: rect.top,
+	                left: hasRoomOnRight ? desiredLeft : Math.max(padding, rect.left - modalWidth - 8),
+	              })
+	            }
+	            setShowActionModal((prev) => !prev)
+	          }}
+	          className={`ml-auto p-1.5 rounded-md transition-colors ${showActionModal ? 'bg-[#2a2a2a] text-white' : 'hover:bg-[#2a2a2a]'}`}
+	          aria-label="Mais"
+	        >
           <MoreHorizontal size={15} />
         </button>
       </div>

@@ -88,9 +88,9 @@ export default function SearchModal({ open, onClose }: Props) {
         onClick={onClose}
       />
 
-      <div className="relative w-full max-w-3xl rounded-xl bg-neutral-900 text-neutral-200 shadow-xl flex flex-col max-h-[327px]">
+      <div className="relative w-full max-w-3xl rounded-xl bg-white text-gray-900 shadow-xl flex flex-col max-h-[327px] dark:bg-neutral-900 dark:text-neutral-200">
         <div className="flex items-center gap-3  px-4 py-3 shrink-0">
-          <span className="text-neutral-400">
+          <span className="text-gray-500 dark:text-neutral-400">
             <Search size={18} />  
           </span>
           <input
@@ -98,12 +98,16 @@ export default function SearchModal({ open, onClose }: Props) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t('searchPlaceholder')}
-            className="w-full bg-transparent text-base outline-none placeholder:text-neutral-500"
+            className="w-full bg-transparent text-base outline-none placeholder:text-gray-400 dark:placeholder:text-neutral-500"
           />
 
           <button 
             onClick={() => setShowFilters(!showFilters)}
-            className={`p-1 rounded-md transition-colors ${showFilters ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:text-white hover:bg-neutral-800'}`}
+            className={`p-1 rounded-md transition-colors ${
+              showFilters
+                ? 'bg-gray-100 text-gray-900 dark:bg-neutral-800 dark:text-white'
+                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-neutral-400 dark:hover:text-white dark:hover:bg-neutral-800'
+            }`}
           >
             <ListFilter size={16}/> 
           </button>
@@ -173,9 +177,9 @@ export default function SearchModal({ open, onClose }: Props) {
 
         <div className="overflow-y-auto px-2 py-2 min-h-[100px]">
              {loading && notes.length === 0 ? (
-                <div className="p-4 text-center text-neutral-500 text-sm">{t('states.loading')}</div>
+                <div className="p-4 text-center text-gray-500 text-sm dark:text-neutral-500">{t('states.loading')}</div>
              ) : notes.length === 0 ? (
-                <div className="p-4 text-center text-neutral-500 text-sm">{t('states.empty')}</div>
+                <div className="p-4 text-center text-gray-500 text-sm dark:text-neutral-500">{t('states.empty')}</div>
              ) : (
                  Object.entries(groupedNotes).map(([dateLabel, groupNotes]) => (
                     <Section key={dateLabel} title={dateLabel}>
@@ -193,33 +197,37 @@ export default function SearchModal({ open, onClose }: Props) {
              )}
         </div>
 
-        <div className="flex items-center justify-between border-t border-neutral-800 px-4 py-2 text-xs text-neutral-500 shrink-0">
+        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-2 text-xs text-gray-500 shrink-0 dark:border-neutral-800 dark:text-neutral-500">
           <span>{t('footer.openInNewTabShortcut')}</span>
           <div className="relative settings-container">
             <button 
               onClick={() => setShowSettings(!showSettings)}
-              className={`p-1 rounded-md transition-colors ${showSettings ? 'bg-neutral-800 text-neutral-200' : 'text-neutral-500 hover:bg-neutral-800 hover:text-neutral-300'}`}
+              className={`p-1 rounded-md transition-colors ${
+                showSettings
+                  ? 'bg-gray-100 text-gray-900 dark:bg-neutral-800 dark:text-neutral-200'
+                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-neutral-300'
+              }`}
             >
               <Settings size={16}/>
             </button>
 
             {showSettings && (
-              <div className="absolute bottom-full right-0 mb-2 w-72 rounded-lg bg-neutral-800 border border-neutral-700 shadow-2xl p-2 z-[60] text-neutral-200">
+              <div className="absolute bottom-full right-0 mb-2 w-72 rounded-lg bg-white border border-gray-200 shadow-2xl p-2 z-[60] text-gray-900 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-200">
                 <div 
-                  className="flex items-center justify-between p-2 hover:bg-neutral-700/50 rounded-md cursor-pointer transition-colors"
+                  className="flex items-center justify-between p-2 hover:bg-gray-100 rounded-md cursor-pointer transition-colors dark:hover:bg-neutral-700/50"
                   onClick={() => setPersistFilters(!persistFilters)}
                 >
                   <span className="text-[13px]">{t('settings.persistFilters')}</span>
-                  <div className={`w-8 h-4.5 rounded-full relative transition-colors duration-200 ${persistFilters ? 'bg-blue-500' : 'bg-neutral-600'}`}>
+                  <div className={`w-8 h-4.5 rounded-full relative transition-colors duration-200 ${persistFilters ? 'bg-blue-500' : 'bg-gray-300 dark:bg-neutral-600'}`}>
                     <div className={`absolute top-0.5 w-3.5 h-3.5 bg-white rounded-full transition-all duration-200 ${persistFilters ? 'right-0.5' : 'left-0.5'}`}></div>
                   </div>
                 </div>
                 <div 
-                  className="flex items-center justify-between p-2 hover:bg-neutral-700/50 rounded-md cursor-pointer transition-colors"
+                  className="flex items-center justify-between p-2 hover:bg-gray-100 rounded-md cursor-pointer transition-colors dark:hover:bg-neutral-700/50"
                   onClick={() => setHideAiSearch(!hideAiSearch)}
                 >
                   <span className="text-[13px]">{t('settings.hideSearchAllSourcesWithAI')}</span>
-                  <div className={`w-8 h-4.5 rounded-full relative transition-colors duration-200 ${hideAiSearch ? 'bg-blue-500' : 'bg-neutral-600'}`}>
+                  <div className={`w-8 h-4.5 rounded-full relative transition-colors duration-200 ${hideAiSearch ? 'bg-blue-500' : 'bg-gray-300 dark:bg-neutral-600'}`}>
                     <div className={`absolute top-0.5 w-3.5 h-3.5 bg-white rounded-full transition-all duration-200 ${hideAiSearch ? 'right-0.5' : 'left-0.5'}`}></div>
                   </div>
                 </div>
@@ -235,7 +243,7 @@ export default function SearchModal({ open, onClose }: Props) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-3">
-      <p className="px-2 py-1 text-xs uppercase text-neutral-500">
+      <p className="px-2 py-1 text-xs uppercase text-gray-500 dark:text-neutral-500">
         {title}
       </p>
       <div className="space-y-1">{children}</div>
@@ -252,10 +260,10 @@ function Item({ title, note, onClick, defaultNoteTitle }: { title: string; note:
   return (
     <div 
         onClick={onClick}
-        className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-neutral-800 cursor-pointer"
+        className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-gray-100 cursor-pointer dark:hover:bg-neutral-800"
     >
       <div className="flex items-center gap-3">
-        <span className="text-neutral-400">
+        <span className="text-gray-500 dark:text-neutral-400">
           {hasContent ? (
             <FileText size={16} />
           ) : (

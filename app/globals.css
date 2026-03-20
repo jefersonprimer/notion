@@ -393,4 +393,31 @@ button {
 .note-editor-content {
   min-height: 200px;
   cursor: text;
+  color: #111827;
+  caret-color: #111827;
+}
+
+.dark .note-editor-content {
+  color: #d4d4d4;
+  caret-color: #fff;
+}
+
+.note-editor-content h1,
+.note-editor-content h2,
+.note-editor-content h3 {
+  color: #111827;
+}
+
+.dark .note-editor-content h1,
+.dark .note-editor-content h2,
+.dark .note-editor-content h3 {
+  color: #e6e5e3;
+}
+
+.note-editor-content strong {
+  color: inherit;
+}
+
+.dark .note-editor-content strong {
+  color: #f0efed;
 }

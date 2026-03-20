@@ -77,10 +77,23 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
   const modalRef = useRef<HTMLDivElement>(null)
   const [showSlashMenu, setShowSlashMenu] = useState(false)
   const [showColorMenu, setShowColorMenu] = useState(false)
+  const [slashMenuSide, setSlashMenuSide] = useState<'left' | 'right'>('right')
+  const [colorMenuSide, setColorMenuSide] = useState<'left' | 'right'>('right')
 
   const formattedDate = updatedAt
     ? formatRelativeDate(new Date(updatedAt))
     : ''
+
+  const getSubmenuSide = (submenuWidth: number) => {
+    const rect = modalRef.current?.getBoundingClientRect()
+    if (!rect) return 'right' as const
+    const padding = 8
+    const gap = 8
+    const roomOnRight = rect.right + gap + submenuWidth <= window.innerWidth - padding
+    if (roomOnRight) return 'right' as const
+    const roomOnLeft = rect.left - gap - submenuWidth >= padding
+    return roomOnLeft ? ('left' as const) : ('right' as const)
+  }
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -94,10 +107,14 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
 
   return (
     <div ref={modalRef} className="relative w-68 rounded-lg border border-zinc-700 bg-[#252525] backdrop-blur-md shadow-2xl px-1 py-2">
-      {/* SlashMenu submenu – positioned to the left */}
+      {/* SlashMenu submenu */}
       {showSlashMenu && (
         <div
-          style={{ position: 'absolute', right: 'calc(100% + 8px)', top: 0 }}
+          style={{
+            position: 'absolute',
+            ...(slashMenuSide === 'right' ? { left: 'calc(100% + 8px)' } : { right: 'calc(100% + 8px)' }),
+            top: 0,
+          }}
           onMouseEnter={() => setShowSlashMenu(true)}
           onMouseLeave={() => setShowSlashMenu(false)}
         >
@@ -123,10 +140,14 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
         </div>
       )}
 
-      {/* ColorModal submenu – positioned to the left */}
+      {/* ColorModal submenu */}
       {showColorMenu && (
         <div
-          style={{ position: 'absolute', right: 'calc(100% + 8px)', top: 0 }}
+          style={{
+            position: 'absolute',
+            ...(colorMenuSide === 'right' ? { left: 'calc(100% + 8px)' } : { right: 'calc(100% + 8px)' }),
+            top: 0,
+          }}
           onMouseEnter={() => setShowColorMenu(true)}
           onMouseLeave={() => setShowColorMenu(false)}
         >
@@ -204,7 +225,11 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
           icon={<Repeat2 size={20} />}
           label={t('actions.transformInto')}
           hasArrow
-          onMouseEnter={() => { setShowSlashMenu(true); setShowColorMenu(false) }}
+          onMouseEnter={() => {
+            setSlashMenuSide(getSubmenuSide(240))
+            setShowSlashMenu(true)
+            setShowColorMenu(false)
+          }}
           onMouseLeave={() => setShowSlashMenu(false)}
         />
 
@@ -212,7 +237,11 @@ export default function ActionModal({ onClose, userName, updatedAt, onTransformS
           icon={<Palette size={18} />}
           label={t('actions.color')}
           hasArrow
-          onMouseEnter={() => { setShowColorMenu(true); setShowSlashMenu(false) }}
+          onMouseEnter={() => {
+            setColorMenuSide(getSubmenuSide(256))
+            setShowColorMenu(true)
+            setShowSlashMenu(false)
+          }}
           onMouseLeave={() => setShowColorMenu(false)}
         />
 

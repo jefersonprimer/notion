@@ -425,13 +425,13 @@ export default function NotePage() {
                 }}
                 onMouseLeave={() => setIsFloatingOpen(false)}
               >
-                <button
-                  onClick={() => setIsSidebarOpen(true)}
-                  className="p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded text-[#e6e5e3] transition-colors"
-                >
-                  <Menu size={22} className="md:group-hover:hidden" />
-                  <ChevronsRight size={20} className="hidden md:group-hover:block" />
-                </button>
+	                <button
+	                  onClick={() => setIsSidebarOpen(true)}
+	                  className="p-1 hover:bg-gray-100 dark:hover:bg-[#2f2f2f] rounded transition-colors"
+	                >
+	                  <Menu size={22} className="md:group-hover:hidden text-gray-700 dark:text-[#f0efed]" />
+	                  <ChevronsRight size={20} className="hidden md:group-hover:block text-gray-700 dark:text-[#e6e5e3]" />
+	                </button>
 
                 {isFloatingOpen && (
                   <div className="absolute top-full left-0 mt-2 w-60 max-h-[80vh] shadow-xl rounded-lg overflow-visible border border-[#2f2f2f] bg-[#202020] animate-in fade-in zoom-in-95 duration-100 origin-top-left">
@@ -444,26 +444,26 @@ export default function NotePage() {
             <div className="flex items-center">
               {parentNote && (
                 <>
-                  <Link
-                    href={`/${createNoteSlug(updatedTitles[parentNote.id] || parentNote.title, parentNote.id)}`}
-                    className="text-sm text-[#ada9a3] hover:text-[#f0efed] truncate max-w-[120px] md:max-w-[200px] hover:bg-[#fffff315] px-2 py-1 rounded-md transition-colors"
-                  >
-                    {updatedTitles[parentNote.id] || parentNote.title || displayDefaultTitle}
-                  </Link>
-                  <ChevronRight size={14} className="text-[#7d7a75]" />
-                </>
-              )}
+	                  <Link
+	                    href={`/${createNoteSlug(updatedTitles[parentNote.id] || parentNote.title, parentNote.id)}`}
+	                    className="text-sm text-gray-500 hover:text-gray-900 truncate max-w-[120px] md:max-w-[200px] hover:bg-gray-100 dark:text-[#ada9a3] dark:hover:text-[#f0efed] dark:hover:bg-[#fffff315] px-2 py-1 rounded-md transition-colors"
+	                  >
+	                    {updatedTitles[parentNote.id] || parentNote.title || displayDefaultTitle}
+	                  </Link>
+	                  <ChevronRight size={14} className="text-gray-400 dark:text-[#7d7a75]" />
+	                </>
+	              )}
 
-              <button className="text-sm text-[#f0efed] font-normal truncate max-w-[150px] md:max-w-[300px] hover:bg-[#fffff315] px-2 py-1 rounded-md">
-                {title.trim() || displayDefaultTitle}
-              </button>
+	              <button className="text-sm text-gray-900 dark:text-[#f0efed] font-normal truncate max-w-[150px] md:max-w-[300px] hover:bg-gray-100 dark:hover:bg-[#fffff315] px-2 py-1 rounded-md">
+	                {title.trim() || displayDefaultTitle}
+	              </button>
 
-              <div className="hidden md:flex relative group/particular">
-                <button className="flex items-center justify-center text-sm font-normal text-[#7d7a75] hover:text-[#f0efed] gap-2 hover:bg-[#202020] px-2 py-1 rounded-md">
-                  <LockKeyhole size={14} />
-                  {t('privacy.private')}
-                  <ChevronDown size={14} />
-                </button>
+	              <div className="hidden md:flex relative group/particular">
+	                <button className="flex items-center justify-center text-sm font-normal text-gray-500 dark:text-[#7d7a75] hover:text-gray-900 dark:hover:text-[#f0efed] gap-2 hover:bg-gray-100 dark:hover:bg-[#202020] px-2 py-1 rounded-md">
+	                  <LockKeyhole size={14} />
+	                  {t('privacy.private')}
+	                  <ChevronDown size={14} />
+	                </button>
                 <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 hidden group-hover/particular:block bg-[#2f2f2f] text-[#f0efed] text-xs p-1 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
                   {t('privacy.onlyYouHaveAccess')} <br />
                   <span className="text-gray-400">{t('privacy.clickToMove')}</span>
@@ -502,26 +502,28 @@ export default function NotePage() {
               />
             </div>
 
-            <div className="relative group/favorite">
-              <button
-                onClick={handleToggleFavorite}
-                className={`p-1.5 hover:bg-gray-100 dark:hover:bg-[#fffff315] rounded-md transition-colors ${isFavorite ? 'text-[#ca984d]' : 'text-[#f0efed]'}`}
-              >
-                <Star size={18} fill={isFavorite ? 'currentColor' : 'none'} />
-              </button>
+	            <div className="relative group/favorite">
+	              <button
+	                onClick={handleToggleFavorite}
+	                className={`p-1.5 hover:bg-gray-100 dark:hover:bg-[#fffff315] rounded-md transition-colors ${isFavorite ? 'text-[#ca984d]' : 'text-gray-700 dark:text-[#f0efed]'}`}
+	              >
+	                <Star size={18} fill={isFavorite ? 'currentColor' : 'none'} />
+	              </button>
 
               <div className="absolute top-full right-[-28] mt-2 hidden group-hover/favorite:block bg-[#2f2f2f] text-[#f0efed] text-xs p-2 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
                 {isFavorite ? t('favorites.removeFromFavorites') : t('favorites.addToFavorites')}
               </div>
             </div>
 
-            <div className="relative group/more">
-              <button
-                onClick={() => setIsOptionsModalOpen(!isOptionsModalOpen)}
-                className={`p-1.5 text-[#f0efed] rounded-md transition-colors ${isOptionsModalOpen ? 'bg-[#fffff315]' : 'hover:bg-gray-100 dark:hover:bg-[#fffff315]'}`}
-              >
-                <MoreHorizontal size={20} />
-              </button>
+	            <div className="relative group/more">
+	              <button
+	                onClick={() => setIsOptionsModalOpen(!isOptionsModalOpen)}
+	                className={`p-1.5 text-gray-700 dark:text-[#f0efed] rounded-md transition-colors ${
+	                  isOptionsModalOpen ? 'bg-gray-100 dark:bg-[#fffff315]' : 'hover:bg-gray-100 dark:hover:bg-[#fffff315]'
+	                }`}
+	              >
+	                <MoreHorizontal size={20} />
+	              </button>
 
               <div className="absolute top-full right-0 mt-2 hidden group-hover/more:block bg-[#2f2f2f] text-[#f0efed] text-xs p-2 rounded-md shadow-xl whitespace-nowrap z-50 border border-[#3f3f3f]">
                 {t('actions.moreOptionsTooltip')}

@@ -76,7 +76,7 @@ export default function MoreOptionsModal({ open, onClose, position }: MoreOption
               }
             }}
             style={style}
-            className={`z-[9999] bg-[#252525] border-[#3f3f3f] shadow-2xl flex flex-col text-[#cfcfcf] text-sm ${
+            className={`z-[9999] bg-white border-gray-200 shadow-2xl flex flex-col text-gray-700 text-sm dark:bg-[#252525] dark:border-[#3f3f3f] dark:text-[#cfcfcf] ${
               isMobile 
                 ? 'fixed inset-x-0 bottom-0 rounded-t-2xl border-t pb-8 p-4' 
                 : 'fixed w-48 border rounded-md p-1 shadow-lg'
@@ -85,26 +85,26 @@ export default function MoreOptionsModal({ open, onClose, position }: MoreOption
             {/* Mobile Handle */}
             {isMobile && (
               <div className="flex justify-center pb-4">
-                <div className="w-10 h-1 rounded-full bg-[#3f3f3f]" />
+                <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-[#3f3f3f]" />
               </div>
             )}
 
-            <button className="flex items-center gap-2 text-left px-2 py-1.5 rounded-md hover:bg-[#3f3f3f] hover:text-white transition-colors w-full">
+            <button className="flex items-center gap-2 text-left px-2 py-1.5 rounded-md hover:bg-gray-100 hover:text-gray-900 transition-colors w-full dark:hover:bg-[#3f3f3f] dark:hover:text-white">
               <FileText size={18}/>
               {t('items.page')}
             </button>
-            <button className="flex items-center gap-2 text-left px-2 py-1.5 rounded-md hover:bg-[#3f3f3f] hover:text-white transition-colors w-full">
+            <button className="flex items-center gap-2 text-left px-2 py-1.5 rounded-md hover:bg-gray-100 hover:text-gray-900 transition-colors w-full dark:hover:bg-[#3f3f3f] dark:hover:text-white">
               <Brain size={18}/>
               {t('items.aiNotes')}
             </button>
-            <button className="flex items-center gap-2 text-left px-2 py-1.5 rounded-md hover:bg-[#3f3f3f] hover:text-white transition-colors w-full">
+            <button className="flex items-center gap-2 text-left px-2 py-1.5 rounded-md hover:bg-gray-100 hover:text-gray-900 transition-colors w-full dark:hover:bg-[#3f3f3f] dark:hover:text-white">
               <Database size={18}/>
               {t('items.database')}
             </button>
 
-            <div className="h-[1px] bg-[#3f3f3f] my-1 mx-2" />
+            <div className="h-[1px] bg-gray-200 my-1 mx-2 dark:bg-[#3f3f3f]" />
             
-            <button className="flex items-center gap-2 text-left px-2 py-1.5 rounded-md hover:bg-[#3f3f3f] hover:text-white transition-colors w-full">
+            <button className="flex items-center gap-2 text-left px-2 py-1.5 rounded-md hover:bg-gray-100 hover:text-gray-900 transition-colors w-full dark:hover:bg-[#3f3f3f] dark:hover:text-white">
               <Component size={18}/>
               {t('items.templates')}
             </button>
