@@ -135,7 +135,7 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
       </div>
         
         <a 
-          href="https://github.com/jefersonprimer/nolio/releases/latest/download/nolio.apk"
+          href="https://drive.google.com/uc?export=download&id=1VIGX7Nhfb1XgIDzq95kcMLfjM3dOKCqp"
           target="_blank"
           rel="noopener noreferrer"
           className="px-2 mx-1 py-1 hover:bg-gray-100 rounded-md flex items-center gap-2 text-sm transition-colors dark:hover:bg-[#2f2f2f]"
