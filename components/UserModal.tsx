@@ -16,7 +16,7 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
   const modalRef = useRef<HTMLDivElement>(null);
   const [isSignOutConfirmOpen, setIsSignOutConfirmOpen] = useState(false);
   const userName = session?.user?.name?.trim() || t('user.fallbackName');
-  const avatarInitial = (userName.trim().charAt(0) || 'N').toUpperCase();
+  const avatarInitial = ('n').toUpperCase();
 
   const handleClose = useCallback(() => {
     setIsSignOutConfirmOpen(false);
@@ -135,7 +135,7 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
       </div>
         
         <a 
-          href="https://drive.google.com/uc?export=download&id=1VIGX7Nhfb1XgIDzq95kcMLfjM3dOKCqp"
+          href="https://github.com/jefersonprimer/nolio/releases/tag/v1.0.0"
           target="_blank"
           rel="noopener noreferrer"
           className="px-2 mx-1 py-1 hover:bg-gray-100 rounded-md flex items-center gap-2 text-sm transition-colors dark:hover:bg-[#2f2f2f]"
@@ -144,7 +144,7 @@ export default function UserModal({ isOpen, onClose, position, onOpenSettings }:
         </a>
 
       {isSignOutConfirmOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 p-4">
           <div className="w-full max-w-80 text-center rounded-xl border border-gray-200 bg-white p-5 text-gray-900 shadow-2xl dark:border-[#3f3f3f] dark:bg-[#202020] dark:text-[#f0efed]">
             <h3 className="text-lg font-semibold">{t('signOutConfirm.title')}</h3>
             <p className="mt-2 text-sm text-gray-600 dark:text-[#ada9a3]">
